@@ -1,0 +1,57 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>Service</h5>
+            <form [formGroup]="productForm" (ngSubmit)="submitProduct()">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-6 md:col-6">
+                        <label htmlFor="firstname2">Service Name</label>
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="name"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                name.invalid &&
+                                (name.dirty || name.touched)
+                            "
+                        >
+                            Service Name is required</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6 md:col-6">
+                        <label htmlFor="lastname2">Price</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="text"
+                            formControlName="price"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                price.invalid &&
+                                (price.dirty || price.touched)
+                            "
+                        >
+                            Price is required</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-4">
+                        <button pButton pRipple label="Submit"></button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<p-toast key="tst"></p-toast>

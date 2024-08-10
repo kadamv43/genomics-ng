@@ -1,0 +1,120 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="flex align-items-center justify-content-between">
+                <div>
+                    <p class="text-xl">
+                        Name - {{ appointmenData?.patient?.first_name }}
+                        {{ appointmenData?.patient?.last_name }}
+                    </p>
+                    <p *ngIf="appointmenData?.doctor" class="text-xl">
+                        Doctor - Dr. {{ appointmenData?.doctor?.first_name }}
+                        {{ appointmenData?.doctor?.last_name }}
+                    </p>
+                    <p *ngIf="!appointmenData?.doctor" class="text-xl">
+                        Doctor - N/A
+                    </p>
+                </div>
+                <div>
+                    <p class="text-xl">
+                        Date -
+                        {{ appointmenData?.created_at | date : "dd-MM-Y" }}
+                    </p>
+                    <p class="text-xl">
+                        OPD - {{ appointmenData?.appointment_number }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <p-table
+                [value]="appointmenData?.services"
+                styleClass="p-datatable-gridlines"
+                [tableStyle]="{ 'min-width': '50rem' }"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>SR NO.</th>
+                        <th>PARTICULARS</th>
+                        <th>AMOUNT</th>
+                        <!-- <th>Quantity</th> -->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product>
+                    <tr>
+                        <td>{{ product.key }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price }}</td>
+                        <!-- <td>4</td> -->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="2" class="text-right">Total</td>
+                        <td>{{ appointmenData?.total | currency : "INR" }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">Paid</td>
+                        <td>
+                            <input
+                                pInputText
+                                id="firstname2"
+                                type="text"
+                                [(ngModel)]="paid"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">Balance</td>
+                        <td>
+                            <input
+                                pInputText
+                                id="firstname2"
+                                type="text"
+                                disabled
+                                [(ngModel)]="balance"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">Payment Mode</td>
+                        <td>
+                            <p-dropdown
+                                [options]="paymentModes"
+                                [(ngModel)]="selectedPaymentMode"
+                                optionLabel="name"
+                                appendTo="body"
+                                optionValue="code"
+                                placeholder="Payment Method"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-right">Recieved By</td>
+                        <td>
+                            <input
+                                pInputText
+                                id="firstname2"
+                                type="text"
+                                [(ngModel)]="received_by"
+                            />
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <button (click)="downloadInvoice()" pButton><i class="pi pi-download"></i> &nbsp;&nbsp;Download</button>
+        </div>
+    </div>
+</div>

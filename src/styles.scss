@@ -12,3 +12,24 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/demo/styles/flags/flags.css";
 @import "assets/demo/styles/badges.scss";
 @import "assets/demo/styles/code.scss";
+
+.overlay ul{
+    list-style: none;
+        padding: 0px;
+        margin: 0px;
+}
+.overlay ul li {
+        margin-bottom: 7px;
+
+}
+
+
+:root {
+        --primary-color: #46baac;
+}
+
+.p-button {
+        color: #ffffff;
+        background: var(--primary-color);
+        border: 1px solid var(--primary-color);
+}

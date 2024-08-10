@@ -1,0 +1,109 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>User</h5>
+            <form [formGroup]="userForm" (ngSubmit)="submitUser()">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-6 md:col-6">
+                        <label htmlFor="firstname2">First name</label>
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="first_name"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                first_name.invalid &&
+                                (first_name.dirty || first_name.touched)
+                            "
+                        >
+                            First name is required</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6 md:col-6">
+                        <label htmlFor="lastname2">Last name</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="text"
+                            formControlName="last_name"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                last_name.invalid &&
+                                (last_name.dirty || last_name.touched)
+                            "
+                        >
+                            Last name is required</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6">
+                        <label htmlFor="lastname2">Email</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="email"
+                            formControlName="email"
+                        />
+                         <small
+                            class="p-error block"
+                            *ngIf="
+                                email.invalid &&
+                                (email.dirty || email.touched) && email.hasError('required')
+                            "
+                        >
+                            email is required</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                email.invalid &&
+                                (email.dirty || email.touched) && email.hasError('email')
+                            "
+                        >
+                            Invalid email</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <label htmlFor="lastname2">Role</label>
+                        <p-dropdown
+                            [options]="roles"
+                            formControlName="role"
+                            optionLabel="name"
+                            optionValue="code"
+                            placeholder="Select a role"
+
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                role.invalid &&
+                                (role.dirty || role.touched)
+                            "
+                        >
+                            role is required</small
+                        >
+                    </div>
+
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-4">
+                        <button pButton pRipple label="Submit"></button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<p-toast key="tst"></p-toast>
