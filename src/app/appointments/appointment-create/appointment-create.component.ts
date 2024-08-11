@@ -216,9 +216,7 @@ export class AppointmentCreateComponent implements OnInit {
                 appointment = this.appointmentForm.get('appointmentInfo').value;
                 appointment.patient_id = patient_id;
                 appointment.services = this.selectedServicesObjects;
-                appointment.patient =
-                    this.selectedPatient ??
-                    this.appointmentForm.get('patientInfo').value;
+                appointment.patient = this.selectedPatient ?? patient_id
                 this.appointmentService.create(appointment).subscribe((res) => {
                     this.toast.add({
                         key: 'tst',

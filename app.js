@@ -11,6 +11,8 @@ function createWindow() {
         icon: path.join(__dirname, `/dist/sakai-ng/assets/layout/images/logo.ico`),
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true,
         },
     });
 
