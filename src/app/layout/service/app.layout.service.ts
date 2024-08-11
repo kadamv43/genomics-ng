@@ -29,7 +29,7 @@ export class LayoutService {
         menuMode: 'static',
         colorScheme: 'light',
         theme: 'lara-light-indigo',
-        scale: 16,
+        scale: 13,
     };
 
     config = signal<AppConfig>(this._config);
@@ -98,7 +98,7 @@ export class LayoutService {
     }
 
     showConfigSidebar() {
-        this.state.configSidebarVisible = false;
+        this.state.configSidebarVisible = true;
     }
 
     isOverlay() {
