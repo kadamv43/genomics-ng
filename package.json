@@ -1,6 +1,8 @@
 {
-    "name": "sakai-ng",
-    "version": "17.0.0",
+    "name": "Genomics",
+    "version": "1.0.0",
+    "author":"Shree Swami Samarth Media Pvt Ltd",
+    "description": "Genomics Admin App",
     "main": "app.js",
     "license": "MIT",
     "scripts": {
@@ -11,13 +13,13 @@
         "lint": "ng lint",
         "e2e": "ng e2e",
         "package": "electron-packager . MyAngularApp --platform=win32 --arch=x64 --out=release --overwrite",
-        "dist": "pnpm run build && electron-builder --win",
+        "dist": "ng build --configuration=production --aot --base-href ./ && electron-builder --win",
         "build:electron": "ng build --configuration=production --aot --base-href ./ && electron-packager ./dist/sakai-ng my-electron-app --platform=win32 --arch=x64 --out=release --overwrite",
         "electron": "ng build --configuration=production --aot --base-href ./ && electron ."
     },
     "build": {
         "appId": "com.example.app",
-        "productName": "My Electron App",
+        "productName": "Genomics Admin",
         "directories": {
             "output": "dist"
         },
@@ -29,7 +31,7 @@
         ],
         "win": {
             "target": "nsis",
-            "icon": "assets/layout/images/logo.ico"
+            "icon": "src/assets/layout/images/logo.ico"
         },
         "nsis": {
             "oneClick": false,
