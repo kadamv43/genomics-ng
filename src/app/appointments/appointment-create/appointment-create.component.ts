@@ -36,7 +36,7 @@ export class AppointmentCreateComponent implements OnInit {
     doctors: any = [];
     filteredItems: any = [];
     selectedPatient;
-    selectedServicesObjects = []
+    selectedServicesObjects = [];
 
     conditions = [
         { name: 'Hypertension', code: 'Hypertension' },
@@ -94,7 +94,7 @@ export class AppointmentCreateComponent implements OnInit {
             }),
             appointmentInfo: this.fb.group({
                 services: ['', Validators.required],
-                doctor: [''],
+                doctor: ['', Validators.required],
                 appointment_date: [new Date(), Validators.required],
                 appointment_time: [new Date(), Validators.required],
                 reason: [''],
@@ -147,6 +147,10 @@ export class AppointmentCreateComponent implements OnInit {
 
     get appointment_time() {
         return this.appointmentForm.get('appointmentInfo.appointment_time');
+    }
+
+    get doctor() {
+        return this.appointmentForm.get('appointmentInfo.doctor');
     }
 
     get age() {
@@ -210,8 +214,8 @@ export class AppointmentCreateComponent implements OnInit {
 
                 let appointment: any = {};
                 appointment = this.appointmentForm.get('appointmentInfo').value;
-                appointment.patient_id = patient_id
-                appointment.services = this.selectedServicesObjects
+                appointment.patient_id = patient_id;
+                appointment.services = this.selectedServicesObjects;
                 appointment.patient =
                     this.selectedPatient ??
                     this.appointmentForm.get('patientInfo').value;
@@ -230,9 +234,8 @@ export class AppointmentCreateComponent implements OnInit {
         }
     }
 
-    onChange(e){
-        this.selectedServicesObjects = e.value
-        console.log(e.value)
-
+    onChange(e) {
+        this.selectedServicesObjects = e.value;
+        console.log(e.value);
     }
 }

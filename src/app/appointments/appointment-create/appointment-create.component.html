@@ -5,12 +5,12 @@
                 <div class="field col-12 p-0">
                     <p-autoComplete
                         class="w-full"
-                        [suggestions]="filteredItems" 
+                        [suggestions]="filteredItems"
                         field="fullname"
                         [minLength]="1"
                         [dropdown]="true"
-                        [(ngModel)]="selectedPatient" 
-                        (completeMethod)="search($event)" 
+                        [(ngModel)]="selectedPatient"
+                        (completeMethod)="search($event)"
                         (onSelect)="onItemSelected($event)"
                         placeholder="Search patients by name or mobile number"
                     >
@@ -240,6 +240,7 @@
                         </div>
                         <div class="field col-12 md:col-4">
                             <label htmlFor="firstname2">Doctor</label>
+                            <span class="required">*</span>
                             <p-dropdown
                                 [options]="doctors"
                                 optionLabel="name"
@@ -247,6 +248,15 @@
                                 formControlName="doctor"
                                 placeholder="Select Doctor"
                             />
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    doctor.invalid &&
+                                    (doctor.dirty || doctor.touched)
+                                "
+                            >
+                                Doctor is required</small
+                            >
                         </div>
                         <div class="field col-8">
                             <label htmlFor="lastname2">Service</label>

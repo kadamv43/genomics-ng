@@ -44,9 +44,4 @@ export class AppointmentService {
         const url = `${this.baseUrl}/search`;
         return this.httpService.get(url, params);
     }
-
-    downloadInvoice(params:HttpParams) {
-        const url = `${this.baseUrl}/generate`;
-        return this.httpService.post(url, params);
-    }
 }

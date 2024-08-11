@@ -53,10 +53,13 @@
                         <!-- <td>4</td> -->
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="footer">
+
+                <ng-template [formGroup]="invoiceForm" pTemplate="footer">
                     <tr>
                         <td colspan="2" class="text-right">Total</td>
-                        <td>{{ appointmenData?.total | currency : "INR" }}</td>
+                        <td>
+                            {{ appointmenData?.total | currency : "INR" }}
+                        </td>
                     </tr>
                     <tr>
                         <td colspan="2" class="text-right">Paid</td>
@@ -65,8 +68,39 @@
                                 pInputText
                                 id="firstname2"
                                 type="text"
-                                [(ngModel)]="paid"
+                                formControlName="paid"
                             />
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    paid.invalid &&
+                                    (paid.dirty || paid.touched) &&
+                                    paid.hasError('required')
+                                "
+                            >
+                                Paid Amount is required</small
+                            >
+                             <small
+                                class="p-error block"
+                                *ngIf="
+                                    paid.invalid &&
+                                    (paid.dirty || paid.touched) &&
+                                    paid.hasError('pattern')
+                                "
+                            >
+                                Paid Amount is invalid</small
+                            >
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    paid.invalid &&
+                                    (paid.dirty || paid.touched) &&
+                                    paid.hasError('max')
+                                "
+                            >
+                                Paid Amount must less than or Equal to
+                                Total</small
+                            >
                         </td>
                     </tr>
                     <tr>
@@ -76,8 +110,8 @@
                                 pInputText
                                 id="firstname2"
                                 type="text"
-                                disabled
-                                [(ngModel)]="balance"
+                                readonly
+                                formControlName="balance"
                             />
                         </td>
                     </tr>
@@ -86,12 +120,22 @@
                         <td>
                             <p-dropdown
                                 [options]="paymentModes"
-                                [(ngModel)]="selectedPaymentMode"
+                                formControlName="payment_mode"
                                 optionLabel="name"
                                 appendTo="body"
                                 optionValue="code"
                                 placeholder="Payment Method"
                             />
+                             <small
+                                class="p-error block"
+                                *ngIf="
+                                    payment_mode.invalid &&
+                                    (payment_mode.dirty || payment_mode.touched) &&
+                                    payment_mode.hasError('required')
+                                "
+                            >
+                                Paid Method is required</small
+                            >
                         </td>
                     </tr>
                     <tr>
@@ -101,8 +145,18 @@
                                 pInputText
                                 id="firstname2"
                                 type="text"
-                                [(ngModel)]="received_by"
+                                formControlName="received_by"
                             />
+                             <small
+                                class="p-error block"
+                                *ngIf="
+                                    received_by.invalid &&
+                                    (received_by.dirty || received_by.touched) &&
+                                    received_by.hasError('required')
+                                "
+                            >
+                                received by is required</small
+                            >
                         </td>
                     </tr>
                 </ng-template>
@@ -114,7 +168,9 @@
 <div class="grid">
     <div class="col-12">
         <div class="card">
-            <button (click)="downloadInvoice()" pButton><i class="pi pi-download"></i> &nbsp;&nbsp;Download</button>
+            <button (click)="downloadInvoice()" pButton>
+                <i class="pi pi-download"></i> &nbsp;&nbsp;Download
+            </button>
         </div>
     </div>
 </div>
