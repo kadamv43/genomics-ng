@@ -17,7 +17,7 @@ function createWindow() {
         },
     });
 
-    require("@electron/remote/main").enable(win.webContents);
+    require("@electron/remote/main").enable(mainWindow.webContents);
 
     mainWindow.loadURL(
         url.format({
@@ -27,7 +27,7 @@ function createWindow() {
         })
     );
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     mainWindow.on("closed", function () {
         mainWindow = null;
