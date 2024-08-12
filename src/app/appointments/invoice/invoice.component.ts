@@ -7,6 +7,12 @@ import { AppointmentService } from 'src/app/services/appointment/appointment.ser
 import { environment } from 'src/environments/environment';
 import { saveAs } from 'file-saver';
 import { DatePipe } from '@angular/common';
+import { dialog, app } from '@electron/remote'; // Correct import
+import * as fs from 'fs';
+import * as path from 'path';
+import { Buffer } from 'buffer'; // Import Buffer
+import { ElectronService } from 'src/app/services/electron.service';
+
 
 @Component({
     selector: 'app-invoice',
@@ -44,7 +50,7 @@ export class InvoiceComponent implements OnInit {
         private appointmentService: AppointmentService,
         private fb: FormBuilder,
         private http: HttpClient,
-        private productService: ProductService
+        private electonService: ElectronService
     ) {
         this.invoiceForm = fb.group({
             paid: [0],
@@ -134,11 +140,13 @@ export class InvoiceComponent implements OnInit {
 
             this.http
                 .post(environment.baseUrl + url, data, { responseType: 'blob' })
-                .subscribe((response: Blob) => {
-                    const blob = new Blob([response], {
-                        type: 'application/pdf',
-                    });
-                    saveAs(blob, 'invoice.pdf');
+                .subscribe(async(response: Blob) => {
+
+                    this.electonService.downloadPdf(response);
+                    // const blob = new Blob([response], {
+                    //     type: 'application/pdf',
+                    // });
+                    // saveAs(blob, 'invoice.pdf');
                 });
         }
     }

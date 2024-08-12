@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require("electron");
+require("@electron/remote/main").initialize();
 const url = require("url");
 const path = require("path");
 
@@ -15,6 +16,8 @@ function createWindow() {
             enableRemoteModule: true,
         },
     });
+
+    require("@electron/remote/main").enable(win.webContents);
 
     mainWindow.loadURL(
         url.format({
