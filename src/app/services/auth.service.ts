@@ -7,11 +7,7 @@ import { Router } from '@angular/router';
 export class AuthService {
     constructor(private router: Router) {}
 
-    // Mock function to check if the user is logged in
     isLoggedIn(): boolean {
-       
-        // Implement actual logic to check if the user is logged in
-        // For example, check if there's a valid JWT token in local storage
         return !!localStorage.getItem('token');
     }
 
@@ -20,8 +16,8 @@ export class AuthService {
         this.router.navigate(['/']);
     }
 
-    getRole(){
-        return localStorage.getItem("role")
+    getRole() {
+        return localStorage.getItem('role');
     }
 
     logout(): void {

@@ -13,6 +13,7 @@ import { ApiService } from 'src/app/services/api.service';
 })
 export class LoginComponent {
     valCheck: string[] = ['remember'];
+    loading = false;
 
     display = false;
 
@@ -42,19 +43,25 @@ export class LoginComponent {
     login() {
         this.loginForm.markAllAsTouched();
         if (this.loginForm.valid) {
+            this.loading = true;
             this.apiService.login(this.loginForm.value).subscribe(
                 (res: any) => {
                     let token = res.token;
+                    localStorage.setItem('token', token);
+                    
                     this.apiService
-                        .getAuthUserDetails(token)
+                        .getAuthUserDetails()
                         .subscribe((res: any) => {
-                            localStorage.setItem('token', token);
-                            localStorage.setItem('role', res.role);
-                            this.router.navigateByUrl('/');
+                             localStorage.setItem('role', res.role);
+                            setTimeout(() => {
+                                this.loading = false;
+                                this.router.navigateByUrl('/');
+                            },2000);
                         });
                 },
                 (err) => {
                     if (err.status == 401) {
+                        this.loading = false;
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Login failed',
@@ -69,7 +76,7 @@ export class LoginComponent {
             );
         }
     }
-    goTo(url){
-        this.router.navigateByUrl(url)
+    goTo(url) {
+        this.router.navigateByUrl(url);
     }
 }

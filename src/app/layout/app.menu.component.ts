@@ -323,6 +323,36 @@ export class AppMenuComponent implements OnInit {
                             routerLink: ['products'],
                         },
                     ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Doctors',
+                            icon: 'pi pi-fw pi-users',
+                            routerLink: ['doctors'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Patients',
+                            icon: 'pi pi-fw pi-users',
+                            routerLink: ['patients'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Invoices',
+                            icon: 'pi pi-fw pi-file',
+                            routerLink: ['invoices'],
+                        },
+                    ],
                 }
             );
         }else if(this.role == "staff" || this.role =="doctor"){

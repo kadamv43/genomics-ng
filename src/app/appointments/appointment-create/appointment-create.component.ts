@@ -98,10 +98,7 @@ export class AppointmentCreateComponent implements OnInit {
                 appointment_date: [new Date(), Validators.required],
                 appointment_time: [new Date(), Validators.required],
                 reason: [''],
-            }),
-            medicalHistoryInfo: this.fb.group({
-                allergies: [''],
-            }),
+            })
         });
     }
     ngOnInit(): void {

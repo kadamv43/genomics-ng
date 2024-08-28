@@ -8,6 +8,11 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { ApiService } from 'src/app/services/api.service';
+import { CommonService } from 'src/app/services/common/common.service';
+import { serialize } from 'v8';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { FileUploadFormComponent } from '../file-upload-form/file-upload-form.component';
 
 interface expandedRows {
     [key: string]: boolean;
@@ -16,7 +21,7 @@ interface expandedRows {
     selector: 'app-appointment-list',
     templateUrl: './appointment-list.component.html',
     styleUrl: './appointment-list.component.scss',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService, MessageService, DialogService],
 })
 export class AppointmentListComponent {
     statusList = [
@@ -26,7 +31,10 @@ export class AppointmentListComponent {
         { name: 'Cancelled', code: 'Cancelled' },
     ];
 
+    display = false;
     selectedStatus = '';
+    selectedDate = '';
+    searchText = '';
     customers1: Customer[] = [];
 
     customers2: Customer[] = [];
@@ -53,22 +61,27 @@ export class AppointmentListComponent {
 
     idFrozen: boolean = false;
 
-    loading: boolean = true;
+    loading: boolean = false;
 
     appointments: any = [];
 
     role = '';
 
-    @ViewChild('filter') filter!: ElementRef;
+    doctors = [];
+
+    minDate;
+
+    ref: DynamicDialogRef | undefined;
 
     constructor(
-        private customerService: CustomerService,
-        private productService: ProductService,
         private appointmentService: AppointmentService,
         private router: Router,
         private authService: AuthService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
+        private api: ApiService,
+        private commonService: CommonService,
+        private dialogService: DialogService
     ) {}
 
     ngOnInit() {
@@ -77,49 +90,12 @@ export class AppointmentListComponent {
             this.appointments = res;
         });
 
-        this.role = this.authService.getRole();
-
-        this.customerService.getCustomersLarge().then((customers) => {
-            this.customers1 = customers;
-            this.loading = false;
-
-            // @ts-ignore
-            this.customers1.forEach(
-                (customer) =>
-                    (customer.date = new Date(customer.date).toString())
-            );
+        this.api.getDoctors().subscribe((res: any) => {
+            this.doctors = res.map((item) => {
+                return { name: item.first_name, code: item._id };
+            });
         });
-        this.customerService
-            .getCustomersMedium()
-            .then((customers) => (this.customers2 = customers));
-        this.customerService
-            .getCustomersLarge()
-            .then((customers) => (this.customers3 = customers));
-        this.productService
-            .getProductsWithOrdersSmall()
-            .then((data) => (this.products = data));
-
-        this.representatives = [
-            { name: 'Amy Elsner', image: 'amyelsner.png' },
-            { name: 'Anna Fali', image: 'annafali.png' },
-            { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-            { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-            { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-            { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-            { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-            { name: 'Onyama Limba', image: 'onyamalimba.png' },
-            { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-            { name: 'XuXue Feng', image: 'xuxuefeng.png' },
-        ];
-
-        this.statuses = [
-            { label: 'Unqualified', value: 'unqualified' },
-            { label: 'Qualified', value: 'qualified' },
-            { label: 'New', value: 'new' },
-            { label: 'Negotiation', value: 'negotiation' },
-            { label: 'Renewal', value: 'renewal' },
-            { label: 'Proposal', value: 'proposal' },
-        ];
+        this.role = this.authService.getRole();
     }
 
     onSort() {
@@ -183,11 +159,6 @@ export class AppointmentListComponent {
         );
     }
 
-    clear(table: Table) {
-        table.clear();
-        this.filter.nativeElement.value = '';
-    }
-
     goTo(url) {
         this.router.navigateByUrl(url);
     }
@@ -221,6 +192,30 @@ export class AppointmentListComponent {
         });
     }
 
+    async clear() {
+        this.selectedStatus = '';
+        this.selectedDate = '';
+        this.searchText = '';
+    }
+
+    filter() {
+        let params = {};
+        if (this.searchText != '') {
+            params['q'] = this.searchText;
+        }
+
+        if (this.selectedStatus != '') {
+            params['status'] = this.selectedStatus;
+        }
+
+        if (this.selectedDate != '') {
+            params['from'] = this.selectedDate[0];
+            params['to'] = this.selectedDate[1];
+        }
+
+        let queryParams = this.commonService.getHttpParamsByJson(params);
+        console.log(queryParams);
+    }
     async updateStatus(id, status) {
         this.appointmentService.update(id, { status }).subscribe((res) => {
             this.messageService.add({
@@ -229,6 +224,15 @@ export class AppointmentListComponent {
                 summary: 'Success Message',
                 detail: 'Status updated successfully',
             });
+        });
+    }
+
+    openDialog(id: string) {
+        this.ref = this.dialogService.open(FileUploadFormComponent, {
+            data: {
+                id
+            },
+            header: 'File Upload',
         });
     }
 }

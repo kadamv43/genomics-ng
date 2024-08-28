@@ -263,55 +263,6 @@
                     </div>
                 </p-panel>
 
-                <p-panel
-                    header="Medical History (Optional)"
-                    [toggleable]="true"
-                    formGroupName="medicalHistoryInfo"
-                    class="line-height-3 m-5"
-                >
-                    <div class="formgroup-inline p-fluid p-formgrid grid">
-                        <div class="field col-3">
-                            <!-- <label htmlFor="lastname2">Condition</label> -->
-                            <p-dropdown
-                                [options]="conditions"
-                                optionLabel="name"
-                                placeholder="Select a condition"
-                            />
-                        </div>
-                        <div class="field col-3">
-                            <!-- <label htmlFor="lastname2">since</label> -->
-                            <p-dropdown
-                                [options]="conditionSince"
-                                optionLabel="name"
-                                placeholder="Select a condition"
-                            />
-                        </div>
-                        <div class="field col-3">
-                            <!-- <label htmlFor="firstname2">Tratment</label> -->
-                            <p-dropdown
-                                [options]="treatment"
-                                optionLabel="name"
-                                placeholder="Select a condition"
-                            />
-                        </div>
-                        <div class="field col-2">
-                            <button
-                                pButton
-                                pRipple
-                                type="button"
-                                icon="pi pi-plus"
-                                class="p-button-rounded"
-                            ></button>
-                        </div>
-                    </div>
-                    <div class="p-fluid p-formgrid grid">
-                        <div class="field col-12">
-                            <label htmlFor="lastname2">Allergies</label>
-                            <p-chips formControlName="allergies"></p-chips>
-                        </div>
-                    </div>
-                </p-panel>
-
                 <div class="grid">
                     <div class="col-12">
                         <button

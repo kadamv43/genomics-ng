@@ -30,6 +30,9 @@ import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
 import { AppointmentEditComponent } from './appointment-edit/appointment-edit.component';
 import { InvoiceComponent } from './invoice/invoice.component';
+import { FileUploadModule } from 'primeng/fileupload';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { FileUploadFormComponent } from './file-upload-form/file-upload-form.component';
 
 
 @NgModule({
@@ -38,12 +41,14 @@ import { InvoiceComponent } from './invoice/invoice.component';
         AppointmentCreateComponent,
         AppointmentEditComponent,
         InvoiceComponent,
+        FileUploadFormComponent
     ],
     imports: [
         CommonModule,
         FormsModule,
         TableModule,
         ToolbarModule,
+        FileUploadModule,
         RatingModule,
         ButtonModule,
         SliderModule,
@@ -69,6 +74,8 @@ import { InvoiceComponent } from './invoice/invoice.component';
         MessageModule,
         MessagesModule,
         ChipsModule,
+        DynamicDialogModule,
+
     ],
 })
 export class AppointmentsModule {}

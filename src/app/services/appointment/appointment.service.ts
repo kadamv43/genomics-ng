@@ -20,14 +20,8 @@ export class AppointmentService {
     }
 
     getAll() {
-        let headers = new HttpHeaders();
-        const token = localStorage.getItem('token');
-        if (token) {
-            headers = headers.set('Authorization', 'Bearer ' + token);
-        }
-
         const url = this.baseUrl;
-        return this.httpService.get(url, undefined, headers);
+        return this.httpService.get(url);
     }
 
     findById(id: string) {

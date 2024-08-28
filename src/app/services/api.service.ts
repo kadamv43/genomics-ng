@@ -12,11 +12,9 @@ export class ApiService {
         private commonService: CommonService
     ) {}
 
-    getAuthUserDetails(token: string) {
+    getAuthUserDetails() {
         const url = 'auth/details';
-        let headers = new HttpHeaders();
-        headers = headers.set('Authorization', `Bearer ${token}`);
-        return this.httpService.get(url, null, headers);
+        return this.httpService.get(url);
     }
     createUser(user) {
         const url = 'users';

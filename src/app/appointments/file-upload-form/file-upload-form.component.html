@@ -1,0 +1,29 @@
+<div class="grid">
+    <div class="col-12">
+        <input
+            [style]="{ width: '100%' }"
+            pInputText
+            type="text"
+            class=""
+            placeholder="file name"
+        />
+    </div>
+    <div class="col-12">
+        <p-fileUpload
+            accept="{{ acceptedFiles }}"
+            name="files"
+            [url]="fileUploadUrl"
+            (onUpload)="onUpload($event)"
+            [multiple]="true"
+        >
+            <ng-template pTemplate="content">
+                <ul *ngIf="uploadedFiles.length">
+                    <li *ngFor="let file of uploadedFiles">
+                        {{ file.name }} - {{ file.size }} bytes
+                    </li>
+                </ul>
+            </ng-template>
+        </p-fileUpload>
+    </div>
+</div>
+<p-toast></p-toast>

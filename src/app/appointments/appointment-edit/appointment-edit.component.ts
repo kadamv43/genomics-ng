@@ -95,9 +95,6 @@ export class AppointmentEditComponent {
                 appointment_time: [new Date(), Validators.required],
                 reason: [''],
             }),
-            medicalHistoryInfo: this.fb.group({
-                allergies: [''],
-            }),
         });
     }
     ngOnInit(): void {
