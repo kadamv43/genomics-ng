@@ -33,6 +33,7 @@ import { InvoiceComponent } from './invoice/invoice.component';
 import { FileUploadModule } from 'primeng/fileupload';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { FileUploadFormComponent } from './file-upload-form/file-upload-form.component';
+import { ChipModule } from 'primeng/chip';
 
 
 @NgModule({
@@ -74,6 +75,7 @@ import { FileUploadFormComponent } from './file-upload-form/file-upload-form.com
         MessageModule,
         MessagesModule,
         ChipsModule,
+        ChipModule,
         DynamicDialogModule,
 
     ],

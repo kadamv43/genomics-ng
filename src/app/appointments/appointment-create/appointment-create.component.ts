@@ -182,7 +182,7 @@ export class AppointmentCreateComponent implements OnInit {
             email: this.selectedPatient.email,
             age: this.selectedPatient.age,
             blood_group: this.selectedPatient.blood_group,
-            dob: new Date(this.selectedPatient.dob),
+            dob: this.selectedPatient.dob ? new Date(this.selectedPatient.dob) : "",
         });
         console.log('Selected item:', this.selectedPatient);
         // Add your logic here, e.g., update other parts of the form, make additional API calls, etc.

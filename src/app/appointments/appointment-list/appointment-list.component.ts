@@ -13,6 +13,7 @@ import { CommonService } from 'src/app/services/common/common.service';
 import { serialize } from 'v8';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { FileUploadFormComponent } from '../file-upload-form/file-upload-form.component';
+import { DatePipe } from '@angular/common';
 
 interface expandedRows {
     [key: string]: boolean;
@@ -21,7 +22,7 @@ interface expandedRows {
     selector: 'app-appointment-list',
     templateUrl: './appointment-list.component.html',
     styleUrl: './appointment-list.component.scss',
-    providers: [ConfirmationService, MessageService, DialogService],
+    providers: [ConfirmationService, MessageService, DialogService, DatePipe],
 })
 export class AppointmentListComponent {
     statusList = [
@@ -71,6 +72,8 @@ export class AppointmentListComponent {
 
     minDate;
 
+    totalRecords = 0;
+
     ref: DynamicDialogRef | undefined;
 
     constructor(
@@ -81,15 +84,11 @@ export class AppointmentListComponent {
         private confirmationService: ConfirmationService,
         private api: ApiService,
         private commonService: CommonService,
-        private dialogService: DialogService
+        private dialogService: DialogService,
+        private datePipe: DatePipe
     ) {}
 
     ngOnInit() {
-        this.appointmentService.getAll().subscribe((res) => {
-            console.log(res);
-            this.appointments = res;
-        });
-
         this.api.getDoctors().subscribe((res: any) => {
             this.doctors = res.map((item) => {
                 return { name: item.first_name, code: item._id };
@@ -98,9 +97,49 @@ export class AppointmentListComponent {
         this.role = this.authService.getRole();
     }
 
+    loadAppointments(event: any) {
+        this.loading = true;
+
+        const page = event.first / event.rows;
+        const size = event.rows;
+
+        let params = {};
+
+        if (this.searchText != '') {
+            params['q'] = this.searchText;
+        }
+
+        if (this.selectedStatus != '') {
+            params['status'] = this.selectedStatus;
+        }
+
+        if (this.selectedDate != '') {
+            params['from'] = this.datePipe.transform(
+                this.selectedDate[0],
+                'yyyy-MM-dd'
+            );
+            params['to'] = this.datePipe.transform(
+                this.selectedDate[1],
+                'yyyy-MM-dd'
+            );
+        }
+
+        params['page'] = page;
+        params['size'] = size;
+
+        let queryParams = this.commonService.getHttpParamsByJson(params);
+        this.appointmentService.getAll(queryParams).subscribe((data: any) => {
+            this.appointments = data.data;
+            this.totalRecords = data.total;
+            this.loading = false;
+        });
+    }
+
     onSort() {
         this.updateRowGroupMetaData();
     }
+
+  
 
     updateRowGroupMetaData() {
         this.rowGroupMetadata = {};
@@ -192,10 +231,11 @@ export class AppointmentListComponent {
         });
     }
 
-    async clear() {
+    async clear(event) {
         this.selectedStatus = '';
         this.selectedDate = '';
         this.searchText = '';
+        this.loadAppointments(event);
     }
 
     filter() {
@@ -209,12 +249,20 @@ export class AppointmentListComponent {
         }
 
         if (this.selectedDate != '') {
-            params['from'] = this.selectedDate[0];
-            params['to'] = this.selectedDate[1];
+            params['from'] = this.datePipe.transform(
+                this.selectedDate[0],
+                'yyyy-MM-dd'
+            );
+            params['to'] = this.datePipe.transform(
+                this.selectedDate[1],
+                'yyyy-MM-dd'
+            );
         }
 
         let queryParams = this.commonService.getHttpParamsByJson(params);
-        console.log(queryParams);
+        this.appointmentService.getAll(queryParams).subscribe((res) => {
+            this.appointments = res;
+        });
     }
     async updateStatus(id, status) {
         this.appointmentService.update(id, { status }).subscribe((res) => {
@@ -230,7 +278,7 @@ export class AppointmentListComponent {
     openDialog(id: string) {
         this.ref = this.dialogService.open(FileUploadFormComponent, {
             data: {
-                id
+                id,
             },
             header: 'File Upload',
         });

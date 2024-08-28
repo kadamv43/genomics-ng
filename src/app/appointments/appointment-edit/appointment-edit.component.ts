@@ -8,6 +8,8 @@ import {
     Validators,
 } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Route, Router } from '@angular/router';
+import { el } from '@fullcalendar/core/internal-common';
+import test from 'node:test';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { lastValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -67,6 +69,12 @@ export class AppointmentEditComponent {
         { name: 'AB-', code: 'AB-' },
     ];
 
+    statusList = [
+        { name: 'Ongoing', code: 'Ongoing' },
+        { name: 'Complete', code: 'Completed' },
+        { name: 'Cancel', code: 'Cancelled' },
+    ];
+
     constructor(
         private fb: FormBuilder,
         private api: ApiService,
@@ -94,6 +102,8 @@ export class AppointmentEditComponent {
                 appointment_date: [new Date(), Validators.required],
                 appointment_time: [new Date(), Validators.required],
                 reason: [''],
+                status: [''],
+                remark: [''],
             }),
         });
     }
@@ -106,8 +116,9 @@ export class AppointmentEditComponent {
 
         this.api.getDoctors().subscribe((res: any) => {
             this.doctors = res.map((item) => {
-                return { name: item.first_name + item.last_name,...item };
+                return { name: item.first_name + item.last_name, ...item };
             });
+            console.log(this.doctors);
         });
 
         this.route.paramMap.subscribe((params: ParamMap) => {
@@ -119,8 +130,10 @@ export class AppointmentEditComponent {
                     appointment_date: new Date(res.appointment_date),
                     appointment_time: new Date(res.appointment_time),
                     services: res?.services,
-                    doctor: res?.doctor?.id,
+                    doctor: res?.doctor?._id,
                     reason: res?.reason,
+                    status: res?.status,
+                    remark: res?.remark,
                 });
 
                 this.appointmentForm.get('patientInfo').patchValue({
@@ -133,6 +146,10 @@ export class AppointmentEditComponent {
                     age: res?.patient?.age,
                     blood_group: res?.patient?.blood_group,
                 });
+
+                if (res?.status == 'Completed' || res?.status == 'Cancelled') {
+                    this.appointmentForm.disable();
+                }
             });
         });
     }
@@ -167,6 +184,14 @@ export class AppointmentEditComponent {
         return this.appointmentForm.get('appointmentInfo.appointment_time');
     }
 
+    get status() {
+        return this.appointmentForm.get('appointmentInfo.status');
+    }
+
+    get remark() {
+        return this.appointmentForm.get('appointmentInfo.remark');
+    }
+
     get age() {
         return this.appointmentForm.get('patientInfo.age');
     }
@@ -188,6 +213,16 @@ export class AppointmentEditComponent {
                 };
             });
         });
+    }
+
+    onChangeStatus() {
+        if (this.status.value == 'Ongoing') {
+            this.remark.clearValidators();
+            this.remark.updateValueAndValidity();
+        } else {
+            this.remark.setValidators([Validators.required]);
+            this.remark.updateValueAndValidity();
+        }
     }
 
     onItemSelected(event: any) {
@@ -232,5 +267,11 @@ export class AppointmentEditComponent {
     onChange(e) {
         this.selectedServicesObjects = e.value;
         console.log(e.value);
+    }
+
+    onClickChips(text) {
+        if (!this.appointmentForm.disabled) {
+            this.remark.setValue(text);
+        }
     }
 }

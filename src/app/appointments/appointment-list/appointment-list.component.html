@@ -20,7 +20,7 @@
                     pRipple
                     label="Export"
                     icon="pi pi-upload"
-                    class="p-button-help"
+                    class="p-button-help secondary"
                     (click)="dt.exportCSV()"
                 ></button>
             </ng-template>
@@ -36,11 +36,14 @@
                 #dt1
                 [value]="appointments"
                 dataKey="id"
-                [rows]="10"
-                [loading]="loading"
                 [rowHover]="true"
+                [lazy]="true"
+                [rows]="10"
+                [totalRecords]="totalRecords"
+                [loading]="loading"
                 styleClass="p-datatable-gridlines"
                 [paginator]="true"
+                (onLazyLoad)="loadAppointments($event)"
                 [globalFilterFields]="[
                     'name',
                     'country.name',
@@ -85,9 +88,10 @@
                         <div class="col-1">
                             <button
                                 pButton
+                                class="primary"
                                 type="button"
                                 label="fiter"
-                                (click)="filter()"
+                                (click)="loadAppointments(dt1)"
                                 icon="pi pi-filter"
                             ></button>
                         </div>
@@ -95,7 +99,8 @@
                             <button
                                 pButton
                                 type="button"
-                                (click)="clear()"
+                                class="p-button-secondary"
+                                (click)="clear(dt1)"
                                 label="Clear"
                                 icon="pi pi-times"
                             ></button>

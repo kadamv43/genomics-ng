@@ -13,11 +13,12 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/demo/styles/badges.scss";
 @import "assets/demo/styles/code.scss";
 
-.overlay ul{
-    list-style: none;
+.overlay ul {
+        list-style: none;
         padding: 0px;
         margin: 0px;
 }
+
 .overlay ul li {
         margin-bottom: 7px;
 
@@ -26,4 +27,15 @@ $gutter: 1rem; //for primeflex grid system
 
 :root {
         --primary-color: #46baac;
+}
+
+.primary {
+        background-color: #46baac;
+        border: #46baac;
+        color: white;
+}
+
+.secondary {
+        background-color: #eb6078;
+        border: #eb6078;
 }
