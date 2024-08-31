@@ -20,6 +20,7 @@ import { ChipsModule } from 'primeng/chips';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
+import { DialogModule } from 'primeng/dialog';
 
 
 @NgModule({
@@ -46,6 +47,7 @@ import { RippleModule } from 'primeng/ripple';
         MessageModule,
         MessagesModule,
         ChipsModule,
+        DialogModule
     ],
 })
 export class PatientsModule {}

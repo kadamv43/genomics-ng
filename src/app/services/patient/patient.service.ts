@@ -14,6 +14,11 @@ export class PatientService {
         return this.httpService.post(url, user);
     }
 
+    importExcel(user) {
+        const url = `${this.baseUrl}/import`;
+        return this.httpService.post(url, user);
+    }
+
     update(id: string, user) {
         const url = `${this.baseUrl}/${id}`;
         return this.httpService.patch(url, user);
@@ -21,7 +26,7 @@ export class PatientService {
 
     getAll(params) {
         const url = this.baseUrl;
-        return this.httpService.get(url,params);
+        return this.httpService.get(url, params);
     }
 
     findById(id: string) {

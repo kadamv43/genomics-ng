@@ -16,6 +16,7 @@ export class PatientListComponent {
     loading = false;
     totalRecords = 0;
     searchText = '';
+    showImportDialog = false;
 
     constructor(
         private patientService: PatientService,
@@ -87,5 +88,14 @@ export class PatientListComponent {
             data,
             fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
         );
+    }
+
+    myUploader(event){
+        const file = event.files[0];
+        const formData: FormData = new FormData();
+        formData.append('file', file, file.name);
+        this.patientService.importExcel(formData).subscribe((res)=>{
+            console.log(res)
+        })
     }
 }
