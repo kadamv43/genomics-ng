@@ -212,15 +212,14 @@ export class InvoiceComponent implements OnInit {
                 };
 
                 this.http
-                    .post(environment.baseUrl + url, data, {
-                        responseType: 'blob',
-                    })
-                    .subscribe(async (response: Blob) => {
-                        // this.electonService.downloadPdf(response);
-                        const blob = new Blob([response], {
-                            type: 'application/pdf',
-                        });
-                        saveAs(blob, 'invoice.pdf');
+                    .post(environment.baseUrl + url, data)
+                    .subscribe(async (res:Blob) => {
+                        this.electonService.downloadPdf(res);
+                        console.log(res)
+                        // const blob = new Blob([response], {
+                        //     type: 'application/pdf',
+                        // });
+                        // saveAs(blob, 'invoice.pdf');
                     });
             });
         }
