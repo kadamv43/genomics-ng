@@ -1,3 +1,5 @@
+<div *ngIf="appointmenData?.status=='Completed'">
+
 <div class="grid">
     <div class="col-12">
         <div class="card">
@@ -196,3 +198,29 @@
         </div>
     </div>
 </div>
+</div>
+
+<div *ngIf="appointmenData?.status=='Cancelled'" class="grid">
+    <div class="col-12">
+        <div class="card">
+            <p class="text-2xl text-red-500	">You can not create invoice for cancelled appointment</p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="appointmenData?.status=='Created'" class="grid">
+    <div class="col-12">
+        <div class="card">
+          <p class="text-2xl text-green-600">Please complete appointment to generate Invoice</p> 
+        </div>
+    </div>
+</div>
+
+<div *ngIf="appointmenData?.status=='Ongoing'" class="grid">
+    <div class="col-12">
+        <div class="card">
+          <p class="text-2xl text-green-600">Please complete appointment to generate Invoice</p> 
+        </div>
+    </div>
+</div>
+<p-toast key="tst"></p-toast>

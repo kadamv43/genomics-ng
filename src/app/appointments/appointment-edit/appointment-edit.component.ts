@@ -116,7 +116,7 @@ export class AppointmentEditComponent {
         });
 
         this.api.getDoctors().subscribe((res: any) => {
-            this.doctors = res.map((item) => {
+            this.doctors = res?.data?.map((item) => {
                 return { name: item.first_name + item.last_name, ...item };
             });
             console.log(this.doctors);

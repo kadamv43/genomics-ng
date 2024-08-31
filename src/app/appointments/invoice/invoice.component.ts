@@ -19,10 +19,12 @@ import * as path from 'path';
 import { Buffer } from 'buffer'; // Import Buffer
 import { ElectronService } from 'src/app/services/electron.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-invoice',
     templateUrl: './invoice.component.html',
+    providers: [MessageService],
     styleUrl: './invoice.component.scss',
 })
 export class InvoiceComponent implements OnInit {
@@ -59,6 +61,7 @@ export class InvoiceComponent implements OnInit {
         private fb: FormBuilder,
         private http: HttpClient,
         private electonService: ElectronService,
+        private toast: MessageService,
         private invoiceService: InvoicesService
     ) {
         this.invoiceForm = fb.group({
@@ -173,6 +176,7 @@ export class InvoiceComponent implements OnInit {
     }
 
     downloadInvoice() {
+       
         this.invoiceForm.markAllAsTouched();
         if (this.invoiceForm.valid) {
             let invoiceData = {

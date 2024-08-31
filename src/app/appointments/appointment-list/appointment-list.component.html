@@ -40,7 +40,6 @@
                 [lazy]="true"
                 [rows]="10"
                 [totalRecords]="totalRecords"
-                [loading]="loading"
                 styleClass="p-datatable-gridlines"
                 [paginator]="true"
                 (onLazyLoad)="loadAppointments($event)"
@@ -245,6 +244,8 @@
                             <p-toast></p-toast>
                             <i (click)="openDialog(customer._id)" class="pi pi-upload text-green-500 mx-2"></i>
                             <i
+                            *ngIf="role!='doctor'"
+
                                 (click)="
                                     goTo(
                                         'appointments/generate-invoice/' +

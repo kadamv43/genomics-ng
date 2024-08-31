@@ -1,5 +1,7 @@
 import { HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+// const { ipcRenderer } = window.require('electron');
+
 
 @Injectable({
     providedIn: 'root',
@@ -15,5 +17,9 @@ export class CommonService {
             }
         }
         return params;
+    }
+
+    downloadFile(url: string) {
+        // ipcRenderer.send('download-file', url);
     }
 }

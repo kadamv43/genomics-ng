@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-reports',
@@ -20,7 +21,10 @@ export class ReportsComponent implements OnInit {
             this.appointmentService
                 .findById(this.id)
                 .subscribe((res: any) =>{
-                  this.documents = res?.files
+                  this.documents = res?.files.map((item)=>{
+                        item.file = environment.baseUrl+item.file
+                        return item
+                  })
                 });
         });
     }

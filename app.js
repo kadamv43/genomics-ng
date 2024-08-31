@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app,ipcMain, BrowserWindow } = require("electron");
 require("@electron/remote/main").initialize();
 const url = require("url");
 const path = require("path");
@@ -42,4 +42,9 @@ app.on("window-all-closed", function () {
 
 app.on("activate", function () {
     if (mainWindow === null) createWindow();
+});
+
+ipcMain.on("download-file", (event, url) => {
+    const win = BrowserWindow.getFocusedWindow();
+    win.webContents.downloadURL(url);
 });

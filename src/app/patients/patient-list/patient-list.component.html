@@ -15,7 +15,7 @@
 
                 <ng-template pTemplate="right">
                     <!-- <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload> -->
-                    <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="exportExcel()"></button>
+                    <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help secondary" (click)="exportExcel()"></button>
                 </ng-template>
             </p-toolbar>
     </div>
@@ -31,7 +31,6 @@
                 [lazy]="true"
                 [rows]="10"
                 [totalRecords]="totalRecords"
-                [loading]="loading"
                 [rowHover]="true"
                 styleClass="p-datatable-gridlines"
                 [paginator]="true"
