@@ -86,6 +86,7 @@ export class PatientEditComponent {
                 dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
+                reference_by:['']
             }),
             medicalHistoryInfo: this.fb.group({
                 allergies: [''],
@@ -109,6 +110,7 @@ export class PatientEditComponent {
                     dob: res?.dob ? new Date(res?.dob) : '',
                     age: res?.age,
                     blood_group: res?.blood_group,
+                    reference_by: res?.reference_by,
                 });
 
                 this.patientForm.get('medicalHistoryInfo').patchValue({

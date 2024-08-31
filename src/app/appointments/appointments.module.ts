@@ -34,6 +34,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { FileUploadFormComponent } from './file-upload-form/file-upload-form.component';
 import { ChipModule } from 'primeng/chip';
+import { ReportsComponent } from './reports/reports.component';
 
 
 @NgModule({
@@ -42,7 +43,8 @@ import { ChipModule } from 'primeng/chip';
         AppointmentCreateComponent,
         AppointmentEditComponent,
         InvoiceComponent,
-        FileUploadFormComponent
+        FileUploadFormComponent,
+        ReportsComponent
     ],
     imports: [
         CommonModule,

@@ -93,6 +93,7 @@ export class PatientCreateComponent {
                 dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
+                reference_by:[]
             }),
             medicalHistoryInfo: this.fb.group({
                 allergies: [''],

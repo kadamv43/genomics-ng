@@ -118,7 +118,7 @@
                             >
                         </div>
 
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-3">
                             <label htmlFor="lastname2">DOB</label>
                             <p-calendar
                                 formControlName="dob"
@@ -130,7 +130,7 @@
                             ></p-calendar>
                         </div>
 
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-3">
                             <label htmlFor="lastname2">Age</label>
                             <input
                                 pInputText
@@ -150,7 +150,7 @@
                             >
                         </div>
 
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-3">
                             <label htmlFor="lastname2">Blood Group</label>
                             <p-dropdown
                                 [options]="bloodGroups"
@@ -158,6 +158,15 @@
                                 optionValue="code"
                                 formControlName="blood_group"
                                 placeholder="Select Blood Group"
+                            />
+                        </div>
+                        <div class="field col-12 md:col-3">
+                            <label htmlFor="lastname2">Reference By</label>
+                            <input
+                                pInputText
+                                id="lastname2"
+                                type="text"
+                                formControlName="reference_by"
                             />
                         </div>
                     </div>

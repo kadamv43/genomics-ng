@@ -45,20 +45,39 @@
                         <!-- <th>Quantity</th> -->
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-product>
+                <ng-template  pTemplate="body" let-product>
                     <tr>
                         <td>{{ product.key }}</td>
                         <td>{{ product.name }}</td>
                         <td>{{ product.price }}</td>
                         <!-- <td>4</td> -->
                     </tr>
+                   
                 </ng-template>
+               
 
                 <ng-template [formGroup]="invoiceForm" pTemplate="footer">
                     <tr>
                         <td colspan="2" class="text-right">Total</td>
                         <td>
                             {{ appointmenData?.total | currency : "INR" }}
+                        </td>
+                    </tr>
+                    <tr *ngIf="role == 'admin'">
+                        <td colspan="2" class="text-right">Discount</td>
+                        <td>
+                            <input
+                                pInputText
+                                id="firstname2"
+                                type="text"
+                                formControlName="discount"
+                            />
+                        </td>
+                    </tr>
+                    <tr *ngIf="discount.value > 0">
+                        <td colspan="2" class="text-right">New Total</td>
+                        <td>
+                            {{ new_total | currency : "INR" }}
                         </td>
                     </tr>
                     <tr>
@@ -80,7 +99,7 @@
                             >
                                 Paid Amount is required</small
                             >
-                             <small
+                            <small
                                 class="p-error block"
                                 *ngIf="
                                     paid.invalid &&
@@ -103,6 +122,7 @@
                             >
                         </td>
                     </tr>
+
                     <tr>
                         <td colspan="2" class="text-right">Balance</td>
                         <td>
@@ -126,11 +146,12 @@
                                 optionValue="code"
                                 placeholder="Payment Method"
                             />
-                             <small
+                            <small
                                 class="p-error block"
                                 *ngIf="
                                     payment_mode.invalid &&
-                                    (payment_mode.dirty || payment_mode.touched) &&
+                                    (payment_mode.dirty ||
+                                        payment_mode.touched) &&
                                     payment_mode.hasError('required')
                                 "
                             >
@@ -147,11 +168,12 @@
                                 type="text"
                                 formControlName="received_by"
                             />
-                             <small
+                            <small
                                 class="p-error block"
                                 *ngIf="
                                     received_by.invalid &&
-                                    (received_by.dirty || received_by.touched) &&
+                                    (received_by.dirty ||
+                                        received_by.touched) &&
                                     received_by.hasError('required')
                                 "
                             >

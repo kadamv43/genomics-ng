@@ -95,6 +95,7 @@ export class AppointmentEditComponent {
                 dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
+                reference_by: [''],
             }),
             appointmentInfo: this.fb.group({
                 services: ['', Validators.required],
@@ -145,6 +146,7 @@ export class AppointmentEditComponent {
                     dob: res?.patient?.dob ? new Date(res?.patient?.dob) : '',
                     age: res?.patient?.age,
                     blood_group: res?.patient?.blood_group,
+                    reference_by: res?.patient?.reference_by,
                 });
 
                 if (res?.status == 'Completed' || res?.status == 'Cancelled') {

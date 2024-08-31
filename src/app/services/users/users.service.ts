@@ -5,8 +5,8 @@ import { HttpParams } from '@angular/common/http';
 @Injectable({
     providedIn: 'root',
 })
-export class InvoicesService {
-    baseUrl = 'invoice';
+export class UsersService {
+    baseUrl = 'users';
     constructor(private httpService: HttpService) {}
 
     create(user) {
@@ -19,9 +19,9 @@ export class InvoicesService {
         return this.httpService.patch(url, user);
     }
 
-    getAll(params:any) {
+    getAll(params) {
         const url = this.baseUrl;
-        return this.httpService.get(url,params);
+        return this.httpService.get(url, params);
     }
 
     findById(id: string) {
@@ -37,5 +37,10 @@ export class InvoicesService {
     searchBy(params: HttpParams) {
         const url = `${this.baseUrl}/search`;
         return this.httpService.get(url, params);
+    }
+
+    globalSearch(query) {
+        const url = `${this.baseUrl}/global-search/?q=${query}`;
+        return this.httpService.get(url);
     }
 }

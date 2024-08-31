@@ -19,9 +19,9 @@ export class DoctorsService {
         return this.httpService.patch(url, user);
     }
 
-    getAll() {
+    getAll(params) {
         const url = this.baseUrl;
-        return this.httpService.get(url);
+        return this.httpService.get(url,params);
     }
 
     findById(id: string) {

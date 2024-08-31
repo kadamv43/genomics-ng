@@ -18,11 +18,20 @@ export class FileUploadFormComponent implements OnInit {
 
     ngOnInit() {
         console.log('~ this.dialogConfig.data:', this.dialogConfig.data);
-        this.fileUploadUrl = this.fileUploadUrl +'/'+ this.dialogConfig.data.id;
+        this.fileUploadUrl =
+            this.fileUploadUrl + '/' + this.dialogConfig.data.id;
     }
 
+    file_name = '';
     acceptedFiles: string = '.pdf, .jpg, .png';
     uploadedFiles: any[] = [];
+
+    onBeforeUpload(event) {
+        if(this.file_name==""){
+            return
+        }
+        event.formData.append('file_name', this.file_name);
+    }
 
     onUpload(event: any) {
         for (const file of event.files) {

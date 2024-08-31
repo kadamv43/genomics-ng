@@ -81,7 +81,7 @@ export class DoctorEditComponent {
                 first_name: ['', Validators.required],
                 last_name: ['', Validators.required],
                 mobile: [
-                    { value: '', disabled: true },
+                    { value: '' },
                     [Validators.required, this.mobileNumberValidator],
                 ],
                 email: ['', Validators.email],

@@ -4,6 +4,7 @@
             [style]="{ width: '100%' }"
             pInputText
             type="text"
+            [(ngModel)]="file_name"
             class=""
             placeholder="file name"
         />
@@ -13,6 +14,7 @@
             accept="{{ acceptedFiles }}"
             name="files"
             [url]="fileUploadUrl"
+            (onBeforeUpload)="onBeforeUpload($event)"
             (onUpload)="onUpload($event)"
             [multiple]="true"
         >

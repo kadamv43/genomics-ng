@@ -9,10 +9,6 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ApiService } from 'src/app/services/api.service';
 
-interface Role {
-    name: string;
-    code: string;
-}
 
 @Component({
     selector: 'app-user-edit',
@@ -23,11 +19,6 @@ interface Role {
 export class UserEditComponent implements OnInit {
     userForm: FormGroup;
     id: string;
-
-    roles: Role[] = [
-        { name: 'Staff', code: 'staff' },
-        { name: 'Doctor', code: 'doctor' },
-    ];
 
     constructor(
         private fb: FormBuilder,
@@ -40,7 +31,6 @@ export class UserEditComponent implements OnInit {
             first_name: ['', Validators.required],
             last_name: ['', Validators.required],
             email: ['', [Validators.email, Validators.required]],
-            role: ['', Validators.required],
         });
     }
     ngOnInit(): void {
@@ -51,8 +41,7 @@ export class UserEditComponent implements OnInit {
                 this.userForm.patchValue({
                     first_name: res.first_name,
                     last_name: res.last_name,
-                    email: res.email,
-                    role: res.role,
+                    email: res.email
                 });
             });
         });
@@ -67,9 +56,6 @@ export class UserEditComponent implements OnInit {
     get email() {
         return this.userForm.get('email');
     }
-    get role() {
-        return this.userForm.get('role');
-    }
 
     submitUser() {
         this.userForm.markAllAsTouched();
@@ -81,7 +67,7 @@ export class UserEditComponent implements OnInit {
                     key: 'tst',
                     severity: 'success',
                     summary: 'Success Message',
-                    detail: 'User updated successfully',
+                    detail: 'Staff updated successfully',
                 });
                 setTimeout(() => {
                     this.router.navigateByUrl('users');

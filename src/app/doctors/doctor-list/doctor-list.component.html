@@ -14,8 +14,9 @@
                 </ng-template>
 
                 <ng-template pTemplate="right">
-                    <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload>
-                    <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
+                    <!-- <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload> -->
+                    <button pButton pRipple label="Excel" icon="pi pi-download" class="p-button-help mr-2 inline-block" (click)="exportExcel()"></button>
+                    <!-- <button pButton pRipple label="PDF" icon="pi pi-download" class="p-button-info" (click)="dt1.exportCSV()"></button> -->
                 </ng-template>
             </p-toolbar>
     </div>
@@ -30,10 +31,13 @@
                 [value]="doctors"
                 dataKey="id"
                 [rows]="10"
+                [lazy]="true"
+                [totalRecords]="totalRecords"
                 [loading]="loading"
                 [rowHover]="true"
                 styleClass="p-datatable-gridlines"
                 [paginator]="true"
+                (onLazyLoad)="loadDoctors($event)"
                 [globalFilterFields]="[
                     'name',
                     'country.name',
@@ -54,7 +58,7 @@
                                 pInputText
                                 type="text"
                                 #filter
-                                (input)="onGlobalFilter(dt1, $event)"
+                                (input)="search(dt1,$event)"
                                 placeholder="Search Keyword"
                                 class="w-full"
                             />
@@ -131,13 +135,13 @@
                 </ng-template>
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="8">No customers found.</td>
+                        <td colspan="8">No Doctors found.</td>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="loadingbody">
                     <tr>
                         <td colspan="8">
-                            Loading customers data. Please wait.
+                            Loading Doctor data. Please wait.
                         </td>
                     </tr>
                 </ng-template>
