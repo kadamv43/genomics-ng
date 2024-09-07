@@ -12,6 +12,7 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/demo/styles/flags/flags.css";
 @import "assets/demo/styles/badges.scss";
 @import "assets/demo/styles/code.scss";
+@import "../node_modules/quill/dist/quill.snow.css";
 
 .overlay ul {
         list-style: none;

@@ -1,0 +1,178 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>Contact Details</h5>
+            <form [formGroup]="contactForm" (ngSubmit)="submitUser()">
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-6 md:col-6">
+                        <label htmlFor="firstname2">Mobile Numbers</label>
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="mobile_numbers"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                mobile_numbers.invalid &&
+                                (mobile_numbers.dirty || mobile_numbers.touched)
+                            "
+                        >
+                            Mobile is required</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6 md:col-6">
+                        <label htmlFor="lastname2">Email</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="text"
+                            formControlName="email"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                email.invalid &&
+                                (email.dirty || email.touched)
+                            "
+                        >
+                            Email is required</small
+                        >
+                         <small
+                            class="p-error block"
+                            *ngIf="
+                                email.invalid &&
+                                (email.dirty || email.touched) && email.hasError('email')
+                            "
+                        >
+                            Invalid email</small
+                        >
+                    </div>
+                </div>
+                <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6">
+                        <label htmlFor="lastname2">Address</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="text"
+                            formControlName="address"
+                        />
+                         <small
+                            class="p-error block"
+                            *ngIf="
+                                address.invalid &&
+                                (address.dirty || address.touched) && address.hasError('required')
+                            "
+                        >
+                            address is required</small
+                        >
+                       
+                    </div>
+                </div>
+
+                  <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6">
+                        <label htmlFor="lastname2">facebook Link</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="email"
+                            formControlName="facebook_link"
+                        />
+                         <small
+                            class="p-error block"
+                            *ngIf="
+                                facebook_link.invalid &&
+                                (facebook_link.dirty || facebook_link.touched) && facebook_link.hasError('required')
+                            "
+                        >
+                            facebook_link is required</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                facebook_link.invalid &&
+                                (facebook_link.dirty || facebook_link.touched) && facebook_link.hasError('invalidUrl')
+                            "
+                        >
+                            Invalid facebook_link</small
+                        >
+                    </div>
+                </div>
+
+                  <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6">
+                        <label htmlFor="lastname2">Youtube Link</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="email"
+                            formControlName="youtube_link"
+                        />
+                         <small
+                            class="p-error block"
+                            *ngIf="
+                                youtube_link.invalid &&
+                                (youtube_link.dirty || youtube_link.touched) && youtube_link.hasError('required')
+                            "
+                        >
+                            youtube_link is required</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                youtube_link.invalid &&
+                                (youtube_link.dirty || youtube_link.touched) && youtube_link.hasError('invalidUrl')
+                            "
+                        >
+                            Invalid youtube_link</small
+                        >
+                    </div>
+                </div>
+
+                  <div class="p-fluid p-formgrid grid">
+                     <div class="field col-6">
+                        <label htmlFor="lastname2">Instagram Link</label>
+                        <input
+                            pInputText
+                            id="lastname2"
+                            type="email"
+                            formControlName="instagram_link"
+                        />
+                         <small
+                            class="p-error block"
+                            *ngIf="
+                                instagram_link.invalid &&
+                                (instagram_link.dirty || instagram_link.touched) && instagram_link.hasError('required')
+                            "
+                        >
+                            instagram_link is required</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                instagram_link.invalid &&
+                                (instagram_link.dirty || instagram_link.touched) && instagram_link.hasError('invalidUrl')
+                            "
+                        >
+                            Invalid instagram_link</small
+                        >
+                    </div>
+                </div>
+               
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-4">
+                        <button pButton pRipple label="Submit"></button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+<p-toast key="tst"></p-toast>

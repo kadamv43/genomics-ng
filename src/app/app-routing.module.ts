@@ -69,6 +69,22 @@ import { AuthGuard } from './auth.guard';
                                 ),
                         },
                         {
+                            path: 'contact-details',
+                            canActivate: [AuthGuard],
+                            loadChildren: () =>
+                                import(
+                                    './contact-details/contact-details.module'
+                                ).then((m) => m.ContactDetailsModule),
+                        },
+                        {
+                            path: 'blogs',
+                            canActivate: [AuthGuard],
+                            loadChildren: () =>
+                                import(
+                                    './blog/blog.module'
+                                ).then((m) => m.BlogModule),
+                        },
+                        {
                             path: 'utilities',
                             loadChildren: () =>
                                 import(
