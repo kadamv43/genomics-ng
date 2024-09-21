@@ -31,7 +31,10 @@
                             pInputText
                             id="lastname2"
                             type="file"
+                             accept="image/*"
                             formControlName="image"
+                            (change)="onFileSelected($event)"
+
                         />
                         <small
                             class="p-error block"
@@ -41,6 +44,15 @@
                         >
                             Image is required</small
                         >
+                    </div>
+                </div>
+                 <div class="col-12">
+                    <div class="banner-image">
+                        <img
+                            *ngIf="imagePreview"
+                            class=""
+                            [src]="imagePreview"
+                        />
                     </div>
                 </div>
 

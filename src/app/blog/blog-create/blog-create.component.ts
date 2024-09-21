@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { BlogsService } from 'src/app/services/blogs/blogs.service';
+import { environment } from 'src/environments/environment';
 
 interface City {
     name: string;
@@ -18,6 +19,9 @@ interface City {
 })
 export class BlogCreateComponent {
     blogForm: FormGroup;
+    imageBasePath = environment.uploadPath;
+    selectedFile: File | null = null;
+    imagePreview: string | ArrayBuffer | null = null;
 
     constructor(
         private blogService: BlogsService,
@@ -52,12 +56,26 @@ export class BlogCreateComponent {
         return this.blogForm.get('description');
     }
 
+    onFileSelected(event: any): void {
+        this.selectedFile = event.target.files[0];
+        if (this.selectedFile) {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                this.imagePreview = reader.result;
+            };
+
+            // Read the image file as a data URL
+            reader.readAsDataURL(this.selectedFile);
+        }
+    }
+
     async submit() {
         this.blogForm.markAllAsTouched();
         if (this.blogForm.valid) {
             const formData = new FormData();
             formData.append('title', this.blogForm.get('title')?.value);
-            formData.append('image', this.blogForm.get('image')?.value);
+            formData.append('image',this.selectedFile,this.selectedFile.name);
             formData.append(
                 'description',
                 this.blogForm.get('description')?.value

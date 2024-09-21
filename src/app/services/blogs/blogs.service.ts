@@ -11,12 +11,12 @@ export class BlogsService {
 
     create(user) {
         const url = this.baseUrl;
-        return this.httpService.post(url, user);
+        return this.httpService.postWithFormData(url, user);
     }
 
     update(id: string, user) {
         const url = `${this.baseUrl}/${id}`;
-        return this.httpService.patch(url, user);
+        return this.httpService.patchWithFormData(url, user);
     }
 
     getAll(params) {
