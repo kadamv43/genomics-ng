@@ -9,7 +9,6 @@ export class HttpService {
     constructor(private http: HttpClient) {}
 
     get(url: string, params?: HttpParams, headers?: HttpHeaders) {
-
         return this.http.get(environment.baseUrl + url, {
             headers,
             params,
@@ -20,7 +19,19 @@ export class HttpService {
         return this.http.post(environment.baseUrl + url, body);
     }
 
+    postWithFormData(url: string, body: any) {
+        return this.http.post(environment.baseUrl + url, body, {
+            headers: new HttpHeaders({
+                enctype: 'multipart/form-data',
+            }),
+        });
+    }
+
     patch(url: string, body: any) {
+        return this.http.patch(environment.baseUrl + url, body);
+    }
+
+    patchWithFormData(url: string, body: any) {
         return this.http.patch(environment.baseUrl + url, body);
     }
 

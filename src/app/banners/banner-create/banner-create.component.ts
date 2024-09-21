@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { BannerService } from 'src/app/services/banner/banner.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-banner-create',
@@ -12,6 +13,9 @@ import { BannerService } from 'src/app/services/banner/banner.service';
 })
 export class BannerCreateComponent {
     bannerForm: FormGroup;
+    imageBasePath = environment.uploadPath;
+    selectedFile: File | null = null;
+    imagePreview: string | ArrayBuffer | null = null;
 
     constructor(
         private bannerService: BannerService,
@@ -42,12 +46,26 @@ export class BannerCreateComponent {
         return this.bannerForm.get('status');
     }
 
+    onFileSelected(event: any): void {
+        this.selectedFile = event.target.files[0];
+        if (this.selectedFile) {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                this.imagePreview = reader.result;
+            };
+
+            // Read the image file as a data URL
+            reader.readAsDataURL(this.selectedFile);
+        }
+    }
+
     async submit() {
         this.bannerForm.markAllAsTouched();
         if (this.bannerForm.valid) {
             const formData = new FormData();
             formData.append('title', this.bannerForm.get('title')?.value);
-            formData.append('image', this.bannerForm.get('image')?.value);
+            formData.append('image', this.selectedFile, this.selectedFile.name);
             formData.append('status', this.bannerForm.get('status')?.value);
             this.bannerService.create(formData).subscribe((res) => {
                 this.toast.add({

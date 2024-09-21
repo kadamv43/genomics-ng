@@ -31,7 +31,9 @@
                             pInputText
                             id="lastname2"
                             type="file"
+                            (change)="onFileSelected($event)"
                             formControlName="image"
+                            accept="image/*"
                         />
                         <small
                             class="p-error block"
@@ -41,25 +43,36 @@
                         >
                             Image is required</small
                         >
+                        
                     </div>
                 </div>
 
+                <div class="col-12">
+                    <div class="banner-image">
+                        <img
+                            *ngIf="imagePreview"
+                            class=""
+                            [src]="imagePreview"
+                        />
+                    </div>
+                </div>
 
                 <div class="p-fluid p-formgrid grid">
                     <div class="field col-12 md:col-6">
                         <label htmlFor="title">Status</label>
                         <span class="required">*</span>
-                         <p-dropdown
-                                [options]="statusList"
-                                optionLabel="name"
-                                optionValue="code"
-                                formControlName="status"
-                                placeholder="Select Status"
-                            />
+                        <p-dropdown
+                            [options]="statusList"
+                            optionLabel="name"
+                            optionValue="code"
+                            formControlName="status"
+                            placeholder="Select Status"
+                        />
                         <small
                             class="p-error block"
                             *ngIf="
-                                status.invalid && (status.dirty || status.touched)
+                                status.invalid &&
+                                (status.dirty || status.touched)
                             "
                         >
                             status is required</small
