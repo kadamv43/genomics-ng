@@ -1,34 +1,25 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { Customer, Representative } from 'src/app/demo/api/customer';
-import { CustomerService } from 'src/app/demo/service/customer.service';
 import { Product } from 'src/app/demo/api/product';
-import { ProductService } from 'src/app/demo/service/product.service';
 import { Table } from 'primeng/table';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
-import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ApiService } from 'src/app/services/api.service';
 import { CommonService } from 'src/app/services/common/common.service';
-import { serialize } from 'v8';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DatePipe } from '@angular/common';
 import { FileUploadFormComponent } from 'src/app/appointments/file-upload-form/file-upload-form.component';
-import { BlogsService } from 'src/app/services/blogs/blogs.service';
 import * as FileSaver from 'file-saver';
-import { title } from 'process';
-
-interface expandedRows {
-    [key: string]: boolean;
-}
+import { GalleryService } from 'src/app/services/gallery/gallery.service';
 
 @Component({
-    selector: 'app-blog-list',
-    templateUrl: './blog-list.component.html',
-    styleUrl: './blog-list.component.scss',
+    selector: 'app-gallery-list',
+    templateUrl: './gallery-list.component.html',
+    styleUrl: './gallery-list.component.scss',
     providers: [MessageService, ConfirmationService, DialogService, DatePipe],
 })
-export class BlogListComponent {
+export class GalleryListComponent {
     statusList = [
         { name: 'Created', code: 'Created' },
         { name: 'Ongoing', code: 'Ongoing' },
@@ -58,8 +49,6 @@ export class BlogListComponent {
 
     rowGroupMetadata: any;
 
-    expandedRows: expandedRows = {};
-
     activityValues: number[] = [0, 100];
 
     isExpanded: boolean = false;
@@ -81,7 +70,7 @@ export class BlogListComponent {
     ref: DynamicDialogRef | undefined;
 
     constructor(
-        private blogService: BlogsService,
+        private galleryService: GalleryService,
         private router: Router,
         private authService: AuthService,
         private messageService: MessageService,
@@ -127,7 +116,7 @@ export class BlogListComponent {
         params['size'] = size;
 
         let queryParams = this.commonService.getHttpParamsByJson(params);
-        this.blogService.getAll(queryParams).subscribe((data: any) => {
+        this.galleryService.getAll(queryParams).subscribe((data: any) => {
             this.appointments = data.data;
             this.totalRecords = data.total;
             this.loading = false;
@@ -168,19 +157,6 @@ export class BlogListComponent {
         }
     }
 
-    expandAll() {
-        if (!this.isExpanded) {
-            this.products.forEach((product) =>
-                product && product.name
-                    ? (this.expandedRows[product.name] = true)
-                    : ''
-            );
-        } else {
-            this.expandedRows = {};
-        }
-        this.isExpanded = !this.isExpanded;
-    }
-
     formatCurrency(value: number) {
         return value.toLocaleString('en-US', {
             style: 'currency',
@@ -206,7 +182,7 @@ export class BlogListComponent {
             message: 'Are you sure that you want to proceed?',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.blogService.delete(user._id).subscribe((res) => {
+                this.galleryService.delete(user._id).subscribe((res) => {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Deleted',
@@ -257,12 +233,12 @@ export class BlogListComponent {
         }
 
         let queryParams = this.commonService.getHttpParamsByJson(params);
-        this.blogService.getAll(queryParams).subscribe((res) => {
+        this.galleryService.getAll(queryParams).subscribe((res) => {
             this.appointments = res;
         });
     }
     async updateStatus(id, status) {
-        this.blogService.update(id, { status }).subscribe((res) => {
+        this.galleryService.update(id, { status }).subscribe((res) => {
             this.messageService.add({
                 // key: 'tst',
                 severity: 'success',

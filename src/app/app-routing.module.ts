@@ -80,9 +80,25 @@ import { AuthGuard } from './auth.guard';
                             path: 'blogs',
                             canActivate: [AuthGuard],
                             loadChildren: () =>
-                                import(
-                                    './blog/blog.module'
-                                ).then((m) => m.BlogModule),
+                                import('./blog/blog.module').then(
+                                    (m) => m.BlogModule
+                                ),
+                        },
+                        {
+                            path: 'gallery',
+                            canActivate: [AuthGuard],
+                            loadChildren: () =>
+                                import('./gallery/gallery.module').then(
+                                    (m) => m.GalleryModule
+                                ),
+                        },
+                        {
+                            path: 'banners',
+                            canActivate: [AuthGuard],
+                            loadChildren: () =>
+                                import('./banners/banners.module').then(
+                                    (m) => m.BannersModule
+                                ),
                         },
                         {
                             path: 'utilities',

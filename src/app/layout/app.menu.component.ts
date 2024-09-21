@@ -164,12 +164,12 @@ export class AppMenuComponent implements OnInit {
                              {
                                  label: 'Banners',
                                  icon: 'pi pi-fw pi-image',
-                                 routerLink: ['/auth/login'],
+                                 routerLink: ['banners'],
                              },
                              {
                                  label: 'Gallery',
                                  icon: 'pi pi-fw pi-image',
-                                 routerLink: ['/auth/error'],
+                                 routerLink: ['gallery'],
                              },
                              {
                                  label: 'Blog',
