@@ -1,225 +1,288 @@
-<div *ngIf="appointmenData?.status=='Completed'">
+<div *ngIf="appointmenData?.status == 'Completed'">
+    <div class="grid">
+        <div class="col-12">
+            <div class="card">
+                <div class="flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-xl">
+                            Name - {{ appointmenData?.patient?.first_name }}
+                            {{ appointmenData?.patient?.last_name }}
+                        </p>
+                        <p *ngIf="appointmenData?.doctor" class="text-xl">
+                            Doctor - Dr.
+                            {{ appointmenData?.doctor?.first_name }}
+                            {{ appointmenData?.doctor?.last_name }}
+                        </p>
+                        <p *ngIf="!appointmenData?.doctor" class="text-xl">
+                            Doctor - N/A
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xl">
+                            Date -
+                            {{ appointmenData?.created_at | date : "dd-MM-Y" }}
+                        </p>
+                        <p class="text-xl">
+                            OPD - {{ appointmenData?.appointment_number }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="grid">
-    <div class="col-12">
-        <div class="card">
-            <div class="flex align-items-center justify-content-between">
-                <div>
-                    <p class="text-xl">
-                        Name - {{ appointmenData?.patient?.first_name }}
-                        {{ appointmenData?.patient?.last_name }}
-                    </p>
-                    <p *ngIf="appointmenData?.doctor" class="text-xl">
-                        Doctor - Dr. {{ appointmenData?.doctor?.first_name }}
-                        {{ appointmenData?.doctor?.last_name }}
-                    </p>
-                    <p *ngIf="!appointmenData?.doctor" class="text-xl">
-                        Doctor - N/A
-                    </p>
+    <div class="grid">
+        <div class="col-3">
+            <button class="secondary" pButton (click)="addItem()" type="button">
+                Add Extra Items
+            </button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12">
+            <div [formGroup]="extraForm" class="card">
+                <div class="grid border-bottom">
+                    <div class="col-3 text-xl">SR NO.</div>
+                    <div class="col-3 text-xl">PARTICULARS</div>
+                    <div class="col-3 text-xl">AMOUNT</div>
                 </div>
-                <div>
-                    <p class="text-xl">
-                        Date -
-                        {{ appointmenData?.created_at | date : "dd-MM-Y" }}
-                    </p>
-                    <p class="text-xl">
-                        OPD - {{ appointmenData?.appointment_number }}
-                    </p>
+                <div
+                    class="grid mt-2"
+                    *ngFor="let item of appointmenData?.services"
+                >
+                    <div class="col-3">
+                        {{ item?.key }}
+                    </div>
+                    <div class="col-3">
+                        {{ item?.name }}
+                    </div>
+                    <div class="col-3">
+                        {{ item?.price }}
+                    </div>
                 </div>
+                <div class="" formArrayName="extras">
+                    <div
+                        class="grid mt-2"
+                        *ngFor="let item of extras.controls; let i = index"
+                        [formGroupName]="i"
+                    >
+                        <div class="col-3"></div>
+
+                        <div class="col-3">
+                            <input
+                                pInputText
+                                formControlName="name"
+                                type="text"
+                            />
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    item.get('name').invalid &&
+                                    (item.get('name').dirty ||
+                                        item.get('name').touched) &&
+                                    item.get('name').hasError('required')
+                                "
+                            >
+                                Particular is required</small
+                            >
+                        </div>
+
+                        <div class="col-3">
+                            <input
+                                pInputText
+                                formControlName="price"
+                                (change)="onPrice($event)"
+                                type="text"
+                            />
+
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    item.get('price').invalid &&
+                                    (item.get('price').dirty ||
+                                        item.get('price').touched) &&
+                                    item.get('price').hasError('required')
+                                "
+                            >
+                                Price is required</small
+                            >
+                        </div>
+
+                        <div class="col-3">
+                            <button
+                                pButton
+                                pRipple
+                                (click)="removeItem(i)"
+                                type="button"
+                                icon="pi pi-minus"
+                                class="p-button-danger p-button-rounded"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div [formGroup]="invoiceForm">
+                <div class="grid mt-2">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <label class="text-right font-bold">Total</label>
+                    </div>
+
+                    <div class="col-3">
+                        {{ appointmenData?.total | currency : "INR" }}
+                    </div>
+                </div>
+
+                <div *ngIf="role == 'admin'" class="grid mt-2">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <label class="font-bold">Discount</label>
+                    </div>
+                    <div class="col-3">
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="discount"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid mt-2" *ngIf="discount.value > 0">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <label>New Total</label>
+                    </div>
+                    <div class="col-3">
+                        {{ new_total | currency : "INR" }}
+                    </div>
+                </div>
+
+                <div class="grid mt-2">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <label>Paid</label>
+                    </div>
+                    <div class="col-3">
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="paid"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                paid.invalid &&
+                                (paid.dirty || paid.touched) &&
+                                paid.hasError('required')
+                            "
+                        >
+                            Paid Amount is required</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                paid.invalid &&
+                                (paid.dirty || paid.touched) &&
+                                paid.hasError('pattern')
+                            "
+                        >
+                            Paid Amount is invalid</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                paid.invalid &&
+                                (paid.dirty || paid.touched) &&
+                                paid.hasError('max')
+                            "
+                        >
+                            Paid Amount must less than or Equal to Total</small
+                        >
+                    </div>
+                </div>
+
+                <div class="grid mt-2">
+                    <div class="col-3"></div>
+                    <div class="col-3">Balance</div>
+                    <div class="col-3">
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            readonly
+                            formControlName="balance"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid mt-2">
+                    <div class="col-3"></div>
+                    <div class="col-3">Payment Mode</div>
+                    <div class="col-3">
+                        <p-dropdown
+                            [options]="paymentModes"
+                            formControlName="payment_mode"
+                            optionLabel="name"
+                            appendTo="body"
+                            optionValue="code"
+                            placeholder="Payment Method"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                payment_mode.invalid &&
+                                (payment_mode.dirty || payment_mode.touched) &&
+                                payment_mode.hasError('required')
+                            "
+                        >
+                            Paid Method is required</small
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12">
+            <div class="card">
+                <button class="primary" (click)="downloadInvoice()" pButton>
+                    <i class="pi pi-download"></i> &nbsp;&nbsp;Download
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="grid">
+<div *ngIf="appointmenData?.status == 'Cancelled'" class="grid">
     <div class="col-12">
         <div class="card">
-            <p-table
-                [value]="appointmenData?.services"
-                styleClass="p-datatable-gridlines"
-                [tableStyle]="{ 'min-width': '50rem' }"
-            >
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>SR NO.</th>
-                        <th>PARTICULARS</th>
-                        <th>AMOUNT</th>
-                        <!-- <th>Quantity</th> -->
-                    </tr>
-                </ng-template>
-                <ng-template  pTemplate="body" let-product>
-                    <tr>
-                        <td>{{ product.key }}</td>
-                        <td>{{ product.name }}</td>
-                        <td>{{ product.price }}</td>
-                        <!-- <td>4</td> -->
-                    </tr>
-                   
-                </ng-template>
-               
-
-                <ng-template [formGroup]="invoiceForm" pTemplate="footer">
-                    <tr>
-                        <td colspan="2" class="text-right">Total</td>
-                        <td>
-                            {{ appointmenData?.total | currency : "INR" }}
-                        </td>
-                    </tr>
-                    <tr *ngIf="role == 'admin'">
-                        <td colspan="2" class="text-right">Discount</td>
-                        <td>
-                            <input
-                                pInputText
-                                id="firstname2"
-                                type="text"
-                                formControlName="discount"
-                            />
-                        </td>
-                    </tr>
-                    <tr *ngIf="discount.value > 0">
-                        <td colspan="2" class="text-right">New Total</td>
-                        <td>
-                            {{ new_total | currency : "INR" }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-right">Paid</td>
-                        <td>
-                            <input
-                                pInputText
-                                id="firstname2"
-                                type="text"
-                                formControlName="paid"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    paid.invalid &&
-                                    (paid.dirty || paid.touched) &&
-                                    paid.hasError('required')
-                                "
-                            >
-                                Paid Amount is required</small
-                            >
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    paid.invalid &&
-                                    (paid.dirty || paid.touched) &&
-                                    paid.hasError('pattern')
-                                "
-                            >
-                                Paid Amount is invalid</small
-                            >
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    paid.invalid &&
-                                    (paid.dirty || paid.touched) &&
-                                    paid.hasError('max')
-                                "
-                            >
-                                Paid Amount must less than or Equal to
-                                Total</small
-                            >
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td colspan="2" class="text-right">Balance</td>
-                        <td>
-                            <input
-                                pInputText
-                                id="firstname2"
-                                type="text"
-                                readonly
-                                formControlName="balance"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-right">Payment Mode</td>
-                        <td>
-                            <p-dropdown
-                                [options]="paymentModes"
-                                formControlName="payment_mode"
-                                optionLabel="name"
-                                appendTo="body"
-                                optionValue="code"
-                                placeholder="Payment Method"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    payment_mode.invalid &&
-                                    (payment_mode.dirty ||
-                                        payment_mode.touched) &&
-                                    payment_mode.hasError('required')
-                                "
-                            >
-                                Paid Method is required</small
-                            >
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-right">Recieved By</td>
-                        <td>
-                            <input
-                                pInputText
-                                id="firstname2"
-                                type="text"
-                                formControlName="received_by"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    received_by.invalid &&
-                                    (received_by.dirty ||
-                                        received_by.touched) &&
-                                    received_by.hasError('required')
-                                "
-                            >
-                                received by is required</small
-                            >
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
+            <p class="text-2xl text-red-500">
+                You can not create invoice for cancelled appointment
+            </p>
         </div>
     </div>
 </div>
 
-<div class="grid">
+<div *ngIf="appointmenData?.status == 'Created'" class="grid">
     <div class="col-12">
         <div class="card">
-            <button class="primary" (click)="downloadInvoice()" pButton>
-                <i class="pi pi-download"></i> &nbsp;&nbsp;Download
-            </button>
-        </div>
-    </div>
-</div>
-</div>
-
-<div *ngIf="appointmenData?.status=='Cancelled'" class="grid">
-    <div class="col-12">
-        <div class="card">
-            <p class="text-2xl text-red-500	">You can not create invoice for cancelled appointment</p>
+            <p class="text-2xl text-green-600">
+                Please complete appointment to generate Invoice
+            </p>
         </div>
     </div>
 </div>
 
-<div *ngIf="appointmenData?.status=='Created'" class="grid">
+<div *ngIf="appointmenData?.status == 'Ongoing'" class="grid">
     <div class="col-12">
         <div class="card">
-          <p class="text-2xl text-green-600">Please complete appointment to generate Invoice</p> 
-        </div>
-    </div>
-</div>
-
-<div *ngIf="appointmenData?.status=='Ongoing'" class="grid">
-    <div class="col-12">
-        <div class="card">
-          <p class="text-2xl text-green-600">Please complete appointment to generate Invoice</p> 
+            <p class="text-2xl text-green-600">
+                Please complete appointment to generate Invoice
+            </p>
         </div>
     </div>
 </div>

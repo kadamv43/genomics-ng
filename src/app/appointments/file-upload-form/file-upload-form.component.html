@@ -1,5 +1,5 @@
 <div class="grid">
-    <div class="col-12">
+    <div *ngIf="fileNameInput" class="col-12">
         <input
             [style]="{ width: '100%' }"
             pInputText
@@ -13,9 +13,10 @@
         <p-fileUpload
             accept="{{ acceptedFiles }}"
             name="files"
-            [url]="fileUploadUrl"
+            [auto]="false" 
+            [customUpload]="true" 
             (onBeforeUpload)="onBeforeUpload($event)"
-            (onUpload)="onUpload($event)"
+            (uploadHandler)="onUpload($event)" 
             [multiple]="true"
         >
             <ng-template pTemplate="content">

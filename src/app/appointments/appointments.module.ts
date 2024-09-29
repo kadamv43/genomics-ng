@@ -79,7 +79,6 @@ import { ReportsComponent } from './reports/reports.component';
         ChipsModule,
         ChipModule,
         DynamicDialogModule,
-
     ],
 })
 export class AppointmentsModule {}

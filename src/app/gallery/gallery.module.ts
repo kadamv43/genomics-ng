@@ -7,29 +7,35 @@ import { GalleryCreateComponent } from './gallery-create/gallery-create.componen
 import { GalleryEditComponent } from './gallery-edit/gallery-edit.component';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TableModule } from 'primeng/table';
+
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { DropdownModule } from 'primeng/dropdown';
+import { GalleryImagesComponent } from './gallery-images/gallery-images.component';
+import { MessagesModule } from 'primeng/messages';
 
 
 @NgModule({
-  declarations: [
-    GalleryListComponent,
-    GalleryCreateComponent,
-    GalleryEditComponent
-  ],
-  imports: [
-    CommonModule,
-    ToolbarModule,
-    TableModule,
-    ButtonModule,
-    InputTextModule,
-    ReactiveFormsModule,
-    GalleryRoutingModule,
-    ToastModule,
-    DropdownModule
-  ]
+    declarations: [
+        GalleryListComponent,
+        GalleryCreateComponent,
+        GalleryEditComponent,
+        GalleryImagesComponent,
+    ],
+    imports: [
+        CommonModule,
+        ToolbarModule,
+        TableModule,
+        ButtonModule,
+        InputTextModule,
+        ReactiveFormsModule,
+        GalleryRoutingModule,
+        ToastModule,
+        MessagesModule,
+        MessagesModule,
+        DropdownModule,
+    ],
 })
-export class GalleryModule { }
+export class GalleryModule {}

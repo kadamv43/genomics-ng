@@ -33,6 +33,7 @@ export class InvoiceComponent implements OnInit {
     appointmenData: any = [];
     total = 0;
     invoiceForm: FormGroup;
+    extraForm: FormGroup;
     new_total = 0;
     role = '';
 
@@ -43,18 +44,9 @@ export class InvoiceComponent implements OnInit {
         { name: 'UPI', code: 'UPI' },
     ];
 
-    products = [
-        {
-            id: '1',
-            name: 'Endoscopy',
-            price: 4000,
-        },
-        {
-            id: '2',
-            name: 'Ultrasonography',
-            price: 4000,
-        },
-    ];
+    extraPrice = 0;
+
+    products = [];
     constructor(
         private route: ActivatedRoute,
         private appointmentService: AppointmentService,
@@ -70,9 +62,30 @@ export class InvoiceComponent implements OnInit {
             received_by: ['', Validators.required],
             payment_mode: ['', Validators.required],
             discount: [0],
-            extras: this.fb.array([this.createItem()]),
         });
+
+        this.extraForm = fb.group({
+            extras: this.fb.array([]),
+        });
+
         this.onChanges();
+    }
+
+    private subscribeToFormArrayChanges(): void {
+        this.extras.valueChanges.subscribe((values) => {
+            this.extraPrice = 0;
+            values.forEach((element) => {
+                this.extraPrice += Number(element.price);
+            });
+            let existingTotal = this.appointmenData.total;
+
+            this.appointmenData.total = existingTotal + this.extraPrice;
+            console.log('FormArray values changed:', this.extraPrice);
+        });
+    }
+
+    onPrice(evt){
+        this.appointmenData.total + this.extraPrice
     }
 
     setMaxValidation(maxValue: number): void {
@@ -127,7 +140,7 @@ export class InvoiceComponent implements OnInit {
     }
 
     get extras(): FormArray {
-        return this.invoiceForm.get('extras') as FormArray;
+        return this.extraForm.get('extras') as FormArray;
     }
 
     ngOnInit(): void {
@@ -159,24 +172,40 @@ export class InvoiceComponent implements OnInit {
     }
 
     addItem(): void {
-        this.extras.push(this.createItem());
+        console.log('ss');
+        const control = this.createItem();
+        this.extras.push(control);
+        this.subscribeToFormArrayChanges();
+
+        // this.subscribeToControlChanges(control);
     }
 
     createItem(): FormGroup {
         return this.fb.group({
-            name: [''],
-            price: [''],
+            name: ['', [Validators.required]],
+            price: [0, [Validators.required, Validators.pattern(/^\d+$/)]],
         });
     }
 
     removeItem(index: number): void {
-        if (this.extras.length > 1) {
-            this.extras.removeAt(index);
-        }
+        // if (this.extras.length > 1) {
+        this.extras.removeAt(index);
+        // }
+    }
+
+    addExtra() {
+        let length = this.appointmenData.services.length;
+        console.log(this.appointmenData.services);
+        this.appointmenData.services.push({
+            key: length + 1,
+            name: '',
+            price: '',
+        });
     }
 
     downloadInvoice() {
-       
+        this.extraForm.markAllAsTouched();
+        console.log(this.extraForm.value);
         this.invoiceForm.markAllAsTouched();
         if (this.invoiceForm.valid) {
             let invoiceData = {
@@ -213,9 +242,9 @@ export class InvoiceComponent implements OnInit {
 
                 this.http
                     .post(environment.baseUrl + url, data)
-                    .subscribe(async (res:Blob) => {
+                    .subscribe(async (res: Blob) => {
                         this.electonService.downloadPdf(res);
-                        console.log(res)
+                        console.log(res);
                         // const blob = new Blob([response], {
                         //     type: 'application/pdf',
                         // });

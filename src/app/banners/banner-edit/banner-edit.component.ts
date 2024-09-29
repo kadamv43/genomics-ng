@@ -20,6 +20,7 @@ export class BannerEditComponent {
     selectedFile: File | null = null;
     imagePreview: string | ArrayBuffer | null = null;
 
+
     constructor(
         private bannerService: BannerService,
         private toast: MessageService,

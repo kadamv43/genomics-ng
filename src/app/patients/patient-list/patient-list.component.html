@@ -69,6 +69,14 @@
                             <div
                                 class="flex justify-content-between align-items-center"
                             >
+                                Patient Number
+                                <!-- <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter> -->
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
                                 First Name
                                 <!-- <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter> -->
                             </div>
@@ -118,6 +126,9 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
                     <tr>
+                        <td>
+                            {{ product.patient_number }}
+                        </td>
                         <td>
                             {{ product.first_name }}
                         </td>

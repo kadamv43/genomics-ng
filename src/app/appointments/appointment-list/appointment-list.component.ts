@@ -279,6 +279,9 @@ export class AppointmentListComponent {
         this.ref = this.dialogService.open(FileUploadFormComponent, {
             data: {
                 id,
+                fileNameInput: false,
+                fileTypes: '.png,.jpg,.jpeg,.JPEG,.pdf',
+                fileUploadUrl: 'appointments/upload-files/' + id,
             },
             header: 'File Upload',
         });
