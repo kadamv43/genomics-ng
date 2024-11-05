@@ -1,5 +1,5 @@
 <div *ngIf="appointmenData?.status == 'Completed'">
-    <div class="grid">
+    <div  class="grid">
         <div class="col-12">
             <div class="card">
                 <div class="flex align-items-center justify-content-between">
@@ -92,7 +92,6 @@
                             <input
                                 pInputText
                                 formControlName="price"
-                                (change)="onPrice($event)"
                                 type="text"
                             />
 
@@ -218,6 +217,29 @@
                     </div>
                 </div>
 
+                 <div class="grid mt-2">
+                    <div class="col-3"></div>
+                    <div class="col-3">Received By</div>
+                    <div class="col-3">
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="received_by"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                received_by.invalid &&
+                                (received_by.dirty || received_by.touched) &&
+                                received_by.hasError('required')
+                            "
+                        >
+                            Received By is required</small
+                        >
+                    </div>
+                </div>
+
                 <div class="grid mt-2">
                     <div class="col-3"></div>
                     <div class="col-3">Payment Mode</div>
@@ -249,8 +271,8 @@
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <button class="primary" (click)="downloadInvoice()" pButton>
-                    <i class="pi pi-download"></i> &nbsp;&nbsp;Download
+                <button class="primary" (click)="saveAndPreview()" pButton>
+                    <i class="pi pi-download"></i> &nbsp;&nbsp;Save and Preview
                 </button>
             </div>
         </div>

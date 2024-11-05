@@ -43,7 +43,7 @@ export class FileUploadFormComponent implements OnInit {
         event.formData.append('file_name', this.file_name);
     }
 
-    onUpload(event: any) {
+    async onUpload(event: any) {
         console.log('ee');
         console.log(event);
         // Access the uploaded file from the event
@@ -57,18 +57,22 @@ export class FileUploadFormComponent implements OnInit {
             formData.append('files', file);
         });
 
-        lastValueFrom(this.http.postWithFormData(this.fileUploadUrl, formData));
+        await lastValueFrom(this.http.postWithFormData(this.fileUploadUrl, formData))
+
 
         this.messageService.add({
             severity: 'success',
             summary: 'Success',
             detail: 'File Uploaded',
-        });
+        })
 
         this.dialogService.dialogComponentRefMap.forEach((dialog) => {
             dialog.destroy()
         });
         
-        // location.reload()
+        setTimeout(() => {
+             location.reload();
+        }, 2000);
+        //
     }
 }

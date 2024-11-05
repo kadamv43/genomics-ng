@@ -59,6 +59,9 @@ importers:
       file-saver:
         specifier: ^2.0.5
         version: 2.0.5
+      html2canvas:
+        specifier: ^1.4.1
+        version: 1.4.1
       jspdf:
         specifier: ^2.5.1
         version: 2.5.1
@@ -7092,8 +7095,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  base64-arraybuffer@1.0.2:
-    optional: true
+  base64-arraybuffer@1.0.2: {}
 
   base64-js@1.5.1: {}
 
@@ -7512,7 +7514,6 @@ snapshots:
   css-line-break@2.1.0:
     dependencies:
       utrie: 1.0.2
-    optional: true
 
   css-loader@6.10.0(webpack@5.90.3(esbuild@0.20.1)):
     dependencies:
@@ -8319,7 +8320,6 @@ snapshots:
     dependencies:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
-    optional: true
 
   htmlparser2@8.0.2:
     dependencies:
@@ -10111,7 +10111,6 @@ snapshots:
   text-segmentation@1.0.3:
     dependencies:
       utrie: 1.0.2
-    optional: true
 
   thunky@1.1.0: {}
 
@@ -10223,7 +10222,6 @@ snapshots:
   utrie@1.0.2:
     dependencies:
       base64-arraybuffer: 1.0.2
-    optional: true
 
   uuid@8.3.2: {}
 

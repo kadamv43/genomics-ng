@@ -1,5 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import {
     FormArray,
     FormBuilder,
@@ -7,7 +13,9 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import jsPDF from 'jspdf';
+
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { environment } from 'src/environments/environment';
@@ -20,6 +28,7 @@ import { Buffer } from 'buffer'; // Import Buffer
 import { ElectronService } from 'src/app/services/electron.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { MessageService } from 'primeng/api';
+import html2canvas from 'html2canvas';
 
 @Component({
     selector: 'app-invoice',
@@ -44,8 +53,7 @@ export class InvoiceComponent implements OnInit {
         { name: 'UPI', code: 'UPI' },
     ];
 
-    extraPrice = 0;
-
+    private navElementRef: ElementRef;
     products = [];
     constructor(
         private route: ActivatedRoute,
@@ -54,6 +62,7 @@ export class InvoiceComponent implements OnInit {
         private http: HttpClient,
         private electonService: ElectronService,
         private toast: MessageService,
+        private router: Router,
         private invoiceService: InvoicesService
     ) {
         this.invoiceForm = fb.group({
@@ -69,23 +78,6 @@ export class InvoiceComponent implements OnInit {
         });
 
         this.onChanges();
-    }
-
-    private subscribeToFormArrayChanges(): void {
-        this.extras.valueChanges.subscribe((values) => {
-            this.extraPrice = 0;
-            values.forEach((element) => {
-                this.extraPrice += Number(element.price);
-            });
-            let existingTotal = this.appointmenData.total;
-
-            this.appointmenData.total = existingTotal + this.extraPrice;
-            console.log('FormArray values changed:', this.extraPrice);
-        });
-    }
-
-    onPrice(evt){
-        this.appointmenData.total + this.extraPrice
     }
 
     setMaxValidation(maxValue: number): void {
@@ -149,18 +141,54 @@ export class InvoiceComponent implements OnInit {
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
-                let total = 0;
-                let services = res?.services.map((element, i) => {
-                    total = total + Number(element.price);
-                    return { key: i + 1, ...element };
-                });
+                console.log('vk', res);
+            
+                if (res?.invoice) {
+                    this.total = res?.invoice?.total;
+                    this.new_total = res?.invoice?.total;
+                    this.invoiceForm
+                        ?.get('discount')
+                        .setValue(res?.invoice?.discount ?? 0);
+                    this.invoiceForm
+                        ?.get('paid')
+                        .setValue(res?.invoice?.paid ?? 0);
+                    // this.invoiceForm
+                    //     ?.get('balance')
+                    //     .setValue(res?.invoice?.balance ?? 0);
+                    this.invoiceForm
+                        ?.get('received_by')
+                        .setValue(res?.invoice?.received_by ?? "");
 
-                res.services = services;
-                this.appointmenData = res;
-                this.total = total;
-                this.new_total = total;
-                this.appointmenData.total = total;
-                this.setMaxValidation(total);
+                    this.invoiceForm
+                        ?.get('payment_mode')
+                        .setValue(res?.invoice?.payment_mode ?? "");
+
+                        res.services = res?.invoice?.particulars.map(
+                            (element, i) => {
+                                return { key: i + 1, ...element };
+                            }
+                        );
+
+                        this.appointmenData = res;
+                        this.appointmenData.total = this.total;
+                        this.setMaxValidation(this.total);
+                }else{
+
+                     let total = 0;
+                     let services = res?.services.map((element, i) => {
+                         total = total + Number(element.price);
+                         return { key: i + 1, ...element };
+                     });
+
+                     res.services = services;
+                     this.appointmenData = res;
+                     this.total = total;
+                     this.new_total = total;
+                     this.appointmenData.total = total;
+                     this.setMaxValidation(total);
+                }
+
+                
                 //this.balance =  total - this.paid
                 console.log(this.appointmenData);
             });
@@ -175,9 +203,6 @@ export class InvoiceComponent implements OnInit {
         console.log('ss');
         const control = this.createItem();
         this.extras.push(control);
-        this.subscribeToFormArrayChanges();
-
-        // this.subscribeToControlChanges(control);
     }
 
     createItem(): FormGroup {
@@ -203,7 +228,7 @@ export class InvoiceComponent implements OnInit {
         });
     }
 
-    downloadInvoice() {
+    saveAndPreview() {
         this.extraForm.markAllAsTouched();
         console.log(this.extraForm.value);
         this.invoiceForm.markAllAsTouched();
@@ -217,8 +242,8 @@ export class InvoiceComponent implements OnInit {
                 balance: this.balance.value,
                 discount: this.discount.value,
                 payment_mode: this.payment_mode.value,
-                received_by: this.received_by.value,
-                particulars: {},
+                received_by: 'test',
+                particulars: [],
             };
 
             invoiceData.particulars = this.appointmenData.services.map(
@@ -227,29 +252,16 @@ export class InvoiceComponent implements OnInit {
                 }
             );
 
-            this.invoiceService.create(invoiceData).subscribe((res) => {
-                const url = `appointments/invoice-pdf/${this.id}`;
-                let date = new DatePipe('en-US').transform(
-                    Date(),
-                    'dd-MM-YYYY'
-                );
+            this.extraForm.get('extras').value.forEach((item) => {
+                invoiceData.particulars.push(item);
+            });
 
-                let data = {
-                    ...this.invoiceForm.value,
-                    ...this.appointmenData,
-                    date,
-                };
-
-                this.http
-                    .post(environment.baseUrl + url, data)
-                    .subscribe(async (res: Blob) => {
-                        this.electonService.downloadPdf(res);
-                        console.log(res);
-                        // const blob = new Blob([response], {
-                        //     type: 'application/pdf',
-                        // });
-                        // saveAs(blob, 'invoice.pdf');
-                    });
+            this.invoiceService.create(invoiceData).subscribe((res: any) => {
+                this.router.navigate([
+                    'appointments',
+                    'preview-invoice',
+                    res?._id,
+                ]);
             });
         }
     }
