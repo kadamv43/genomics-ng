@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    baseUrl: 'http://localhost:3000/',
-    uploadPath: 'http://localhost:3000/uploads/',
+    baseUrl: 'https://stageapi.genomicsivfcentre.com/',
+    uploadPath: 'https://stageapi.genomicsivfcentre.com/uploads/',
 };
