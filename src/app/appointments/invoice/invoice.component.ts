@@ -160,7 +160,7 @@ export class InvoiceComponent implements OnInit {
 
                 if (res?.invoice) {
                     this.total = res?.invoice?.total_amount;
-                    this.new_total = res?.invoice?.total;
+                    // this.new_total = res?.invoice?.total;
                     this.invoiceForm
                         ?.get('discount')
                         .setValue(res?.invoice?.discount ?? 0);
@@ -207,18 +207,19 @@ export class InvoiceComponent implements OnInit {
                     this.appointmenData.total = this.total;
                     this.setMaxValidation(this.total);
                 } else {
-                    let total = 0;
+                    // let total = 0;
                     let services = res?.services.map((element, i) => {
-                        total = total + Number(element.price);
+                        this.serviceTotal =
+                            this.serviceTotal + Number(element.price);
                         return { key: i + 1, ...element };
                     });
 
                     res.services = services;
                     this.appointmenData = res;
-                    this.total = total;
-                    this.new_total = total;
-                    this.appointmenData.total = total;
-                    this.setMaxValidation(total);
+                    this.total = this.serviceTotal;
+                    this.new_total = this.serviceTotal;;
+                    this.appointmenData.total = this.serviceTotal;;
+                    this.setMaxValidation(this.total);
                 }
 
                 //this.balance =  total - this.paid
