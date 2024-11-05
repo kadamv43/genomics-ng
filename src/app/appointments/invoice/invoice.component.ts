@@ -29,6 +29,7 @@ import { ElectronService } from 'src/app/services/electron.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { MessageService } from 'primeng/api';
 import html2canvas from 'html2canvas';
+import { it } from 'node:test';
 
 @Component({
     selector: 'app-invoice',
@@ -46,6 +47,8 @@ export class InvoiceComponent implements OnInit {
     new_total = 0;
     role = '';
 
+    serviceTotal = 0;
+    extraSum = 0;
     paymentModes = [
         { name: 'Cash', code: 'Cash' },
         { name: 'Debit Card', code: 'Debit Card' },
@@ -109,12 +112,24 @@ export class InvoiceComponent implements OnInit {
             }
             this.invoiceForm.get('balance')?.setValue(this.new_total);
         });
+
+        this.extraForm.get('extras')?.valueChanges.subscribe((value) => {
+            this.extraSum = this.extras.value.reduce(
+                (sum, item) => sum + Number(item.price),
+                0
+            );
+            console.log(this.extraSum);
+        });
     }
 
     get balance() {
         return this.invoiceForm.get('balance');
     }
 
+    get totalma() {
+        console.log(this.extras.value);
+        return this.extras.value;
+    }
     get paid() {
         return this.invoiceForm.get('paid');
     }
@@ -142,9 +157,9 @@ export class InvoiceComponent implements OnInit {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
                 console.log('vk', res);
-            
+
                 if (res?.invoice) {
-                    this.total = res?.invoice?.total;
+                    this.total = res?.invoice?.total_amount;
                     this.new_total = res?.invoice?.total;
                     this.invoiceForm
                         ?.get('discount')
@@ -157,38 +172,55 @@ export class InvoiceComponent implements OnInit {
                     //     .setValue(res?.invoice?.balance ?? 0);
                     this.invoiceForm
                         ?.get('received_by')
-                        .setValue(res?.invoice?.received_by ?? "");
+                        .setValue(res?.invoice?.received_by ?? '');
 
                     this.invoiceForm
                         ?.get('payment_mode')
-                        .setValue(res?.invoice?.payment_mode ?? "");
+                        .setValue(res?.invoice?.payment_mode ?? '');
 
-                        res.services = res?.invoice?.particulars.map(
-                            (element, i) => {
-                                return { key: i + 1, ...element };
-                            }
-                        );
+                    const names = res?.services.map((item) => item.name);
 
-                        this.appointmenData = res;
-                        this.appointmenData.total = this.total;
-                        this.setMaxValidation(this.total);
-                }else{
+                    const pert = res?.invoice?.particulars.map(
+                        (item) => item.name
+                    );
 
-                     let total = 0;
-                     let services = res?.services.map((element, i) => {
-                         total = total + Number(element.price);
-                         return { key: i + 1, ...element };
-                     });
+                    const unique = this.getUniqueElements(names, pert);
+                    // console.log(unique)
 
-                     res.services = services;
-                     this.appointmenData = res;
-                     this.total = total;
-                     this.new_total = total;
-                     this.appointmenData.total = total;
-                     this.setMaxValidation(total);
+                    const extras = res?.invoice?.particulars.filter((item) =>
+                        unique.includes(item.name)
+                    );
+
+                    extras.forEach((element) => {
+                        this.addItem(element.name, element.price);
+                    });
+                    console.log(extras);
+                    // console.log(pert);
+                    let services = res?.services.map((element, i) => {
+                        this.serviceTotal =
+                            this.serviceTotal + Number(element.price);
+                        return { key: i + 1, ...element };
+                    });
+
+                    res.services = services;
+                    this.appointmenData = res;
+                    this.appointmenData.total = this.total;
+                    this.setMaxValidation(this.total);
+                } else {
+                    let total = 0;
+                    let services = res?.services.map((element, i) => {
+                        total = total + Number(element.price);
+                        return { key: i + 1, ...element };
+                    });
+
+                    res.services = services;
+                    this.appointmenData = res;
+                    this.total = total;
+                    this.new_total = total;
+                    this.appointmenData.total = total;
+                    this.setMaxValidation(total);
                 }
 
-                
                 //this.balance =  total - this.paid
                 console.log(this.appointmenData);
             });
@@ -199,23 +231,30 @@ export class InvoiceComponent implements OnInit {
         // });
     }
 
-    addItem(): void {
-        console.log('ss');
-        const control = this.createItem();
+    addItem(name = '', price = 0): void {
+        const control = this.createItem(name, price);
         this.extras.push(control);
     }
 
-    createItem(): FormGroup {
+    createItem(name, price): FormGroup {
         return this.fb.group({
-            name: ['', [Validators.required]],
-            price: [0, [Validators.required, Validators.pattern(/^\d+$/)]],
+            name: [name, [Validators.required]],
+            price: [price, [Validators.required, Validators.pattern(/^\d+$/)]],
         });
     }
 
     removeItem(index: number): void {
         // if (this.extras.length > 1) {
         this.extras.removeAt(index);
+        this.total = this.serviceTotal + this.extraSum;
+
         // }
+    }
+
+    getUniqueElements(arr1, arr2) {
+        const uniqueArr1 = arr1.filter((item) => !arr2.includes(item));
+        const uniqueArr2 = arr2.filter((item) => !arr1.includes(item));
+        return [...uniqueArr1, ...uniqueArr2];
     }
 
     addExtra() {
@@ -228,6 +267,13 @@ export class InvoiceComponent implements OnInit {
         });
     }
 
+    onExtraPriceChange(i) {
+        console.log(this.extraSum);
+        if (!isNaN(this.extraSum)) {
+            this.total = this.serviceTotal + this.extraSum;
+        }
+    }
+
     saveAndPreview() {
         this.extraForm.markAllAsTouched();
         console.log(this.extraForm.value);
@@ -237,12 +283,12 @@ export class InvoiceComponent implements OnInit {
                 appointment: this.appointmenData?._id,
                 patient: this.appointmenData?.patient?._id,
                 doctor: this.appointmenData?.doctor?._id,
-                total_amount: this.appointmenData?.total,
+                total_amount: this.total,
                 paid: this.paid.value,
                 balance: this.balance.value,
                 discount: this.discount.value,
                 payment_mode: this.payment_mode.value,
-                received_by: 'test',
+                received_by: this.received_by.value,
                 particulars: [],
             };
 
