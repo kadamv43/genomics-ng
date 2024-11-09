@@ -122,26 +122,7 @@
                                 invalid email</small
                             >
                         </div>
-                        <div class="field col-12 md:col-4">
-                            <label htmlFor="lastname2">Gender</label>
-                            <span class="required">*</span>
-                            <p-dropdown
-                                [options]="genders"
-                                optionLabel="name"
-                                optionValue="code"
-                                formControlName="gender"
-                                placeholder="Select Gender"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    gender.invalid &&
-                                    (gender.dirty || gender.touched)
-                                "
-                            >
-                                gender is required</small
-                            >
-                        </div>
+                       
 
                         <div class="field col-12 md:col-3">
                             <label htmlFor="lastname2">DOB</label>

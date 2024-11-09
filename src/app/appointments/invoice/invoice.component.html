@@ -32,6 +32,11 @@
     </div>
 
     <div class="grid">
+        <div class="col-2">
+            <button class="secondary" pButton (click)="addPrePostItem()" type="button">
+                Add Pre/Post Items
+            </button>
+        </div>
         <div class="col-3">
             <button class="secondary" pButton (click)="addItem()" type="button">
                 Add Extra Items
@@ -40,25 +45,88 @@
     </div>
 
     <div class="grid">
-        <div class="col-12">
+        <div class="col-8">
             <div [formGroup]="extraForm" class="card">
                 <div class="grid border-bottom">
-                    <div class="col-3 text-xl">SR NO.</div>
-                    <div class="col-3 text-xl">PARTICULARS</div>
-                    <div class="col-3 text-xl">AMOUNT</div>
+                    <div class="col-2 text-l">SR NO.</div>
+                    <div class="col-4 text-l">PARTICULARS</div>
+                    <div class="col-3 text-l">AMOUNT</div>
                 </div>
                 <div
                     class="grid mt-2"
-                    *ngFor="let item of appointmenData?.services"
+                    *ngFor="let item of appointmenData?.services;let i = index "
                 >
-                    <div class="col-3">
-                        {{ item?.key }}
+                    <div class="col-2">
+                        {{ i+1 }}
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         {{ item?.name }}
                     </div>
                     <div class="col-3">
                         {{ item?.price }}
+                    </div>
+                </div>
+                 <div class="" formArrayName="prePostExtras">
+                    <div
+                        class="grid mt-2"
+                        *ngFor="let item of prePostExtras.controls; let i = index"
+                        [formGroupName]="i"
+                    >
+                        <div class="col-2"></div>
+
+                        <div class="col-4">
+                            <p-dropdown
+                                [options]="prePostCharges"
+                                optionLabel="name"
+                                optionValue="code"
+                                formControlName="name"
+                                (change)="onPrePostValueChange(i)"
+                                placeholder="Select Pre Post"
+                            />
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    item.get('name').invalid &&
+                                    (item.get('name').dirty ||
+                                        item.get('name').touched) &&
+                                    item.get('name').hasError('required')
+                                "
+                            >
+                                Particular is required</small
+                            >
+                        </div>
+
+                        <div class="col-3">
+                            <input
+                                pInputText
+                                (change)="onPrePostValueChange(i)"
+                                formControlName="price"
+                                type="text"
+                            />
+
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    item.get('price').invalid &&
+                                    (item.get('price').dirty ||
+                                        item.get('price').touched) &&
+                                    item.get('price').hasError('required')
+                                "
+                            >
+                                Price is required</small
+                            >
+                        </div>
+
+                        <div class="col-3">
+                            <button
+                                pButton
+                                pRipple
+                                (click)="removePrePostItem(i)"
+                                type="button"
+                                icon="pi pi-minus"
+                                class="p-button-danger p-button-rounded"
+                            ></button>
+                        </div>
                     </div>
                 </div>
                 <div class="" formArrayName="extras">
@@ -67,11 +135,12 @@
                         *ngFor="let item of extras.controls; let i = index"
                         [formGroupName]="i"
                     >
-                        <div class="col-3"></div>
+                        <div class="col-2"></div>
 
-                        <div class="col-3">
+                        <div class="col-4">
                             <input
                                 pInputText
+                                (change)="onExtraValueChange(i)"
                                 formControlName="name"
                                 type="text"
                             />
@@ -91,7 +160,7 @@
                         <div class="col-3">
                             <input
                                 pInputText
-                                (change)="onExtraPriceChange(i)"
+                                (change)="onExtraValueChange(i)"
                                 formControlName="price"
                                 type="text"
                             />
@@ -121,21 +190,25 @@
                         </div>
                     </div>
                 </div>
+               
             </div>
-            <div [formGroup]="invoiceForm">
+           
+        </div>
+        <div class="col-4">
+             <div [formGroup]="invoiceForm" class="card">
                 <div class="grid mt-2">
-                    <div class="col-3"></div>
+                    <!-- <div class="col-3"></div> -->
                     <div class="col-3">
                         <label class="text-right font-bold">Total</label>
                     </div>
 
                     <div class="col-3">
-                        {{ total | currency : "INR" }}
+                        {{ invoiceData.total | currency : "INR" }}
                     </div>
                 </div>
 
-                <div *ngIf="role == 'admin'" class="grid mt-2">
-                    <div class="col-3"></div>
+                <div class="grid mt-2">
+                    <!-- <div class="col-3"></div> -->
                     <div class="col-3">
                         <label class="font-bold">Discount</label>
                     </div>
@@ -150,17 +223,17 @@
                 </div>
 
                 <div class="grid mt-2" *ngIf="discount.value > 0">
-                    <div class="col-3"></div>
+                    <!-- <div class="col-3"></div> -->
                     <div class="col-3">
                         <label>New Total</label>
                     </div>
                     <div class="col-3">
-                        {{ new_total | currency : "INR" }}
+                        {{ invoiceData.discountedTotal | currency : "INR" }}
                     </div>
                 </div>
 
                 <div class="grid mt-2">
-                    <div class="col-3"></div>
+                    <!-- <div class="col-3"></div> -->
                     <div class="col-3">
                         <label>Paid</label>
                     </div>
@@ -205,7 +278,7 @@
                 </div>
 
                 <div class="grid mt-2">
-                    <div class="col-3"></div>
+                    <!-- <div class="col-3"></div> -->
                     <div class="col-3">Balance</div>
                     <div class="col-3">
                         <input
@@ -218,31 +291,8 @@
                     </div>
                 </div>
 
-                 <div class="grid mt-2">
-                    <div class="col-3"></div>
-                    <div class="col-3">Received By</div>
-                    <div class="col-3">
-                        <input
-                            pInputText
-                            id="firstname2"
-                            type="text"
-                            formControlName="received_by"
-                        />
-                        <small
-                            class="p-error block"
-                            *ngIf="
-                                received_by.invalid &&
-                                (received_by.dirty || received_by.touched) &&
-                                received_by.hasError('required')
-                            "
-                        >
-                            Received By is required</small
-                        >
-                    </div>
-                </div>
-
                 <div class="grid mt-2">
-                    <div class="col-3"></div>
+                    <!-- <div class="col-3"></div> -->
                     <div class="col-3">Payment Mode</div>
                     <div class="col-3">
                         <p-dropdown

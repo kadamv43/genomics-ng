@@ -53,11 +53,6 @@ export class AppointmentEditComponent {
         { name: 'Diet and Medication', code: 'Diet and Medication' },
     ];
 
-    genders = [
-        { name: 'Male', code: 'Male' },
-        { name: 'Female', code: 'Female' },
-    ];
-
     bloodGroups = [
         { name: 'A+', code: 'A+' },
         { name: 'O+', code: 'O+' },
@@ -91,7 +86,6 @@ export class AppointmentEditComponent {
                 last_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
                 email: ['', Validators.email],
-                gender: ['', Validators.required],
                 dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
@@ -142,7 +136,6 @@ export class AppointmentEditComponent {
                     last_name: res?.patient?.last_name,
                     mobile: res?.patient?.mobile,
                     email: res?.patient?.email,
-                    gender: res?.patient?.gender,
                     dob: res?.patient?.dob ? new Date(res?.patient?.dob) : '',
                     age: res?.patient?.age,
                     blood_group: res?.patient?.blood_group,
@@ -168,10 +161,6 @@ export class AppointmentEditComponent {
 
     get email() {
         return this.appointmentForm.get('patientInfo.email');
-    }
-
-    get gender() {
-        return this.appointmentForm.get('patientInfo.gender');
     }
 
     get services() {
@@ -232,7 +221,6 @@ export class AppointmentEditComponent {
             first_name: this.selectedPatient.first_name,
             last_name: this.selectedPatient.last_name,
             mobile: this.selectedPatient.mobile,
-            gender: this.selectedPatient.gender,
             email: this.selectedPatient.email,
             age: this.selectedPatient.age,
             blood_group: this.selectedPatient.blood_group,

@@ -56,11 +56,6 @@ export class AppointmentCreateComponent implements OnInit {
         { name: 'Diet and Medication', code: 'Diet and Medication' },
     ];
 
-    genders = [
-        { name: 'Male', code: 'Male' },
-        { name: 'Female', code: 'Female' },
-    ];
-
     bloodGroups = [
         { name: 'A+', code: 'A+' },
         { name: 'O+', code: 'O+' },
@@ -87,7 +82,6 @@ export class AppointmentCreateComponent implements OnInit {
                 last_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
                 email: ['', Validators.email],
-                gender: ['', Validators.required],
                 dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
@@ -129,10 +123,6 @@ export class AppointmentCreateComponent implements OnInit {
 
     get email() {
         return this.appointmentForm.get('patientInfo.email');
-    }
-
-    get gender() {
-        return this.appointmentForm.get('patientInfo.gender');
     }
 
     get services() {
@@ -179,7 +169,6 @@ export class AppointmentCreateComponent implements OnInit {
             first_name: this.selectedPatient.first_name,
             last_name: this.selectedPatient.last_name,
             mobile: this.selectedPatient.mobile,
-            gender: this.selectedPatient.gender,
             email: this.selectedPatient.email,
             age: this.selectedPatient.age,
             blood_group: this.selectedPatient.blood_group,

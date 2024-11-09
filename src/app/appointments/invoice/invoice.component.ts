@@ -1,35 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    OnInit,
-    ViewChild,
-} from '@angular/core';
-import {
-    FormArray,
-    FormBuilder,
-    FormControl,
-    FormGroup,
-    Validators,
-} from '@angular/forms';
-import jsPDF from 'jspdf';
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { ProductService } from 'src/app/demo/service/product.service';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
-import { environment } from 'src/environments/environment';
-import { saveAs } from 'file-saver';
-import { DatePipe } from '@angular/common';
-import { dialog, app } from '@electron/remote'; // Correct import
-import * as fs from 'fs';
-import * as path from 'path';
-import { Buffer } from 'buffer'; // Import Buffer
 import { ElectronService } from 'src/app/services/electron.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { MessageService } from 'primeng/api';
-import html2canvas from 'html2canvas';
 import { it } from 'node:test';
+import { ba } from '@fullcalendar/core/internal-common';
 
 @Component({
     selector: 'app-invoice',
@@ -46,7 +25,6 @@ export class InvoiceComponent implements OnInit {
     extraForm: FormGroup;
     new_total = 0;
     role = '';
-
     serviceTotal = 0;
     extraSum = 0;
     paymentModes = [
@@ -56,8 +34,19 @@ export class InvoiceComponent implements OnInit {
         { name: 'UPI', code: 'UPI' },
     ];
 
-    private navElementRef: ElementRef;
-    products = [];
+    invoiceData = {
+        total: 0,
+        discountedTotal: 0,
+        paid: 0,
+        balance: 0,
+        discount: 0,
+        items: [],
+        prepost: [],
+        extras: [],
+    };
+
+    prePostCharges: any = [];
+
     constructor(
         private route: ActivatedRoute,
         private appointmentService: AppointmentService,
@@ -71,13 +60,13 @@ export class InvoiceComponent implements OnInit {
         this.invoiceForm = fb.group({
             paid: [0],
             balance: [0, Validators.required],
-            received_by: ['', Validators.required],
             payment_mode: ['', Validators.required],
             discount: [0],
         });
 
         this.extraForm = fb.group({
             extras: this.fb.array([]),
+            prePostExtras: this.fb.array([]),
         });
 
         this.onChanges();
@@ -95,30 +84,13 @@ export class InvoiceComponent implements OnInit {
     }
     onChanges(): void {
         this.invoiceForm.get('paid')?.valueChanges.subscribe((value) => {
-            if (value && value > 0) {
-                this.invoiceForm
-                    .get('balance')
-                    ?.setValue(this.new_total - Number(value));
-            } else {
-                this.invoiceForm.get('balance')?.setValue(0);
-            }
+            this.calculateInvoice();
+            this.invoiceForm.get('balance')?.setValue(this.invoiceData.balance);
         });
 
         this.invoiceForm.get('discount')?.valueChanges.subscribe((value) => {
-            if (value && value > 0) {
-                this.new_total = this.total - value;
-            } else {
-                this.new_total = this.total;
-            }
-            this.invoiceForm.get('balance')?.setValue(this.new_total);
-        });
-
-        this.extraForm.get('extras')?.valueChanges.subscribe((value) => {
-            this.extraSum = this.extras.value.reduce(
-                (sum, item) => sum + Number(item.price),
-                0
-            );
-            console.log(this.extraSum);
+            this.calculateInvoice();
+            this.invoiceForm.get('balance')?.setValue(this.invoiceData.balance);
         });
     }
 
@@ -138,10 +110,6 @@ export class InvoiceComponent implements OnInit {
         return this.invoiceForm.get('payment_mode');
     }
 
-    get received_by() {
-        return this.invoiceForm.get('received_by');
-    }
-
     get discount() {
         return this.invoiceForm.get('discount');
     }
@@ -150,17 +118,17 @@ export class InvoiceComponent implements OnInit {
         return this.extraForm.get('extras') as FormArray;
     }
 
+    get prePostExtras(): FormArray {
+        return this.extraForm.get('prePostExtras') as FormArray;
+    }
+
     ngOnInit(): void {
         this.role = localStorage.getItem('role') ?? '';
 
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
-                console.log('vk', res);
-
                 if (res?.invoice) {
-                    this.total = res?.invoice?.total_amount;
-                    // this.new_total = res?.invoice?.total;
                     this.invoiceForm
                         ?.get('discount')
                         .setValue(res?.invoice?.discount ?? 0);
@@ -170,71 +138,76 @@ export class InvoiceComponent implements OnInit {
                     // this.invoiceForm
                     //     ?.get('balance')
                     //     .setValue(res?.invoice?.balance ?? 0);
-                    this.invoiceForm
-                        ?.get('received_by')
-                        .setValue(res?.invoice?.received_by ?? '');
 
                     this.invoiceForm
                         ?.get('payment_mode')
                         .setValue(res?.invoice?.payment_mode ?? '');
 
-                    const names = res?.services.map((item) => item.name);
-
-                    const pert = res?.invoice?.particulars.map(
-                        (item) => item.name
-                    );
-
-                    const unique = this.getUniqueElements(names, pert);
-                    // console.log(unique)
-
-                    const extras = res?.invoice?.particulars.filter((item) =>
-                        unique.includes(item.name)
-                    );
-
-                    extras.forEach((element) => {
-                        this.addItem(element.name, element.price);
+                    res?.invoice?.particulars.forEach((item) => {
+                        if (item.type == 'extra') {
+                            this.addItem(item.name, item.price);
+                        } else if (item.type == 'prepost') {
+                            this.addPrePostItem(item.name, item.price);
+                        }
                     });
-                    console.log(extras);
-                    // console.log(pert);
+
                     let services = res?.services.map((element, i) => {
-                        this.serviceTotal =
-                            this.serviceTotal + Number(element.price);
-                        return { key: i + 1, ...element };
+                        return { name: element.name, price: element.price,type:'service'};
                     });
 
+                    this.invoiceData.items = services;
                     res.services = services;
                     this.appointmenData = res;
                     this.appointmenData.total = this.total;
-                    this.setMaxValidation(this.total);
                 } else {
-                    // let total = 0;
                     let services = res?.services.map((element, i) => {
-                        this.serviceTotal =
-                            this.serviceTotal + Number(element.price);
-                        return { key: i + 1, ...element };
+                        return {
+                            name: element.name,
+                            price: element.price,
+                            type: 'service',
+                        };
                     });
-
+                    this.invoiceData.items = services;
                     res.services = services;
                     this.appointmenData = res;
-                    this.total = this.serviceTotal;
-                    this.new_total = this.serviceTotal;;
-                    this.appointmenData.total = this.serviceTotal;;
-                    this.setMaxValidation(this.total);
                 }
 
                 //this.balance =  total - this.paid
+                this.calculateInvoice();
                 console.log(this.appointmenData);
             });
         });
 
-        // this.productService.getProducts().then((data) => {
-        //     this.products = data;
-        // });
+        this.invoiceService.getPrePostCharges().subscribe((data) => {
+            this.prePostCharges = data;
+        });
+
+        console.log(this.invoiceData);
+    }
+
+    addPrePostItem(name = '', price = 0): void {
+        const control = this.createItem(name, price);
+        this.prePostExtras.push(control);
+        this.invoiceData.prepost.push({ name, price, type: 'prepost' });
+    }
+
+    createPrePostItem(name, price): FormGroup {
+        return this.fb.group({
+            name: [name, [Validators.required]],
+            price: [price, [Validators.required, Validators.pattern(/^\d+$/)]],
+        });
+    }
+
+    removePrePostItem(index: number): void {
+        this.prePostExtras.removeAt(index);
+        this.invoiceData.prepost.splice(index, 1);
+        this.calculateInvoice();
     }
 
     addItem(name = '', price = 0): void {
         const control = this.createItem(name, price);
         this.extras.push(control);
+        this.invoiceData.extras.push({ name, price, type: 'extra' });
     }
 
     createItem(name, price): FormGroup {
@@ -245,11 +218,9 @@ export class InvoiceComponent implements OnInit {
     }
 
     removeItem(index: number): void {
-        // if (this.extras.length > 1) {
         this.extras.removeAt(index);
-        this.total = this.serviceTotal + this.extraSum;
-
-        // }
+        this.invoiceData.extras.splice(index, 1);
+        this.calculateInvoice();
     }
 
     getUniqueElements(arr1, arr2) {
@@ -268,42 +239,84 @@ export class InvoiceComponent implements OnInit {
         });
     }
 
-    onExtraPriceChange(i) {
-        console.log(this.extraSum);
-        if (!isNaN(this.extraSum)) {
-            this.total = this.serviceTotal + this.extraSum;
+    onExtraValueChange(i) {
+        this.invoiceData.extras[i] = {
+            type: 'extra',
+            ...this.extras.at(i).value,
+        };
+        this.calculateInvoice();
+    }
+
+    onPrePostValueChange(i) {
+        this.invoiceData.prepost[i] = {
+            type: 'prepost',
+            ...this.prePostExtras.at(i).value,
+        };
+        this.calculateInvoice();
+    }
+
+    calculateInvoice() {
+        let itemSum = this.invoiceData.items.reduce(
+            (sum, item) => (sum = sum + Number(item.price)),
+            0
+        );
+        let extrasum = this.invoiceData.extras.reduce(
+            (sum, item) => (sum = sum + Number(item.price)),
+            0
+        );
+        let prePostSum = this.invoiceData.prepost.reduce(
+            (sum, item) => (sum = sum + Number(item.price)),
+            0
+        );
+
+        let total = itemSum + extrasum + prePostSum;
+        let discount = this.discount.value;
+        let discountedTotal = 0;
+        let paid = this.paid.value;
+
+        let balance = 0;
+
+        if (discount > 0) {
+            discountedTotal = total - discount;
+            balance = discountedTotal - paid;
+            this.setMaxValidation(discountedTotal);
+        } else {
+            balance = total - paid;
+            this.setMaxValidation(total);
         }
+
+        this.invoiceData.balance = balance;
+        this.invoiceData.paid = paid;
+        this.invoiceData.discount = discount;
+        this.invoiceData.total = total;
+        this.invoiceData.balance = balance;
+        this.invoiceData.discountedTotal = discountedTotal;
     }
 
     saveAndPreview() {
         this.extraForm.markAllAsTouched();
-        console.log(this.extraForm.value);
         this.invoiceForm.markAllAsTouched();
+
         if (this.invoiceForm.valid) {
-            let invoiceData = {
+            let invoiceDatum = {
                 appointment: this.appointmenData?._id,
                 patient: this.appointmenData?.patient?._id,
                 doctor: this.appointmenData?.doctor?._id,
-                total_amount: this.total,
+                total_amount: this.invoiceData.total,
                 paid: this.paid.value,
                 balance: this.balance.value,
                 discount: this.discount.value,
                 payment_mode: this.payment_mode.value,
-                received_by: this.received_by.value,
                 particulars: [],
             };
 
-            invoiceData.particulars = this.appointmenData.services.map(
-                (item) => {
-                    return { name: item.name, price: item.price };
-                }
-            );
+            invoiceDatum.particulars = [
+                ...this.invoiceData.items,
+                ...this.invoiceData.extras,
+                ...this.invoiceData.prepost,
+            ];
 
-            this.extraForm.get('extras').value.forEach((item) => {
-                invoiceData.particulars.push(item);
-            });
-
-            this.invoiceService.create(invoiceData).subscribe((res: any) => {
+            this.invoiceService.create(invoiceDatum).subscribe((res: any) => {
                 this.router.navigate([
                     'appointments',
                     'preview-invoice',

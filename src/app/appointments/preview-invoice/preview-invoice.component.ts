@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import * as print from 'print-js';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 
 @Component({
@@ -16,7 +17,7 @@ export class PreviewInvoiceComponent implements OnInit {
     constructor(
         private invoiceService: InvoicesService,
         private route: ActivatedRoute,
-        private router:Router
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -28,9 +29,9 @@ export class PreviewInvoiceComponent implements OnInit {
         });
     }
 
-    print() {
+    download() {
         let element = document.getElementById('invoice');
-        html2canvas(element).then((canvas) => {
+        html2canvas(element,{scale:3}).then((canvas) => {
             const imgWidth = 208;
             const pageHeight = 295;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
@@ -45,7 +46,45 @@ export class PreviewInvoiceComponent implements OnInit {
         });
     }
 
-    back(){
-      this.router.navigate(['appointments', 'generate-invoice',this.invoiceDetails?.appointment]);
+    back() {
+        this.router.navigate([
+            'appointments',
+            'generate-invoice',
+            this.invoiceDetails?.appointment,
+        ]);
+    }
+
+    printFile() {
+        let element = document.getElementById('invoice');
+
+        html2canvas(element,{scale:3})
+            .then((canvas) => {
+                const imgWidth = 208; // Width of A4 in mm
+                const pageHeight = 295; // Height of A4 in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                const pdf = new jsPDF('p', 'mm', 'a4');
+
+                // Add the captured canvas as an image to the PDF
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+                // Convert the PDF to a Blob
+                const pdfBlob = pdf.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                // Use printJS to print the generated PDF
+                print({
+                    printable: pdfUrl,
+                    type: 'pdf',
+                    showModal: true,
+                    onPrintDialogClose: () => {
+                        URL.revokeObjectURL(pdfUrl); // Free memory after printing
+                    },
+                });
+            })
+            .catch((error) => {
+                console.error('Error generating PDF:', error);
+            });
     }
 }

@@ -24,6 +24,11 @@ export class InvoicesService {
         return this.httpService.get(url,params);
     }
 
+    getPrePostCharges() {
+        const url = this.baseUrl + '/pre-post-charges';
+        return this.httpService.get(url);
+    }
+
     findById(id: string) {
         const url = `${this.baseUrl}/${id}`;
         return this.httpService.get(url);
