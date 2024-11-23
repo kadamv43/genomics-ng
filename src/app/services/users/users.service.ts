@@ -19,6 +19,16 @@ export class UsersService {
         return this.httpService.patch(url, user);
     }
 
+    updateNote(data) {
+        const url = `${this.baseUrl}/update-note`;
+        return this.httpService.patch(url, data);
+    }
+
+    getUserDetails() {
+        const url = `${this.baseUrl}/user-details`;
+        return this.httpService.get(url);
+    }
+
     getAll(params) {
         const url = this.baseUrl;
         return this.httpService.get(url, params);

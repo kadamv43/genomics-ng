@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    baseUrl: 'https://api.genomicsivfcentre.com/',
-    uploadPath: 'https://api.genomicsivfcentre.com/uploads/',
+    baseUrl: 'https://stageapi.genomicsivfcentre.com/',
+    uploadPath: 'https://stageapi.genomicsivfcentre.com/uploads/',
 };

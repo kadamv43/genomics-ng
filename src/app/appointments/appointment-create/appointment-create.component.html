@@ -35,8 +35,8 @@
                     class="line-height-3 m-0"
                 >
                     <div class="p-fluid p-formgrid grid">
-                        <div class="field col-12 md:col-6">
-                            <label htmlFor="firstname">First Name</label>
+                        <div class="field col-12 md:col-4">
+                            <label htmlFor="firstname">First Name (Wife)</label>
                             <span class="required">*</span>
                             <input
                                 pInputText
@@ -54,7 +54,26 @@
                                 Firstname is required</small
                             >
                         </div>
-                        <div class="field col-12 md:col-6">
+                        <div class="field col-12 md:col-4">
+                            <label htmlFor="husband_name">First Name (Husband)</label>
+                            <span class="required">*</span>
+                            <input
+                                pInputText
+                                id="husband_name"
+                                type="text"
+                                formControlName="husband_name"
+                            />
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    husband_name.invalid &&
+                                    (husband_name.dirty || husband_name.touched)
+                                "
+                            >
+                                husband name is required</small
+                            >
+                        </div>
+                        <div class="field col-12 md:col-4">
                             <label htmlFor="lastname2">Last name</label>
                             <span class="required">*</span>
                             <input
@@ -74,7 +93,7 @@
                             >
                         </div>
                         <div class="field col-12 md:col-4">
-                            <label htmlFor="firstname2">Mobile Number</label>
+                            <label htmlFor="firstname2">Mobile Number (Wife)</label>
                             <span class="required">*</span>
                             <input
                                 pInputText
@@ -103,6 +122,37 @@
                                 invalid mobile number</small
                             >
                         </div>
+
+                         <div class="field col-12 md:col-4">
+                            <label htmlFor="husband_mobile">Mobile Number (Husband)</label>
+                            <span class="required">*</span>
+                            <input
+                                pInputText
+                                id="husband_mobile"
+                                type="text"
+                                formControlName="husband_mobile"
+                            />
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    husband_mobile.invalid &&
+                                    (husband_mobile.dirty || husband_mobile.touched) &&
+                                    husband_mobile.hasError('required')
+                                "
+                            >
+                                husband mobile is required</small
+                            >
+                            <small
+                                class="p-error block"
+                                *ngIf="
+                                    husband_mobile.invalid &&
+                                    (husband_mobile.dirty || husband_mobile.touched) &&
+                                    husband_mobile.hasError('invalidMobile')
+                                "
+                            >
+                                invalid mobile number</small
+                            >
+                        </div>
                         <div class="field col-12 md:col-4">
                             <label htmlFor="lastname2">Email</label>
                             <input
@@ -125,7 +175,7 @@
                        
 
                         <div class="field col-12 md:col-3">
-                            <label htmlFor="lastname2">DOB</label>
+                            <label htmlFor="lastname2">DOB (wife)</label>
                             <p-calendar
                                 formControlName="dob"
                                 [showIcon]="true"
@@ -137,23 +187,15 @@
                         </div>
 
                         <div class="field col-12 md:col-3">
-                            <label htmlFor="lastname2">Age</label>
-                            <input
-                                pInputText
-                                id="lastname2"
-                                type="text"
-                                formControlName="age"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
-                                    age.invalid &&
-                                    (age.dirty || age.touched) &&
-                                    age.hasError('pattern')
-                                "
-                            >
-                                invalid age</small
-                            >
+                            <label htmlFor="husband_dob">DOB (Husband)</label>
+                            <p-calendar
+                                formControlName="husband_dob"
+                                [showIcon]="true"
+                                [hourFormat]="12"
+                                inputId="icon"
+                                dateFormat="dd/mm/yy"
+                                [maxDate]="minDate"
+                            ></p-calendar>
                         </div>
 
                         <div class="field col-12 md:col-3">

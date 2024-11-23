@@ -84,9 +84,12 @@ export class AppointmentEditComponent {
             patientInfo: this.fb.group({
                 first_name: ['', Validators.required],
                 last_name: ['', Validators.required],
+                husband_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
+                husband_mobile: ['', [this.mobileNumberValidator]],
                 email: ['', Validators.email],
                 dob: [''],
+                husband_dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
                 reference_by: [''],
@@ -134,10 +137,14 @@ export class AppointmentEditComponent {
                 this.appointmentForm.get('patientInfo').patchValue({
                     first_name: res?.patient?.first_name,
                     last_name: res?.patient?.last_name,
+                    husband_name: res?.patient?.husband_name,
                     mobile: res?.patient?.mobile,
+                    husband_mobile: res?.patient?.husband_mobile,
                     email: res?.patient?.email,
                     dob: res?.patient?.dob ? new Date(res?.patient?.dob) : '',
-                    age: res?.patient?.age,
+                    husband_dob: res?.patient?.husband_dob
+                        ? new Date(res?.patient?.husband_dob)
+                        : '',
                     blood_group: res?.patient?.blood_group,
                     reference_by: res?.patient?.reference_by,
                 });
@@ -151,6 +158,14 @@ export class AppointmentEditComponent {
 
     get first_name() {
         return this.appointmentForm.get('patientInfo.first_name');
+    }
+
+    get husband_name() {
+        return this.appointmentForm.get('patientInfo.husband_name');
+    }
+
+    get husband_mobile() {
+        return this.appointmentForm.get('patientInfo.husband_mobile');
     }
     get last_name() {
         return this.appointmentForm.get('patientInfo.last_name');
@@ -189,6 +204,9 @@ export class AppointmentEditComponent {
 
     mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
         const mobilePattern = /^[0-9]{10}$/;
+        if (control.value == '') {
+            return null;
+        }
         return mobilePattern.test(control.value)
             ? null
             : { invalidMobile: true };

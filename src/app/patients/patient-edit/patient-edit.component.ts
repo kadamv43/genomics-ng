@@ -1,5 +1,4 @@
-import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {
     AbstractControl,
     FormArray,
@@ -8,11 +7,8 @@ import {
     ValidationErrors,
     Validators,
 } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Route, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { ApiService } from 'src/app/services/api.service';
-import { AppointmentService } from 'src/app/services/appointment/appointment.service';
-import { CommonService } from 'src/app/services/common/common.service';
 import { PatientService } from 'src/app/services/patient/patient.service';
 
 @Component({
@@ -50,11 +46,6 @@ export class PatientEditComponent {
         { name: 'Diet and Medication', code: 'Diet and Medication' },
     ];
 
-    genders = [
-        { name: 'Male', code: 'Male' },
-        { name: 'Female', code: 'Female' },
-    ];
-
     bloodGroups = [
         { name: 'A+', code: 'A+' },
         { name: 'O+', code: 'O+' },
@@ -68,10 +59,7 @@ export class PatientEditComponent {
 
     constructor(
         private fb: FormBuilder,
-        private api: ApiService,
         private patientService: PatientService,
-        private commonServie: CommonService,
-        private appointmentService: AppointmentService,
         private toast: MessageService,
         private router: Router,
         private route: ActivatedRoute
@@ -79,14 +67,19 @@ export class PatientEditComponent {
         this.patientForm = fb.group({
             patientInfo: this.fb.group({
                 first_name: ['', Validators.required],
+                husband_name: ['', Validators.required],
                 last_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
+                husband_mobile: [
+                    '',
+                    [this.mobileNumberValidator],
+                ],
                 email: ['', Validators.email],
-                gender: ['', Validators.required],
+                address: [''],
                 dob: [''],
-                age: ['', Validators.pattern(/^\d{1,2}$/)],
+                husband_dob: [''],
                 blood_group: [''],
-                reference_by:['']
+                reference_by: [''],
             }),
             medicalHistoryInfo: this.fb.group({
                 allergies: [''],
@@ -103,11 +96,17 @@ export class PatientEditComponent {
                 this.patient_id = res._id;
                 this.patientForm.get('patientInfo').patchValue({
                     first_name: res?.first_name,
+                    husband_name: res?.husband_name,
                     last_name: res?.last_name,
                     mobile: res?.mobile,
+                    husband_mobile: res?.husband_mobile,
+                    address: res?.address,
                     email: res?.email,
                     gender: res?.gender,
                     dob: res?.dob ? new Date(res?.dob) : '',
+                    husband_dob: res?.husband_dob
+                        ? new Date(res?.husband_dob)
+                        : '',
                     age: res?.age,
                     blood_group: res?.blood_group,
                     reference_by: res?.reference_by,
@@ -133,23 +132,25 @@ export class PatientEditComponent {
     get first_name() {
         return this.patientForm.get('patientInfo.first_name');
     }
+
+    get husband_name() {
+        return this.patientForm.get('patientInfo.husband_name');
+    }
+
     get last_name() {
         return this.patientForm.get('patientInfo.last_name');
     }
+
     get mobile() {
         return this.patientForm.get('patientInfo.mobile');
     }
 
+    get husband_mobile() {
+        return this.patientForm.get('patientInfo.husband_mobile');
+    }
+
     get email() {
         return this.patientForm.get('patientInfo.email');
-    }
-
-    get gender() {
-        return this.patientForm.get('patientInfo.gender');
-    }
-
-    get age() {
-        return this.patientForm.get('patientInfo.age');
     }
 
     get history(): FormArray {
@@ -180,6 +181,9 @@ export class PatientEditComponent {
 
     mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
         const mobilePattern = /^[0-9]{10}$/;
+         if (control.value == '') {
+             return null;
+         }
         return mobilePattern.test(control.value)
             ? null
             : { invalidMobile: true };

@@ -135,6 +135,14 @@
                             <div
                                 class="flex justify-content-between align-items-center"
                             >
+                                Created Date
+                                <!-- <p-columnFilter type="date" field="date" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter> -->
+                            </div>
+                        </th>
+                        <th style="min-width: 8rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
                                 Appointment Date
                                 <!-- <p-columnFilter type="date" field="date" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter> -->
                             </div>
@@ -195,6 +203,9 @@
                             <span class="image-text ml-2">{{
                                 customer?.patient?.mobile
                             }}</span>
+                        </td>
+                        <td>
+                            {{ customer.created_at | date : "dd/MM/yyyy" }}
                         </td>
                         <td>
                             {{ customer.appointment_date | date : "dd/MM/yyyy" }}

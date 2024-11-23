@@ -3,11 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { PatientListComponent } from './patient-list/patient-list.component';
 import { PatientEditComponent } from './patient-edit/patient-edit.component';
 import { PatientCreateComponent } from './patient-create/patient-create.component';
+import { PatientProfileComponent } from './patient-profile/patient-profile.component';
 
 const routes: Routes = [
     { path: '', component: PatientListComponent },
     { path: 'edit/:id', component: PatientEditComponent },
     { path: 'create', component: PatientCreateComponent },
+    { path: 'profile/:id', component: PatientProfileComponent },
 ];
 
 

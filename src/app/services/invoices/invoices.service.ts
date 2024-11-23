@@ -19,9 +19,14 @@ export class InvoicesService {
         return this.httpService.patch(url, user);
     }
 
-    getAll(params:any) {
+    getAll(params: any) {
         const url = this.baseUrl;
-        return this.httpService.get(url,params);
+        return this.httpService.get(url, params);
+    }
+
+    getPendingInvoices() {
+        const url = this.baseUrl + '/pending-invoices';
+        return this.httpService.get(url);
     }
 
     getPrePostCharges() {

@@ -46,7 +46,7 @@
                                     >Email</label
                                 >
                                 <input
-                                    formControlName="username"
+                                    formControlName="email"
                                     id="email1"
                                     type="email"
                                     placeholder="Email address"
@@ -57,9 +57,9 @@
                                 <small
                                     class="p-error block"
                                     *ngIf="
-                                        username.invalid &&
-                                        (username.dirty || username.touched) &&
-                                        username.hasError('email')
+                                        email.invalid &&
+                                        (email.dirty || email.touched) &&
+                                        email.hasError('email')
                                     "
                                 >
                                     Invalid email</small
@@ -67,9 +67,9 @@
                                 <small
                                     class="p-error block"
                                     *ngIf="
-                                        username.invalid &&
-                                        (username.dirty || username.touched) &&
-                                        username.hasError('required')
+                                        email.invalid &&
+                                        (email.dirty || email.touched) &&
+                                        email.hasError('required')
                                     "
                                 >
                                     email is required</small

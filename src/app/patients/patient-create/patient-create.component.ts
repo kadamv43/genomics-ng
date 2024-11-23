@@ -86,14 +86,19 @@ export class PatientCreateComponent {
         this.patientForm = fb.group({
             patientInfo: this.fb.group({
                 first_name: ['', Validators.required],
+                husband_name: ['', Validators.required],
                 last_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
+                husband_mobile: [
+                    '',
+                    [this.mobileNumberValidator],
+                ],
                 email: ['', Validators.email],
-                gender: ['', Validators.required],
                 dob: [''],
-                age: ['', Validators.pattern(/^\d{1,2}$/)],
+                address: [''],
+                husband_dob: [''],
                 blood_group: [''],
-                reference_by:[]
+                reference_by: [],
             }),
             medicalHistoryInfo: this.fb.group({
                 allergies: [''],
@@ -108,6 +113,10 @@ export class PatientCreateComponent {
     get first_name() {
         return this.patientForm.get('patientInfo.first_name');
     }
+
+    get husband_name() {
+        return this.patientForm.get('patientInfo.husband_name');
+    }
     get last_name() {
         return this.patientForm.get('patientInfo.last_name');
     }
@@ -115,16 +124,16 @@ export class PatientCreateComponent {
         return this.patientForm.get('patientInfo.mobile');
     }
 
+    get husband_mobile() {
+        return this.patientForm.get('patientInfo.husband_mobile');
+    }
+
     get email() {
         return this.patientForm.get('patientInfo.email');
     }
 
-    get gender() {
-        return this.patientForm.get('patientInfo.gender');
-    }
-
-    get age() {
-        return this.patientForm.get('patientInfo.age');
+    get address() {
+        return this.patientForm.get('patientInfo.email');
     }
 
     get medical_history_info() {
@@ -155,6 +164,9 @@ export class PatientCreateComponent {
 
     mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
         const mobilePattern = /^[0-9]{10}$/;
+        if(control.value == ""){
+            return null
+        }
         return mobilePattern.test(control.value)
             ? null
             : { invalidMobile: true };

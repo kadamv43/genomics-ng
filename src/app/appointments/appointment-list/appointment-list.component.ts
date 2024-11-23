@@ -90,7 +90,8 @@ export class AppointmentListComponent {
 
     ngOnInit() {
         this.api.getDoctors().subscribe((res: any) => {
-            this.doctors = res.map((item) => {
+            console.log(res)
+            this.doctors = res?.data?.map((item) => {
                 return { name: item.first_name, code: item._id };
             });
         });

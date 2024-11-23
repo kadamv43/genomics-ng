@@ -24,6 +24,11 @@ export class AppointmentService {
         return this.httpService.get(url, params);
     }
 
+    getAppointmentsByPatientId(id) {
+        const url = `${this.baseUrl}/patient/${id}`;
+        return this.httpService.get(url);
+    }
+
     findById(id: string) {
         const url = `${this.baseUrl}/${id}`;
         return this.httpService.get(url);

@@ -27,13 +27,13 @@ export class LoginComponent {
         private router: Router
     ) {
         this.loginForm = fb.group({
-            username: ['', [Validators.required, Validators.email]],
+            email: ['', [Validators.required, Validators.email]],
             password: ['', Validators.required],
         });
     }
 
-    get username() {
-        return this.loginForm.get('username');
+    get email() {
+        return this.loginForm.get('email');
     }
 
     get password() {
@@ -46,22 +46,22 @@ export class LoginComponent {
             this.loading = true;
             this.apiService.login(this.loginForm.value).subscribe(
                 (res: any) => {
-                    let token = res.token;
+                    let token = res.accessToken;
                     localStorage.setItem('token', token);
-                    
+
                     this.apiService
                         .getAuthUserDetails()
                         .subscribe((res: any) => {
-                             localStorage.setItem('role', res.role);
+                            localStorage.setItem('role', res.role);
                             setTimeout(() => {
                                 this.loading = false;
                                 this.router.navigateByUrl('/');
-                            },2000);
+                            }, 2000);
                         });
                 },
                 (err) => {
+                    this.loading = false;
                     if (err.status == 401) {
-                        this.loading = false;
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Login failed',

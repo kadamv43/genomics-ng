@@ -79,13 +79,19 @@ export class AppointmentCreateComponent implements OnInit {
         this.appointmentForm = fb.group({
             patientInfo: this.fb.group({
                 first_name: ['', Validators.required],
+                husband_name: ['', Validators.required],
                 last_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
+                husband_mobile: [
+                    '',
+                    [this.mobileNumberValidator],
+                ],
                 email: ['', Validators.email],
                 dob: [''],
+                husband_dob: [''],
                 age: ['', Validators.pattern(/^\d{1,2}$/)],
                 blood_group: [''],
-                reference_by:['']
+                reference_by: [''],
             }),
             appointmentInfo: this.fb.group({
                 services: ['', Validators.required],
@@ -93,7 +99,7 @@ export class AppointmentCreateComponent implements OnInit {
                 appointment_date: [new Date(), Validators.required],
                 appointment_time: [new Date(), Validators.required],
                 reason: [''],
-            })
+            }),
         });
     }
     ngOnInit(): void {
@@ -114,11 +120,17 @@ export class AppointmentCreateComponent implements OnInit {
     get first_name() {
         return this.appointmentForm.get('patientInfo.first_name');
     }
+    get husband_name() {
+        return this.appointmentForm.get('patientInfo.husband_name');
+    }
     get last_name() {
         return this.appointmentForm.get('patientInfo.last_name');
     }
     get mobile() {
         return this.appointmentForm.get('patientInfo.mobile');
+    }
+    get husband_mobile() {
+        return this.appointmentForm.get('patientInfo.husband_mobile');
     }
 
     get email() {
@@ -147,6 +159,9 @@ export class AppointmentCreateComponent implements OnInit {
 
     mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
         const mobilePattern = /^[0-9]{10}$/;
+        if (control.value == '') {
+            return null;
+        }
         return mobilePattern.test(control.value)
             ? null
             : { invalidMobile: true };
@@ -168,13 +183,18 @@ export class AppointmentCreateComponent implements OnInit {
         this.appointmentForm.get('patientInfo').patchValue({
             first_name: this.selectedPatient.first_name,
             last_name: this.selectedPatient.last_name,
+            husband_name: this.selectedPatient.husband_name,
             mobile: this.selectedPatient.mobile,
+            husband_mobile: this.selectedPatient.husband_mobile,
             email: this.selectedPatient.email,
-            age: this.selectedPatient.age,
             blood_group: this.selectedPatient.blood_group,
             reference_by: this.selectedPatient.reference_by,
             dob: this.selectedPatient.dob
                 ? new Date(this.selectedPatient.dob)
+                : '',
+
+            husband_dob: this.selectedPatient.husband_dob
+                ? new Date(this.selectedPatient.husband_dob)
                 : '',
         });
         console.log('Selected item:', this.selectedPatient);
@@ -206,7 +226,7 @@ export class AppointmentCreateComponent implements OnInit {
                 appointment = this.appointmentForm.get('appointmentInfo').value;
                 appointment.patient_id = patient_id;
                 appointment.services = this.selectedServicesObjects;
-                appointment.patient = this.selectedPatient ?? patient_id
+                appointment.patient = this.selectedPatient ?? patient_id;
                 this.appointmentService.create(appointment).subscribe((res) => {
                     this.toast.add({
                         key: 'tst',

@@ -21,6 +21,7 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
 import { DialogModule } from 'primeng/dialog';
+import { PatientProfileComponent } from './patient-profile/patient-profile.component';
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import { DialogModule } from 'primeng/dialog';
         PatientCreateComponent,
         PatientEditComponent,
         PatientListComponent,
+        PatientProfileComponent
     ],
     imports: [
         CommonModule,
