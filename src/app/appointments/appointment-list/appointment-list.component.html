@@ -9,7 +9,7 @@
                         label="New Appointment"
                         class="p-button-outlined mb-2"
                         icon="pi pi-plus"
-                        (click)="goTo('appointments/create')"
+                        [routerLink]="['/appointments', 'create']"
                     ></button>
                 </div>
             </ng-template>
@@ -21,7 +21,7 @@
                     label="Export"
                     icon="pi pi-upload"
                     class="p-button-help secondary"
-                    (click)="dt.exportCSV()"
+                    (click)="exportExcel()"
                 ></button>
             </ng-template>
         </p-toolbar>
@@ -58,6 +58,7 @@
                                 pInputText
                                 type="text"
                                 [(ngModel)]="searchText"
+                                (ngModelChange)="onSearchName($event)"
                                 placeholder="Search by patient name, mobile"
                                 class="w-full"
                             />
@@ -69,31 +70,25 @@
                                 optionValue="code"
                                 placeholder="Select Status"
                                 autoWidth="false"
+                                (ngModelChange)="onStatusChange($event)"
                                 [(ngModel)]="selectedStatus"
                                 [style]="{ width: '100%' }"
                             />
                         </div>
                         <div class="col-3">
                             <p-calendar
+                                
                                 [showIcon]="true"
                                 [hourFormat]="12"
                                 inputId="icon"
                                 [style]="{ width: '100%' }"
                                 [(ngModel)]="selectedDate"
+                                (ngModelChange)="onDateChange($event)"
                                 selectionMode="range"
                                 dateFormat="dd/mm/yy"
                             ></p-calendar>
                         </div>
-                        <div class="col-1">
-                            <button
-                                pButton
-                                class="primary"
-                                type="button"
-                                label="fiter"
-                                (click)="loadAppointments(dt1)"
-                                icon="pi pi-filter"
-                            ></button>
-                        </div>
+                        
                         <div class="col-1">
                             <button
                                 pButton
@@ -188,6 +183,7 @@
                                     'edit',
                                     customer._id
                                 ]"
+                                [queryParams]="queryParams"
                                 >{{ customer.appointment_number }}</a
                             >
                         </td>
@@ -208,7 +204,9 @@
                             {{ customer.created_at | date : "dd/MM/yyyy" }}
                         </td>
                         <td>
-                            {{ customer.appointment_date | date : "dd/MM/yyyy" }}
+                            {{
+                                customer.appointment_date | date : "dd/MM/yyyy"
+                            }}
                         </td>
                         <td>
                             {{ customer.appointment_time | date : "hh:mm a" }}
@@ -253,33 +251,35 @@
                         </td>
                         <td class="text-center">
                             <p-toast></p-toast>
-                            <i (click)="openDialog(customer._id)" class="pi pi-upload text-green-500 mx-2"></i>
                             <i
-                            *ngIf="role!='doctor'"
-
-                                (click)="
-                                    goTo(
-                                        'appointments/generate-invoice/' +
-                                            customer._id
-                                    )
-                                "
+                                (click)="openDialog(customer._id)"
+                                class="pi pi-upload text-green-500 mx-2"
+                            ></i>
+                            <i
+                                *ngIf="role != 'doctor'"
+                                [routerLink]="[
+                                    '/appointments',
+                                    'generate-invoice',
+                                    customer._id
+                                ]"
+                                [queryParams]="queryParams"
                                 class="pi mx-2 true-icon pi-money-bill text-green-500"
                             ></i>
                             <i
-                                (click)="
-                                    goTo('appointments/edit/' + customer._id)
-                                "
+                                [routerLink]="[
+                                    '/appointments',
+                                    'edit',
+                                    customer._id
+                                ]"
+                                [queryParams]="queryParams"
                                 class="pi mx-2 true-icon pi-pencil text-green-500"
                             ></i>
 
-                             <i
-                                (click)="
-                                    goTo('appointments/reports/' + customer._id)
-                                "
+                            <i
+                                [routerLink]="['/appointments','reports',customer._id]"
+                                [queryParams]="queryParams"
                                 class="pi mx-2 true-icon pi-file text-green-500"
                             ></i>
-                            <!-- <i (click)="confirm2($event,customer)" class="pi mx-2 false-icon pi-trash text-pink-500" ></i> -->
-                            <p-confirmPopup key="confirm2"></p-confirmPopup>
                         </td>
                     </tr>
                 </ng-template>

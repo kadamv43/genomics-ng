@@ -82,10 +82,7 @@ export class AppointmentCreateComponent implements OnInit {
                 husband_name: ['', Validators.required],
                 last_name: ['', Validators.required],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
-                husband_mobile: [
-                    '',
-                    [this.mobileNumberValidator],
-                ],
+                husband_mobile: ['', [this.mobileNumberValidator]],
                 email: ['', Validators.email],
                 dob: [''],
                 husband_dob: [''],
@@ -220,6 +217,12 @@ export class AppointmentCreateComponent implements OnInit {
                     patient_id = patient._id;
                 } else {
                     patient_id = res[0]?._id;
+                    await lastValueFrom(
+                        this.patientService.update(
+                            patient_id,
+                            this.appointmentForm.get('patientInfo').value
+                        )
+                    );
                 }
 
                 let appointment: any = {};

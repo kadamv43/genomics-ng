@@ -32,7 +32,11 @@ export class HttpService {
     }
 
     patchWithFormData(url: string, body: any) {
-        return this.http.patch(environment.baseUrl + url, body);
+        return this.http.patch(environment.baseUrl + url, body, {
+            headers: new HttpHeaders({
+                enctype: 'multipart/form-data',
+            }),
+        });
     }
 
     delete(url: string) {

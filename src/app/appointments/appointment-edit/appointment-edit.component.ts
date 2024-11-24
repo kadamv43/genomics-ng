@@ -33,6 +33,7 @@ export class AppointmentEditComponent {
     selectedPatient;
     id: string;
     patient_id;
+    queryParams;
     selectedServicesObjects = [];
 
     conditions = [
@@ -106,6 +107,7 @@ export class AppointmentEditComponent {
         });
     }
     ngOnInit(): void {
+        this.queryParams = this.route.snapshot.queryParams;
         this.minDate = new Date();
 
         this.api.getProducts().subscribe((res) => {

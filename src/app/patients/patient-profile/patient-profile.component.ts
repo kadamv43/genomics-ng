@@ -25,7 +25,7 @@ export class PatientProfileComponent implements OnInit {
                 .getAppointmentsByPatientId(this.id)
                 .subscribe({
                     next: (res: any) => {
-                        this.appointments = res?.map((item)=>{
+                        this.appointments = res?.appointments.map((item)=>{
                           let services = item?.services?.map(
                               (serv) => serv.name
                           );
@@ -34,8 +34,7 @@ export class PatientProfileComponent implements OnInit {
                         });
 
                         console.log(this.appointments)
-                        this.patientData = this.appointments.length > 0 ? this.appointments[0].patient : null;
-                        // console.log(res);
+                        this.patientData = res?.patient;
                     },
                     error: (err) => {
                         console.log(err);

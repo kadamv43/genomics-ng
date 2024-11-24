@@ -1,5 +1,5 @@
 <div *ngIf="appointmenData?.status == 'Completed'">
-    <div  class="grid">
+    <div class="grid">
         <div class="col-12">
             <div class="card">
                 <div class="flex align-items-center justify-content-between">
@@ -33,7 +33,12 @@
 
     <div class="grid">
         <div class="col-2">
-            <button class="secondary" pButton (click)="addPrePostItem()" type="button">
+            <button
+                class="secondary"
+                pButton
+                (click)="addPrePostItem()"
+                type="button"
+            >
                 Add Pre/Post Items
             </button>
         </div>
@@ -54,10 +59,10 @@
                 </div>
                 <div
                     class="grid mt-2"
-                    *ngFor="let item of appointmenData?.services;let i = index "
+                    *ngFor="let item of appointmenData?.services; let i = index"
                 >
                     <div class="col-2">
-                        {{ i+1 }}
+                        {{ i + 1 }}
                     </div>
                     <div class="col-4">
                         {{ item?.name }}
@@ -66,10 +71,13 @@
                         {{ item?.price }}
                     </div>
                 </div>
-                 <div class="" formArrayName="prePostExtras">
+                <div class="" formArrayName="prePostExtras">
                     <div
                         class="grid mt-2"
-                        *ngFor="let item of prePostExtras.controls; let i = index"
+                        *ngFor="
+                            let item of prePostExtras.controls;
+                            let i = index
+                        "
                         [formGroupName]="i"
                     >
                         <div class="col-2"></div>
@@ -190,12 +198,10 @@
                         </div>
                     </div>
                 </div>
-               
             </div>
-           
         </div>
         <div class="col-4">
-             <div [formGroup]="invoiceForm" class="card">
+            <div [formGroup]="invoiceForm" class="card">
                 <div class="grid mt-2">
                     <!-- <div class="col-3"></div> -->
                     <div class="col-3">
@@ -359,4 +365,13 @@
         </div>
     </div>
 </div>
+<button
+    [routerLink]="'/appointments'"
+    [queryParams]="queryParams"
+    pButton
+    pRipple
+    class="secondary ml-3"
+    type="button"
+    label="Back"
+></button>
 <p-toast key="tst"></p-toast>

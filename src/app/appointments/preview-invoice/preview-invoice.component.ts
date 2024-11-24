@@ -7,16 +7,32 @@ import html2pdf from 'html2pdf.js';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { HttpService } from 'src/app/services/http.service';
 import { MessageService } from 'primeng/api';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-preview-invoice',
-    providers:[MessageService],
+    providers: [MessageService],
     templateUrl: './preview-invoice.component.html',
     styleUrl: './preview-invoice.component.scss',
 })
 export class PreviewInvoiceComponent implements OnInit {
     id = '';
     invoiceDetails;
+
+    uploadPath = environment.uploadPath;
+
+    pdfOptions = {
+        margin: 10,
+        filename: 'invoice.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            logging: true,
+            dpi: 192,
+            letterRendering: true,
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    };
 
     constructor(
         private invoiceService: InvoicesService,
@@ -35,42 +51,26 @@ export class PreviewInvoiceComponent implements OnInit {
         });
     }
 
+    // download() {
+    //     let element = document.getElementById('invoice');
+    //     html2canvas(element, { scale: 3 }).then((canvas) => {
+    //         const imgWidth = 208;
+    //         const pageHeight = 295;
+    //         const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    //         const heightLeft = imgHeight;
+
+    //         const pdf = new jsPDF('p', 'mm', 'a4');
+    //         const imgData = canvas.toDataURL('image/png');
+    //         let position = 0;
+
+    //         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    //         pdf.save('invoice.pdf');
+    //     });
+    // }
+
     download() {
-        let element = document.getElementById('invoice');
-        html2canvas(element, { scale: 3 }).then((canvas) => {
-            const imgWidth = 208;
-            const pageHeight = 295;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const heightLeft = imgHeight;
-
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgData = canvas.toDataURL('image/png');
-            let position = 0;
-
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            pdf.save('invoice.pdf');
-        });
-    }
-
-    download2() {
         const element = document.getElementById('invoice'); // Replace with your element's ID
-
-        // Define PDF options
-        const options = {
-            margin: 10,
-            filename: 'invoice.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                logging: true,
-                dpi: 192,
-                letterRendering: true,
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        };
-
-        // Generate PDF
-        html2pdf().set(options).from(element).save();
+        html2pdf().set(this.pdfOptions).from(element).save();
     }
 
     back() {
@@ -85,62 +85,45 @@ export class PreviewInvoiceComponent implements OnInit {
         const element = document.getElementById('invoice'); // Replace with your element's ID
 
         html2pdf()
+            .set(this.pdfOptions)
             .from(element)
             .toPdf()
             .get('pdf')
             .then((pdfObj) => {
-                const formData = new FormData();
-                const pdfFile = new File([pdfObj], 'test.pdf', {
-                    type: 'application/pdf',
-                });
+                const pdfBlob = pdfObj.output('blob'); // Get the PDF as a Blob
 
-                formData.append('files', pdfFile);
+                const formData = new FormData();
+                formData.append('file', pdfBlob, `${this.id}.pdf`);
 
                 this.httpService
-                    .postWithFormData('send-invoice-on-whatsapp', formData)
+                    .patchWithFormData(
+                        `invoice/${this.id}?send=whatsapp`,
+                        formData
+                    )
                     .subscribe({
-                        next: (res) => {
+                        next: (res: any) => {
                             this.toast.add({
                                 key: 'tst',
                                 severity: 'success',
                                 summary: 'Success Message',
-                                detail: 'Appointment created successfully',
+                                detail: 'Invoice Sent successfully',
                             });
                         },
                     });
-
-                    this.toast.add({
-                        key: 'tst',
-                        severity: 'success',
-                        summary: 'Success Message',
-                        detail: 'Invoice Sent successfully',
-                    });
-
-                // You have access to the jsPDF object and can use it as desired.
-                // console.log(pdfObj);
             });
     }
 
     printFile() {
         let element = document.getElementById('invoice');
 
-        html2canvas(element, { scale: 3 })
-            .then((canvas) => {
-                const imgWidth = 208; // Width of A4 in mm
-                const pageHeight = 295; // Height of A4 in mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                const pdf = new jsPDF('p', 'mm', 'a4');
-
-                // Add the captured canvas as an image to the PDF
-                const imgData = canvas.toDataURL('image/png');
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-                // Convert the PDF to a Blob
-                const pdfBlob = pdf.output('blob');
+        html2pdf()
+            .from(element)
+            .set(this.pdfOptions)
+            .toPdf()
+            .get('pdf')
+            .then((pdfObj) => {
+                const pdfBlob = pdfObj.output('blob'); // Get the PDF as a Blob
                 const pdfUrl = URL.createObjectURL(pdfBlob);
-
-                // Use printJS to print the generated PDF
                 print({
                     printable: pdfUrl,
                     type: 'pdf',
@@ -149,9 +132,6 @@ export class PreviewInvoiceComponent implements OnInit {
                         URL.revokeObjectURL(pdfUrl); // Free memory after printing
                     },
                 });
-            })
-            .catch((error) => {
-                console.error('Error generating PDF:', error);
             });
     }
 }

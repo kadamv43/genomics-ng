@@ -7,8 +7,6 @@ import { AppointmentService } from 'src/app/services/appointment/appointment.ser
 import { ElectronService } from 'src/app/services/electron.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { MessageService } from 'primeng/api';
-import { it } from 'node:test';
-import { ba } from '@fullcalendar/core/internal-common';
 
 @Component({
     selector: 'app-invoice',
@@ -45,15 +43,13 @@ export class InvoiceComponent implements OnInit {
         extras: [],
     };
 
+    queryParams = {}
     prePostCharges: any = [];
 
     constructor(
         private route: ActivatedRoute,
         private appointmentService: AppointmentService,
         private fb: FormBuilder,
-        private http: HttpClient,
-        private electonService: ElectronService,
-        private toast: MessageService,
         private router: Router,
         private invoiceService: InvoicesService
     ) {
@@ -125,6 +121,8 @@ export class InvoiceComponent implements OnInit {
     ngOnInit(): void {
         this.role = localStorage.getItem('role') ?? '';
 
+        this.queryParams = this.route.snapshot.queryParams
+
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
@@ -185,7 +183,7 @@ export class InvoiceComponent implements OnInit {
         console.log(this.invoiceData);
     }
 
-    addPrePostItem(name = '', price = 0): void {
+    addPrePostItem(name = '', price = ""): void {
         const control = this.createItem(name, price);
         this.prePostExtras.push(control);
         this.invoiceData.prepost.push({ name, price, type: 'prepost' });
@@ -297,7 +295,7 @@ export class InvoiceComponent implements OnInit {
         this.extraForm.markAllAsTouched();
         this.invoiceForm.markAllAsTouched();
 
-        if (this.invoiceForm.valid) {
+        if (this.invoiceForm.valid && this.extraForm.valid) {
             let invoiceDatum = {
                 appointment: this.appointmenData?._id,
                 patient: this.appointmenData?.patient?._id,

@@ -1,31 +1,36 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Customer, Representative } from 'src/app/demo/api/customer';
-import { CustomerService } from 'src/app/demo/service/customer.service';
 import { Product } from 'src/app/demo/api/product';
-import { ProductService } from 'src/app/demo/service/product.service';
-import { Table } from 'primeng/table';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Router } from '@angular/router';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { ApiService } from 'src/app/services/api.service';
+import * as FileSaver from 'file-saver';
 import { CommonService } from 'src/app/services/common/common.service';
-import { serialize } from 'v8';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { FileUploadFormComponent } from '../file-upload-form/file-upload-form.component';
 import { DatePipe } from '@angular/common';
+import {
+    debounceTime,
+    distinctUntilChanged,
+    first,
+    last,
+    map,
+    Subject,
+} from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { dA } from '@fullcalendar/core/internal-common';
 
-interface expandedRows {
-    [key: string]: boolean;
-}
 @Component({
     selector: 'app-appointment-list',
     templateUrl: './appointment-list.component.html',
     styleUrl: './appointment-list.component.scss',
     providers: [ConfirmationService, MessageService, DialogService, DatePipe],
 })
-export class AppointmentListComponent {
+export class AppointmentListComponent implements OnInit {
+    private searchSubject: Subject<string> = new Subject();
+
     statusList = [
+        { name: 'Select Status', code: null },
         { name: 'Created', code: 'Created' },
         { name: 'Ongoing', code: 'Ongoing' },
         { name: 'Completed', code: 'Completed' },
@@ -34,7 +39,7 @@ export class AppointmentListComponent {
 
     display = false;
     selectedStatus = '';
-    selectedDate = '';
+    selectedDate = [];
     searchText = '';
     customers1: Customer[] = [];
 
@@ -54,8 +59,6 @@ export class AppointmentListComponent {
 
     rowGroupMetadata: any;
 
-    expandedRows: expandedRows = {};
-
     activityValues: number[] = [0, 100];
 
     isExpanded: boolean = false;
@@ -68,33 +71,102 @@ export class AppointmentListComponent {
 
     role = '';
 
-    doctors = [];
-
     minDate;
 
     totalRecords = 0;
 
     ref: DynamicDialogRef | undefined;
 
+    queryParams = {};
+
     constructor(
         private appointmentService: AppointmentService,
-        private router: Router,
         private authService: AuthService,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private api: ApiService,
         private commonService: CommonService,
         private dialogService: DialogService,
-        private datePipe: DatePipe
-    ) {}
+        private datePipe: DatePipe,
+        private route: ActivatedRoute,
+        private router: Router
+    ) {
+        this.searchSubject
+            .pipe(debounceTime(400), distinctUntilChanged())
+            .subscribe((value) => {
+                this.searchText = value;
+                this.queryParams['search'] = this.searchText;
+                console.log(this.queryParams);
+                let data = { first: 0, rows: 10 };
+                this.loadAppointments(data);
+            });
+    }
+
+    searchApi(value: string) {
+        console.log('api', value);
+    }
+
+    onStatusChange(value: string) {
+        this.selectedStatus = value;
+        this.queryParams['status'] = value;
+        console.log(this.queryParams);
+        let data = { first: 0, rows: 10 };
+        this.loadAppointments(data);
+    }
+
+    onDateChange(value: any) {
+        this.selectedDate = value;
+        console.log(this.selectedDate);
+        if (this.selectedDate[0]) {
+            this.queryParams['from'] = this.datePipe.transform(
+                this.selectedDate[0],
+                'yyyy-MM-dd'
+            );
+        }
+
+        if (this.selectedDate[1]) {
+            this.queryParams['to'] = this.datePipe.transform(
+                this.selectedDate[1],
+                'yyyy-MM-dd'
+            );
+        }
+
+        let data = { first: 0, rows: 10 };
+        this.loadAppointments(data);
+    }
+
+    selectTodaysDate() {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        this.selectedDate = [yesterday, today];
+
+        if (this.selectedDate[0]) {
+            this.queryParams['from'] = this.datePipe.transform(
+                this.selectedDate[0],
+                'yyyy-MM-dd'
+            );
+        }
+
+        if (this.selectedDate[1]) {
+            this.queryParams['to'] = this.datePipe.transform(
+                this.selectedDate[1],
+                'yyyy-MM-dd'
+            );
+        }
+    }
 
     ngOnInit() {
-        this.api.getDoctors().subscribe((res: any) => {
-            console.log(res)
-            this.doctors = res?.data?.map((item) => {
-                return { name: item.first_name, code: item._id };
-            });
+        this.route.queryParams.subscribe((data) => {
+            this.selectTodaysDate();
+            this.searchText = data['search'] ?? '';
+            this.selectedStatus = data['status'] ?? '';
+            if (data['from']) {
+                this.selectedDate[0] = new Date(data['from']);
+            }
+            if (data['from'] && !data['to']) {
+                this.selectedDate[1] = null
+            }
+            this.queryParams = { ...data };
         });
+        ;
         this.role = this.authService.getRole();
     }
 
@@ -110,15 +182,19 @@ export class AppointmentListComponent {
             params['q'] = this.searchText;
         }
 
-        if (this.selectedStatus != '') {
+        if (this.selectedStatus) {
             params['status'] = this.selectedStatus;
         }
 
-        if (this.selectedDate != '') {
+        if (this.selectedDate && this.selectedDate[0]) {
+            console.log(this.selectedDate);
             params['from'] = this.datePipe.transform(
                 this.selectedDate[0],
                 'yyyy-MM-dd'
             );
+        }
+
+        if (this.selectedDate && this.selectedDate[1]) {
             params['to'] = this.datePipe.transform(
                 this.selectedDate[1],
                 'yyyy-MM-dd'
@@ -136,144 +212,13 @@ export class AppointmentListComponent {
         });
     }
 
-    onSort() {
-        this.updateRowGroupMetaData();
-    }
-
-  
-
-    updateRowGroupMetaData() {
-        this.rowGroupMetadata = {};
-
-        if (this.customers3) {
-            for (let i = 0; i < this.customers3.length; i++) {
-                const rowData = this.customers3[i];
-                const representativeName = rowData?.representative?.name || '';
-
-                if (i === 0) {
-                    this.rowGroupMetadata[representativeName] = {
-                        index: 0,
-                        size: 1,
-                    };
-                } else {
-                    const previousRowData = this.customers3[i - 1];
-                    const previousRowGroup =
-                        previousRowData?.representative?.name;
-                    if (representativeName === previousRowGroup) {
-                        this.rowGroupMetadata[representativeName].size++;
-                    } else {
-                        this.rowGroupMetadata[representativeName] = {
-                            index: i,
-                            size: 1,
-                        };
-                    }
-                }
-            }
-        }
-    }
-
-    expandAll() {
-        if (!this.isExpanded) {
-            this.products.forEach((product) =>
-                product && product.name
-                    ? (this.expandedRows[product.name] = true)
-                    : ''
-            );
-        } else {
-            this.expandedRows = {};
-        }
-        this.isExpanded = !this.isExpanded;
-    }
-
-    formatCurrency(value: number) {
-        return value.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        });
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal(
-            (event.target as HTMLInputElement).value,
-            'contains'
-        );
-    }
-
-    goTo(url) {
-        this.router.navigateByUrl(url);
-    }
-
-    confirm2(event: Event, user) {
-        this.confirmationService.confirm({
-            key: 'confirm2',
-            target: event.target || new EventTarget(),
-            message: 'Are you sure that you want to proceed?',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.appointmentService.delete(user._id).subscribe((res) => {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Deleted',
-                        detail: 'Appointments Deleted Successfully',
-                    });
-                    let removedItemIndex = this.appointments.findIndex(
-                        (item) => item._id == user._id
-                    );
-                    this.appointments.splice(removedItemIndex, 1);
-                });
-            },
-            reject: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Rejected',
-                    detail: 'Unable to delete Appointments',
-                });
-            },
-        });
+    onSearchName(value: any) {
+        console.log(value);
+        this.searchSubject.next(value); // Push the value into the subject
     }
 
     async clear(event) {
-        this.selectedStatus = '';
-        this.selectedDate = '';
-        this.searchText = '';
-        this.loadAppointments(event);
-    }
-
-    filter() {
-        let params = {};
-        if (this.searchText != '') {
-            params['q'] = this.searchText;
-        }
-
-        if (this.selectedStatus != '') {
-            params['status'] = this.selectedStatus;
-        }
-
-        if (this.selectedDate != '') {
-            params['from'] = this.datePipe.transform(
-                this.selectedDate[0],
-                'yyyy-MM-dd'
-            );
-            params['to'] = this.datePipe.transform(
-                this.selectedDate[1],
-                'yyyy-MM-dd'
-            );
-        }
-
-        let queryParams = this.commonService.getHttpParamsByJson(params);
-        this.appointmentService.getAll(queryParams).subscribe((res) => {
-            this.appointments = res;
-        });
-    }
-    async updateStatus(id, status) {
-        this.appointmentService.update(id, { status }).subscribe((res) => {
-            this.messageService.add({
-                // key: 'tst',
-                severity: 'success',
-                summary: 'Success Message',
-                detail: 'Status updated successfully',
-            });
-        });
+        this.router.navigate(['/appointments']);
     }
 
     openDialog(id: string) {
@@ -286,5 +231,43 @@ export class AppointmentListComponent {
             },
             header: 'File Upload',
         });
+    }
+
+    exportExcel() {
+        const doctors = this.appointments.map((item) => {
+            return {
+                appointment_number: item.appointment_number,
+                first_name: item.patient.first_name,
+                last_name: item.patient.last_name,
+                mobile: item.patient.mobile,
+                status: item.status,
+                email: item.patient.email,
+            };
+        });
+        import('xlsx').then((xlsx) => {
+            const worksheet = xlsx.utils.json_to_sheet(doctors);
+            const workbook = {
+                Sheets: { data: worksheet },
+                SheetNames: ['data'],
+            };
+            const excelBuffer: any = xlsx.write(workbook, {
+                bookType: 'xlsx',
+                type: 'array',
+            });
+            this.saveAsExcelFile(excelBuffer, 'appointments');
+        });
+    }
+
+    saveAsExcelFile(buffer: any, fileName: string): void {
+        let EXCEL_TYPE =
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        let EXCEL_EXTENSION = '.xlsx';
+        const data: Blob = new Blob([buffer], {
+            type: EXCEL_TYPE,
+        });
+        FileSaver.saveAs(
+            data,
+            fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
+        );
     }
 }
