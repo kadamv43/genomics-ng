@@ -13,7 +13,6 @@ import { UsersService } from 'src/app/services/users/users.service';
     providers: [ConfirmationService, MessageService],
 })
 export class UserListComponent {
-    loading: boolean = false;
     totalRecords = 0;
     users: any = [];
     searchText = '';
@@ -27,7 +26,6 @@ export class UserListComponent {
     ) {}
 
     loadUsers(event: any) {
-        this.loading = true;
         const page = event.first / event.rows;
         const size = event.rows;
 
@@ -44,7 +42,6 @@ export class UserListComponent {
         this.userService.getAll(queryParams).subscribe((data: any) => {
             this.users = data.data;
             this.totalRecords = data.total;
-            this.loading = false;
         });
     }
 

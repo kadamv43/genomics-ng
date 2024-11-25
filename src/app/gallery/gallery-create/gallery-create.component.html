@@ -15,30 +15,28 @@
                         />
                         <small
                             class="p-error block"
-                            *ngIf="
-                                name.invalid && (name.dirty || name.touched)
-                            "
+                            *ngIf="name.invalid && (name.dirty || name.touched)"
                         >
                             Name is required</small
                         >
                     </div>
-                    
                 </div>
-                 <div class="p-fluid p-formgrid grid">
+                <div class="p-fluid p-formgrid grid">
                     <div class="field col-12 md:col-6">
                         <label htmlFor="title">Status</label>
                         <span class="required">*</span>
-                         <p-dropdown
-                                [options]="statusList"
-                                optionLabel="name"
-                                optionValue="code"
-                                formControlName="status"
-                                placeholder="Select Status"
-                            />
+                        <p-dropdown
+                            [options]="statusList"
+                            optionLabel="name"
+                            optionValue="code"
+                            formControlName="status"
+                            placeholder="Select Status"
+                        />
                         <small
                             class="p-error block"
                             *ngIf="
-                                status.invalid && (status.dirty || status.touched)
+                                status.invalid &&
+                                (status.dirty || status.touched)
                             "
                         >
                             status is required</small
@@ -53,6 +51,12 @@
                             class="primary"
                             type="submit"
                             label="Submit"
+                        ></button>
+                        <button
+                            pButton
+                            label="Back"
+                            class="secondary ml-3"
+                            [routerLink]="['/gallery']"
                         ></button>
                     </div>
                 </div>

@@ -45,6 +45,7 @@ export class UserEditComponent implements OnInit {
                     first_name: res.first_name,
                     last_name: res.last_name,
                     email: res.email,
+                    mobile:res?.mobile
                 });
             });
         });

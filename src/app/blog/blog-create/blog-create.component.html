@@ -31,10 +31,9 @@
                             pInputText
                             id="lastname2"
                             type="file"
-                             accept="image/*"
+                            accept="image/*"
                             formControlName="image"
                             (change)="onFileSelected($event)"
-
                         />
                         <small
                             class="p-error block"
@@ -46,7 +45,7 @@
                         >
                     </div>
                 </div>
-                 <div class="col-12">
+                <div class="col-12">
                     <div class="banner-image">
                         <img
                             *ngIf="imagePreview"
@@ -82,17 +81,18 @@
                     <div class="field col-12 md:col-6">
                         <label htmlFor="title">Status</label>
                         <span class="required">*</span>
-                         <p-dropdown
-                                [options]="statusList"
-                                optionLabel="name"
-                                optionValue="code"
-                                formControlName="status"
-                                placeholder="Select Status"
-                            />
+                        <p-dropdown
+                            [options]="statusList"
+                            optionLabel="name"
+                            optionValue="code"
+                            formControlName="status"
+                            placeholder="Select Status"
+                        />
                         <small
                             class="p-error block"
                             *ngIf="
-                                status.invalid && (status.dirty || status.touched)
+                                status.invalid &&
+                                (status.dirty || status.touched)
                             "
                         >
                             status is required</small
@@ -108,6 +108,14 @@
                             class="primary"
                             type="submit"
                             label="Submit"
+                        ></button>
+                        <button
+                            pButton
+                            pRipple
+                            [routerLink]="['/blogs']"
+                            class="secondary ml-3"
+                            type="button"
+                            label="Back"
                         ></button>
                     </div>
                 </div>

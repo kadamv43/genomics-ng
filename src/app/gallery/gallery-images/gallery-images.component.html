@@ -11,6 +11,12 @@
                         icon="pi pi-plus"
                         (click)="openDialog(id)"
                     ></button>
+                    <button
+                        pButton
+                        label="Back"
+                        class="secondary mb-2 ml-3"
+                        [routerLink]="['/gallery']"
+                    ></button>
                 </div>
             </ng-template>
         </p-toolbar>

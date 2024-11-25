@@ -104,7 +104,7 @@
                                     email.hasError('required')
                                 "
                             >
-                                 email required</small
+                                email required</small
                             >
                         </div>
                         <div class="field col-12 md:col-4">
@@ -152,7 +152,8 @@
                                 class="p-error block"
                                 *ngIf="
                                     specialization.invalid &&
-                                    (specialization.dirty || specialization.touched) &&
+                                    (specialization.dirty ||
+                                        specialization.touched) &&
                                     specialization.hasError('pattern')
                                 "
                             >
@@ -174,7 +175,8 @@
                                 class="p-error block"
                                 *ngIf="
                                     year_of_experience.invalid &&
-                                    (year_of_experience.dirty || year_of_experience.touched) &&
+                                    (year_of_experience.dirty ||
+                                        year_of_experience.touched) &&
                                     year_of_experience.hasError('pattern')
                                 "
                             >
@@ -204,7 +206,7 @@
                     <div class="p-fluid p-formgrid grid">
                         <div class="field col-12">
                             <label htmlFor="lastname2">Address Line 1</label>
-                        <input
+                            <input
                                 pInputText
                                 id="lastname2"
                                 type="text"
@@ -227,7 +229,7 @@
                     <div class="p-fluid p-formgrid grid">
                         <div class="field col-4">
                             <label htmlFor="lastname2">City</label>
-                             <p-dropdown
+                            <p-dropdown
                                 [options]="cities"
                                 optionLabel="name"
                                 optionValue="code"
@@ -235,9 +237,9 @@
                                 placeholder="Select City"
                             />
                         </div>
-                         <div class="field col-4">
+                        <div class="field col-4">
                             <label htmlFor="lastname2">State</label>
-                             <p-dropdown
+                            <p-dropdown
                                 [options]="states"
                                 optionLabel="name"
                                 optionValue="code"
@@ -245,7 +247,7 @@
                                 placeholder="Select State"
                             />
                         </div>
-                         <div class="field col-4">
+                        <div class="field col-4">
                             <label htmlFor="lastname2">Pincode</label>
                             <input
                                 pInputText
@@ -265,6 +267,12 @@
                             pRipple
                             type="submit"
                             label="Submit"
+                        ></button>
+                        <button
+                            pButton
+                            label="Back"
+                            class="secondary ml-3"
+                            [routerLink]="['/doctors']"
                         ></button>
                     </div>
                 </div>

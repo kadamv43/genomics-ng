@@ -43,9 +43,10 @@
                         >
                     </div>
                 </div>
-                <div class="p-fluid p-formgrid grid">
-                    <div class="field col-4">
-                        <button pButton pRipple label="Submit"></button>
+                <div class="grid">
+                    <div class="col-12">
+                        <button pButton pRipple type="submit" class="primary" label="Submit"></button>
+                        <button pButton [routerLink]="['/products']"  pRipple class="secondary ml-3" type="button" label="back"></button>
                     </div>
                 </div>
                 

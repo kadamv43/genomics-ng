@@ -89,6 +89,38 @@ export class AppMenuComponent implements OnInit {
                             routerLink: ['invoices'],
                         },
                     ],
+                },
+                {
+                    label: '',
+                    icon: 'pi pi-fw pi-briefcase',
+                    items: [
+                        {
+                            label: 'Website',
+                            icon: 'pi pi-fw pi-globe',
+                            items: [
+                                {
+                                    label: 'Banners',
+                                    icon: 'pi pi-fw pi-image',
+                                    routerLink: ['banners'],
+                                },
+                                {
+                                    label: 'Gallery',
+                                    icon: 'pi pi-fw pi-image',
+                                    routerLink: ['gallery'],
+                                },
+                                {
+                                    label: 'Blog',
+                                    icon: 'pi pi-fw pi-pencil',
+                                    routerLink: ['blogs'],
+                                },
+                                {
+                                    label: 'Contact Details',
+                                    icon: 'pi pi-fw pi-phone',
+                                    routerLink: ['contact-details'],
+                                },
+                            ],
+                        },
+                    ],
                 }
             );
         } else if (this.role == 'staff') {
@@ -100,6 +132,16 @@ export class AppMenuComponent implements OnInit {
                             label: 'Appointments',
                             icon: 'pi pi-fw pi-book',
                             routerLink: ['appointments'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Patients',
+                            icon: 'pi pi-fw pi-users',
+                            routerLink: ['patients'],
                         },
                     ],
                 },
@@ -136,19 +178,17 @@ export class AppMenuComponent implements OnInit {
                     ],
                 }
             );
-        }else if( this.role == 'doctor'){
-              this.model.push(
-                  {
-                      label: '',
-                      items: [
-                          {
-                              label: 'Appointments',
-                              icon: 'pi pi-fw pi-book',
-                              routerLink: ['appointments'],
-                          },
-                      ],
-                  },
-              );
+        } else if (this.role == 'doctor') {
+            this.model.push({
+                label: '',
+                items: [
+                    {
+                        label: 'Appointments',
+                        icon: 'pi pi-fw pi-book',
+                        routerLink: ['appointments'],
+                    },
+                ],
+            });
         }
     }
 }
