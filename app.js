@@ -1,4 +1,4 @@
-const { app,ipcMain, BrowserWindow } = require("electron");
+const { app, ipcMain, BrowserWindow, ipcRenderer } = require("electron");
 require("@electron/remote/main").initialize();
 const url = require("url");
 const path = require("path");
@@ -27,11 +27,13 @@ function createWindow() {
         })
     );
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     mainWindow.on("closed", function () {
         mainWindow = null;
     });
+
+  
 }
 
 app.on("ready", createWindow);
