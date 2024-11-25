@@ -1,6 +1,6 @@
 {
     "name": "Genomics",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "author": "Shree Swami Samarth Media Pvt Ltd",
     "description": "Genomics Admin App",
     "main": "app.js",
