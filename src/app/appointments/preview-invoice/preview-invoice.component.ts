@@ -19,6 +19,8 @@ export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
     id = '';
     invoiceDetails;
 
+    logoUrl = ""
+
     uploadPath = environment.uploadPath;
 
     pdfOptions = {

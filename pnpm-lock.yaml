@@ -62,6 +62,9 @@ importers:
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
+      html2pdf:
+        specifier: ^0.0.11
+        version: 0.0.11
       html2pdf.js:
         specifier: ^0.10.2
         version: 0.10.2
@@ -2944,6 +2947,9 @@ packages:
 
   html2pdf.js@0.10.2:
     resolution: {integrity: sha512-WyHVeMb18Bp7vYTmBv1GVsThH//K7SRfHdSdhHPkl4JvyQarNQXnailkYn0QUbRRmnN5rdbbmSIGEsPZtzPy2Q==}
+
+  html2pdf@0.0.11:
+    resolution: {integrity: sha512-Kx3I5r7lazHZzZv5lDk59jQoTxqaEGlf2BcGNvzWGPQVu0hE8jYCk4hboksuaCvmMJPa0S0A+156ZbE71Wdo2w==}
 
   htmlparser2@8.0.2:
     resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
@@ -8393,6 +8399,8 @@ snapshots:
       es6-promise: 4.2.8
       html2canvas: 1.4.1
       jspdf: 2.5.1
+
+  html2pdf@0.0.11: {}
 
   htmlparser2@8.0.2:
     dependencies:
