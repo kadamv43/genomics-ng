@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="p-fluid p-formgrid grid">
-                     <div class="field col-6 md:col-6">
+                    <div class="field col-6 md:col-6">
                         <label htmlFor="lastname2">Last name</label>
                         <input
                             pInputText
@@ -44,7 +44,39 @@
                     </div>
                 </div>
                 <div class="p-fluid p-formgrid grid">
-                     <div class="field col-6">
+                    <div class="field col-6 md:col-6">
+                        <label htmlFor="lastname2">Mobile Number</label>
+                        <input
+                            pInputText
+                            id="firstname2"
+                            type="text"
+                            formControlName="mobile"
+                        />
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                mobile.invalid &&
+                                (mobile.dirty || mobile.touched) &&
+                                mobile.hasError('required')
+                            "
+                        >
+                            mobile is required</small
+                        >
+                        <small
+                            class="p-error block"
+                            *ngIf="
+                                mobile.invalid &&
+                                (mobile.dirty || mobile.touched) &&
+                                mobile.hasError('invalidMobile')
+                            "
+                        >
+                            invalid mobile number</small
+                        >
+                    </div>
+                </div>
+
+                <div class="p-fluid p-formgrid grid">
+                    <div class="field col-6">
                         <label htmlFor="lastname2">Email</label>
                         <input
                             pInputText
@@ -52,11 +84,12 @@
                             type="email"
                             formControlName="email"
                         />
-                         <small
+                        <small
                             class="p-error block"
                             *ngIf="
                                 email.invalid &&
-                                (email.dirty || email.touched) && email.hasError('required')
+                                (email.dirty || email.touched) &&
+                                email.hasError('required')
                             "
                         >
                             email is required</small
@@ -65,20 +98,20 @@
                             class="p-error block"
                             *ngIf="
                                 email.invalid &&
-                                (email.dirty || email.touched) && email.hasError('email')
+                                (email.dirty || email.touched) &&
+                                email.hasError('email')
                             "
                         >
                             Invalid email</small
                         >
                     </div>
                 </div>
-               
+
                 <div class="p-fluid p-formgrid grid">
                     <div class="field col-4">
                         <button pButton pRipple label="Submit"></button>
                     </div>
                 </div>
-                
             </form>
         </div>
     </div>

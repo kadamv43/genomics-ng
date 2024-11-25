@@ -7,19 +7,27 @@ import { AppointmentService } from 'src/app/services/appointment/appointment.ser
 import { ElectronService } from 'src/app/services/electron.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { MessageService } from 'primeng/api';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { ApiService } from 'src/app/services/api.service';
+import { send } from 'process';
 
 @Component({
     selector: 'app-invoice',
     templateUrl: './invoice.component.html',
-    providers: [MessageService],
+    providers: [MessageService, DialogService],
     styleUrl: './invoice.component.scss',
 })
 export class InvoiceComponent implements OnInit {
+    visible: boolean = false;
+
+    ref: DynamicDialogRef | undefined;
+    message = '';
     id;
     patient_id;
     appointmenData: any = [];
     total = 0;
     invoiceForm: FormGroup;
+    otpForm: FormGroup;
     extraForm: FormGroup;
     new_total = 0;
     role = '';
@@ -43,7 +51,9 @@ export class InvoiceComponent implements OnInit {
         extras: [],
     };
 
-    queryParams = {}
+    queryParams = {};
+    config: any = {};
+    otpVisible = false;
     prePostCharges: any = [];
 
     constructor(
@@ -51,7 +61,10 @@ export class InvoiceComponent implements OnInit {
         private appointmentService: AppointmentService,
         private fb: FormBuilder,
         private router: Router,
-        private invoiceService: InvoicesService
+        private invoiceService: InvoicesService,
+        private toast: MessageService,
+        private api: ApiService,
+        private dialogService: DialogService
     ) {
         this.invoiceForm = fb.group({
             paid: [0],
@@ -63,6 +76,10 @@ export class InvoiceComponent implements OnInit {
         this.extraForm = fb.group({
             extras: this.fb.array([]),
             prePostExtras: this.fb.array([]),
+        });
+
+        this.otpForm = fb.group({
+            otp: ['', Validators.required],
         });
 
         this.onChanges();
@@ -121,7 +138,7 @@ export class InvoiceComponent implements OnInit {
     ngOnInit(): void {
         this.role = localStorage.getItem('role') ?? '';
 
-        this.queryParams = this.route.snapshot.queryParams
+        this.queryParams = this.route.snapshot.queryParams;
 
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
@@ -133,9 +150,9 @@ export class InvoiceComponent implements OnInit {
                     this.invoiceForm
                         ?.get('paid')
                         .setValue(res?.invoice?.paid ?? 0);
-                    // this.invoiceForm
-                    //     ?.get('balance')
-                    //     .setValue(res?.invoice?.balance ?? 0);
+                    this.invoiceForm
+                        ?.get('balance')
+                        .setValue(res?.invoice?.balance ?? 0);
 
                     this.invoiceForm
                         ?.get('payment_mode')
@@ -150,9 +167,14 @@ export class InvoiceComponent implements OnInit {
                     });
 
                     let services = res?.services.map((element, i) => {
-                        return { name: element.name, price: element.price,type:'service'};
+                        return {
+                            name: element.name,
+                            price: element.price,
+                            type: 'service',
+                        };
                     });
 
+                    // this.invoiceData = res?.invoice;
                     this.invoiceData.items = services;
                     res.services = services;
                     this.appointmenData = res;
@@ -180,10 +202,10 @@ export class InvoiceComponent implements OnInit {
             this.prePostCharges = data;
         });
 
-        console.log(this.invoiceData);
+        this.config = JSON.parse(localStorage.getItem('config') as string);
     }
 
-    addPrePostItem(name = '', price = ""): void {
+    addPrePostItem(name = '', price = ''): void {
         const control = this.createItem(name, price);
         this.prePostExtras.push(control);
         this.invoiceData.prepost.push({ name, price, type: 'prepost' });
@@ -277,10 +299,10 @@ export class InvoiceComponent implements OnInit {
         if (discount > 0) {
             discountedTotal = total - discount;
             balance = discountedTotal - paid;
-            this.setMaxValidation(discountedTotal);
+            // this.setMaxValidation(discountedTotal);
         } else {
             balance = total - paid;
-            this.setMaxValidation(total);
+            // this.setMaxValidation(total);
         }
 
         this.invoiceData.balance = balance;
@@ -296,24 +318,59 @@ export class InvoiceComponent implements OnInit {
         this.invoiceForm.markAllAsTouched();
 
         if (this.invoiceForm.valid && this.extraForm.valid) {
-            let invoiceDatum = {
-                appointment: this.appointmenData?._id,
-                patient: this.appointmenData?.patient?._id,
-                doctor: this.appointmenData?.doctor?._id,
-                total_amount: this.invoiceData.total,
-                paid: this.paid.value,
-                balance: this.balance.value,
-                discount: this.discount.value,
-                payment_mode: this.payment_mode.value,
-                particulars: [],
-            };
+            if (
+                this.role == 'staff' &&
+                this.discount.value > this.config[0]?.discount_limit
+            ) {
+                this.message =
+                    'Discount limit is ' + this.config[0]?.discount_limit;
+                this.visible = true;
 
-            invoiceDatum.particulars = [
-                ...this.invoiceData.items,
-                ...this.invoiceData.extras,
-                ...this.invoiceData.prepost,
-            ];
+                return;
+            }
 
+            if (this.config[0]?.invoice_generate_otp) {
+                this.sendOTP().subscribe({
+                    next: () => {
+                        this.openOtpDialog();
+                    },
+                });
+            } else {
+                this.saveInvoice();
+            }
+        }
+    }
+
+    saveInvoice() {
+        let invoiceDatum = {
+            appointment: this.appointmenData?._id,
+            patient: this.appointmenData?.patient?._id,
+            doctor: this.appointmenData?.doctor?._id,
+            total_amount: this.invoiceData.total,
+            paid: this.paid.value,
+            balance: this.balance.value,
+            discount: this.discount.value,
+            payment_mode: this.payment_mode.value,
+            particulars: [],
+        };
+
+        invoiceDatum.particulars = [
+            ...this.invoiceData.items,
+            ...this.invoiceData.extras,
+            ...this.invoiceData.prepost,
+        ];
+
+        if (this.appointmenData?.invoice) {
+            this.invoiceService
+                .update(this.appointmenData?.invoice._id, invoiceDatum)
+                .subscribe((res: any) => {
+                    this.router.navigate([
+                        'appointments',
+                        'preview-invoice',
+                        res?._id,
+                    ]);
+                });
+        } else {
             this.invoiceService.create(invoiceDatum).subscribe((res: any) => {
                 this.router.navigate([
                     'appointments',
@@ -321,6 +378,38 @@ export class InvoiceComponent implements OnInit {
                     res?._id,
                 ]);
             });
+        }
+    }
+
+    openOtpDialog() {
+        this.otpVisible = true;
+    }
+
+    sendOTP() {
+        const mobile = localStorage.getItem('mobile');
+        return this.api.sendOTP({ mobile });
+    }
+
+    get otp() {
+        return this.otpForm.get('otp');
+    }
+
+    verifyOTP() {
+        if (this.otpForm.valid) {
+            const mobile = localStorage.getItem('mobile');
+            this.api
+                .verifyOTp({ mobile: mobile, otp: this.otp.value })
+                .subscribe({
+                    next: (res) => {
+                        this.otpForm.reset();
+                        this.otpVisible = false;
+                        this.saveInvoice();
+                    },
+                    error: (err) => {
+                        this.message = err.error.message
+                        this.visible = true;
+                    },
+                });
         }
     }
 }

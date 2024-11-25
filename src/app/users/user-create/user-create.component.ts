@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import {
+    AbstractControl,
     FormBuilder,
     FormControl,
     FormGroup,
+    ValidationErrors,
     Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,6 +30,7 @@ export class UserCreateComponent {
         this.userForm = fb.group({
             first_name: ['', Validators.required],
             last_name: ['', Validators.required],
+            mobile: ['', [Validators.required, this.mobileNumberValidator]],
             email: ['', [Validators.email, Validators.required]],
         });
     }
@@ -40,6 +43,20 @@ export class UserCreateComponent {
     }
     get email() {
         return this.userForm.get('email');
+    }
+
+    get mobile() {
+        return this.userForm.get('mobile');
+    }
+
+    mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
+        const mobilePattern = /^[0-9]{10}$/;
+        if (control.value == '') {
+            return null;
+        }
+        return mobilePattern.test(control.value)
+            ? null
+            : { invalidMobile: true };
     }
 
     async submitUser() {

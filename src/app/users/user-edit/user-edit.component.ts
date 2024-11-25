@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {
+    AbstractControl,
     FormBuilder,
     FormControl,
     FormGroup,
+    ValidationErrors,
     Validators,
 } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -30,6 +32,7 @@ export class UserEditComponent implements OnInit {
         this.userForm = fb.group({
             first_name: ['', Validators.required],
             last_name: ['', Validators.required],
+            mobile: ['', [Validators.required, this.mobileNumberValidator]],
             email: ['', [Validators.email, Validators.required]],
         });
     }
@@ -41,7 +44,7 @@ export class UserEditComponent implements OnInit {
                 this.userForm.patchValue({
                     first_name: res.first_name,
                     last_name: res.last_name,
-                    email: res.email
+                    email: res.email,
                 });
             });
         });
@@ -57,12 +60,26 @@ export class UserEditComponent implements OnInit {
         return this.userForm.get('email');
     }
 
+    get mobile() {
+        return this.userForm.get('mobile');
+    }
+
+    mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
+        const mobilePattern = /^[0-9]{10}$/;
+        if (control.value == '') {
+            return null;
+        }
+        return mobilePattern.test(control.value)
+            ? null
+            : { invalidMobile: true };
+    }
+
     submitUser() {
         this.userForm.markAllAsTouched();
         let user = this.userForm.value;
 
         if (this.userForm.valid) {
-            this.api.updateUser(this.id,user).subscribe((res) => {
+            this.api.updateUser(this.id, user).subscribe((res) => {
                 this.toast.add({
                     key: 'tst',
                     severity: 'success',

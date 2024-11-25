@@ -91,8 +91,23 @@ export class ApiService {
         return this.httpService.get(url);
     }
 
-    resetPassword(id: string,params) {
+    resetPassword(id: string, params) {
         const url = 'users/reset-password/' + id;
         return this.httpService.post(url, params);
+    }
+
+    getAppConfig() {
+        const url = 'app-config';
+        return this.httpService.get(url);
+    }
+
+    sendOTP(data: any) {
+        const url = 'otp/send-otp';
+        return this.httpService.post(url, data);
+    }
+
+    verifyOTp(data: any) {
+        const url = 'otp/verify-otp';
+        return this.httpService.post(url, data);
     }
 }

@@ -96,6 +96,14 @@
                                 <!-- <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter> -->
                             </div>
                         </th>
+                         <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Mobile
+                                <!-- <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter> -->
+                            </div>
+                        </th>
                         <th style="min-width: 8rem">
                             <div
                                 class="flex justify-content-between align-items-center"
@@ -140,6 +148,9 @@
                         <td>
                             {{ customer.email }}
                         </td>
+                         <td>
+                            {{ customer.mobile }}
+                        </td>
                         <td>
                             {{ customer.role }}
                         </td>
@@ -153,7 +164,7 @@
                                 [routerLink]="[
                                     '/users',
                                     'edit',
-                                    'customer._id'
+                                    customer._id
                                 ]"
                                 class="pi mx-4 true-icon pi-pencil text-green-500 cursor-pointer"
                             ></i>

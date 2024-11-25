@@ -10,7 +10,7 @@ import { PendingInvoiceComponent } from './pending-invoice/pending-invoice.compo
 
 @Component({
     templateUrl: './dashboard.component.html',
-    providers:[DialogService]
+    providers: [DialogService],
 })
 export class DashboardComponent implements OnInit {
     items!: MenuItem[];
@@ -20,10 +20,10 @@ export class DashboardComponent implements OnInit {
     chartData: any;
 
     pendingInvoiceCount = 0;
-    pendingInvoices = []
+    pendingInvoices = [];
     ref: DynamicDialogRef | undefined;
     chartOptions: any;
-
+    role = '';
     subscription!: Subscription;
 
     constructor(
@@ -34,13 +34,16 @@ export class DashboardComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        this.role = localStorage.getItem('role');
         this.invoiceService.getPendingInvoices().subscribe({
             next: (res: any) => {
                 this.pendingInvoiceCount = res?.length;
-                this.pendingInvoices= res;
+                this.pendingInvoices = res;
                 console.log(res);
             },
         });
+
+        // this.openModal()
     }
 
     openModal() {

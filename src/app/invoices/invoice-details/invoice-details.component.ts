@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import * as print from 'print-js';
 import html2pdf from 'html2pdf.js';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
@@ -10,12 +8,12 @@ import { MessageService } from 'primeng/api';
 import { environment } from 'src/environments/environment';
 
 @Component({
-    selector: 'app-preview-invoice',
+    selector: 'app-invoice-details',
     providers: [MessageService],
-    templateUrl: './preview-invoice.component.html',
-    styleUrl: './preview-invoice.component.scss',
+    templateUrl: './invoice-details.component.html',
+    styleUrl: './invoice-details.component.scss',
 })
-export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
+export class InvoiceDetailsComponent implements OnInit, AfterViewInit {
     id = '';
     invoiceDetails;
 
@@ -51,8 +49,8 @@ export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
             .get('pdf')
             .then((pdfObj) => {
                 let url = `invoice/${this.id}`;
-                this.savePdfOnServer(url, pdfObj).subscribe({})
-            })
+                this.savePdfOnServer(url, pdfObj).subscribe({});
+            });
     }
 
     ngOnInit(): void {
@@ -83,7 +81,7 @@ export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
 
     download() {
         const element = document.getElementById('invoice'); // Replace with your element's ID
-        html2pdf().set(this.pdfOptions).from(element).save()
+        html2pdf().set(this.pdfOptions).from(element).save();
     }
 
     back() {
@@ -104,27 +102,26 @@ export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
             .get('pdf')
             .then((pdfObj) => {
                 let url = `invoice/${this.id}?send=whatsapp`;
-                this.savePdfOnServer(url,pdfObj).subscribe({
-                next: (res: any) => {
-                    this.toast.add({
-                        key: 'tst',
-                        severity: 'success',
-                        summary: 'Success Message',
-                        detail: 'Invoice Sent successfully',
-                    });
-                },
-            });
+                this.savePdfOnServer(url, pdfObj).subscribe({
+                    next: (res: any) => {
+                        this.toast.add({
+                            key: 'tst',
+                            severity: 'success',
+                            summary: 'Success Message',
+                            detail: 'Invoice Sent successfully',
+                        });
+                    },
+                });
             });
     }
 
-    savePdfOnServer(url,pdfObj) {
+    savePdfOnServer(url, pdfObj) {
         const pdfBlob = pdfObj.output('blob'); // Get the PDF as a Blob
 
         const formData = new FormData();
         formData.append('file', pdfBlob, `${this.id}.pdf`);
 
-        return this.httpService
-            .patchWithFormData(url, formData)
+        return this.httpService.patchWithFormData(url, formData);
     }
     printFile() {
         let element = document.getElementById('invoice');

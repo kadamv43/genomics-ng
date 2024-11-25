@@ -374,4 +374,23 @@
     type="button"
     label="Back"
 ></button>
-<p-toast key="tst"></p-toast>
+<p-dialog [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <span class="ext-red block mb-5">{{message}}</span>
+
+    <div class="flex justify-content-end gap-2">
+        <p-button label="ok" severity="secondary" (onClick)="visible = false" />
+    </div>
+</p-dialog>
+
+<p-dialog header="VerifY OTP" [modal]="true" [(visible)]="otpVisible" [style]="{ width: '25rem' }">
+    <form [formGroup]="otpForm" (ngSubmit)="verifyOTP()">
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">OTP</label>
+        <input formControlName="otp" pInputText id="username" class="flex-auto" autocomplete="off" />
+    </div>
+    <div class="flex justify-content-end gap-2">
+        <p-button label="Cancel" severity="secondary" (onClick)="visible = false" />
+        <p-button type="submit" label="submit" />
+    </div>
+    </form>
+</p-dialog>

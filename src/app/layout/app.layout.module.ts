@@ -21,6 +21,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { NotepadComponent } from './notepad/notepad.component';
 import { EditorModule } from 'primeng/editor';
 import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
     declarations: [
@@ -39,6 +40,7 @@ import { ButtonModule } from 'primeng/button';
         BrowserAnimationsModule,
         InputTextModule,
         SidebarModule,
+        ToastModule,
         BadgeModule,
         RadioButtonModule,
         InputSwitchModule,

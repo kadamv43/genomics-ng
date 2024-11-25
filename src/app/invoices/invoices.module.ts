@@ -9,13 +9,16 @@ import { InvoicesEditComponent } from './invoices-edit/invoices-edit.component';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
+import { InvoiceDetailsComponent } from './invoice-details/invoice-details.component';
+import { ToastModule } from 'primeng/toast';
 
 
 @NgModule({
   declarations: [
     InvoicesListComponent,
     InvoicesCreateComponent,
-    InvoicesEditComponent
+    InvoicesEditComponent,
+    InvoiceDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -23,7 +26,8 @@ import { InputTextModule } from 'primeng/inputtext';
     ButtonModule,
     TableModule,
     InputTextModule,
-    InvoicesRoutingModule
+    InvoicesRoutingModule,
+    ToastModule
   ]
 })
 export class InvoicesModule { }
