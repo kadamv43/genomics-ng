@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
     AbstractControl,
@@ -10,7 +9,6 @@ import {
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { lastValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ApiService } from 'src/app/services/api.service';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { CommonService } from 'src/app/services/common/common.service';
@@ -103,7 +101,6 @@ export class AppointmentCreateComponent implements OnInit {
         this.minDate = new Date();
 
         this.api.getProducts().subscribe((res) => {
-            console.log(res);
             this.serviceList = res;
         });
 
@@ -194,7 +191,6 @@ export class AppointmentCreateComponent implements OnInit {
                 ? new Date(this.selectedPatient.husband_dob)
                 : '',
         });
-        console.log('Selected item:', this.selectedPatient);
         // Add your logic here, e.g., update other parts of the form, make additional API calls, etc.
     }
 
@@ -247,6 +243,5 @@ export class AppointmentCreateComponent implements OnInit {
 
     onChange(e) {
         this.selectedServicesObjects = e.value;
-        console.log(e.value);
     }
 }

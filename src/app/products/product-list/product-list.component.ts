@@ -1,6 +1,4 @@
 import { Component} from '@angular/core';
-import { ProductService } from 'src/app/demo/service/product.service';
-
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 import { ConfirmationService, MessageService } from 'primeng/api';

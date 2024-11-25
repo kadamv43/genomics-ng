@@ -1,5 +1,5 @@
-import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+
+import { Component } from '@angular/core';
 import {
     AbstractControl,
     FormBuilder,
@@ -7,12 +7,9 @@ import {
     ValidationErrors,
     Validators,
 } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Route, Router } from '@angular/router';
-import { el } from '@fullcalendar/core/internal-common';
-import test from 'node:test';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { lastValueFrom } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import {  MessageService } from 'primeng/api';
+
 import { ApiService } from 'src/app/services/api.service';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { CommonService } from 'src/app/services/common/common.service';
@@ -75,7 +72,6 @@ export class AppointmentEditComponent {
         private fb: FormBuilder,
         private api: ApiService,
         private patientService: PatientService,
-        private commonServie: CommonService,
         private appointmentService: AppointmentService,
         private toast: MessageService,
         private router: Router,
@@ -118,7 +114,6 @@ export class AppointmentEditComponent {
             this.doctors = res?.data?.map((item) => {
                 return { name: item.first_name + item.last_name, ...item };
             });
-            console.log(this.doctors);
         });
 
         this.route.paramMap.subscribe((params: ParamMap) => {
@@ -246,7 +241,6 @@ export class AppointmentEditComponent {
             blood_group: this.selectedPatient.blood_group,
             dob: new Date(this.selectedPatient.dob),
         });
-        console.log('Selected item:', this.selectedPatient);
         // Add your logic here, e.g., update other parts of the form, make additional API calls, etc.
     }
 
@@ -276,7 +270,6 @@ export class AppointmentEditComponent {
 
     onChange(e) {
         this.selectedServicesObjects = e.value;
-        console.log(e.value);
     }
 
     onClickChips(text) {

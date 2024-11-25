@@ -100,47 +100,12 @@ import { AuthGuard } from './auth.guard';
                                     (m) => m.BannersModule
                                 ),
                         },
-                        {
-                            path: 'utilities',
-                            loadChildren: () =>
-                                import(
-                                    './demo/components/utilities/utilities.module'
-                                ).then((m) => m.UtilitiesModule),
-                        },
-                        {
-                            path: 'documentation',
-                            loadChildren: () =>
-                                import(
-                                    './demo/components/documentation/documentation.module'
-                                ).then((m) => m.DocumentationModule),
-                        },
-                        {
-                            path: 'blocks',
-                            loadChildren: () =>
-                                import(
-                                    './demo/components/primeblocks/primeblocks.module'
-                                ).then((m) => m.PrimeBlocksModule),
-                        },
-                        {
-                            path: 'pages',
-                            loadChildren: () =>
-                                import(
-                                    './demo/components/pages/pages.module'
-                                ).then((m) => m.PagesModule),
-                        },
                     ],
                 },
                 {
                     path: 'auth',
                     loadChildren: () =>
                         import('./auth/auth.module').then((m) => m.AuthModule),
-                },
-                {
-                    path: 'landing',
-                    loadChildren: () =>
-                        import('./demo/components/landing/landing.module').then(
-                            (m) => m.LandingModule
-                        ),
                 },
                 { path: 'notfound', component: NotfoundComponent },
                 { path: '**', redirectTo: '/notfound' },

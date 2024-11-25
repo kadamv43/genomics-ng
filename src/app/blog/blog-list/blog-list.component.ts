@@ -1,22 +1,15 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Customer, Representative } from 'src/app/demo/api/customer';
-import { CustomerService } from 'src/app/demo/service/customer.service';
-import { Product } from 'src/app/demo/api/product';
-import { ProductService } from 'src/app/demo/service/product.service';
+import { Component } from '@angular/core';
 import { Table } from 'primeng/table';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
-import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { ApiService } from 'src/app/services/api.service';
 import { CommonService } from 'src/app/services/common/common.service';
-import { serialize } from 'v8';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DatePipe } from '@angular/common';
 import { FileUploadFormComponent } from 'src/app/appointments/file-upload-form/file-upload-form.component';
 import { BlogsService } from 'src/app/services/blogs/blogs.service';
 import * as FileSaver from 'file-saver';
-import { title } from 'process';
 
 interface expandedRows {
     [key: string]: boolean;
@@ -40,27 +33,6 @@ export class BlogListComponent {
     selectedStatus = '';
     selectedDate = '';
     searchText = '';
-    customers1: Customer[] = [];
-
-    customers2: Customer[] = [];
-
-    customers3: Customer[] = [];
-
-    selectedCustomers1: Customer[] = [];
-
-    selectedCustomer: Customer = {};
-
-    representatives: Representative[] = [];
-
-    statuses: any[] = [];
-
-    products: Product[] = [];
-
-    rowGroupMetadata: any;
-
-    expandedRows: expandedRows = {};
-
-    activityValues: number[] = [0, 100];
 
     isExpanded: boolean = false;
 
@@ -132,67 +104,6 @@ export class BlogListComponent {
             this.totalRecords = data.total;
             this.loading = false;
         });
-    }
-
-    onSort() {
-        this.updateRowGroupMetaData();
-    }
-
-    updateRowGroupMetaData() {
-        this.rowGroupMetadata = {};
-
-        if (this.customers3) {
-            for (let i = 0; i < this.customers3.length; i++) {
-                const rowData = this.customers3[i];
-                const representativeName = rowData?.representative?.name || '';
-
-                if (i === 0) {
-                    this.rowGroupMetadata[representativeName] = {
-                        index: 0,
-                        size: 1,
-                    };
-                } else {
-                    const previousRowData = this.customers3[i - 1];
-                    const previousRowGroup =
-                        previousRowData?.representative?.name;
-                    if (representativeName === previousRowGroup) {
-                        this.rowGroupMetadata[representativeName].size++;
-                    } else {
-                        this.rowGroupMetadata[representativeName] = {
-                            index: i,
-                            size: 1,
-                        };
-                    }
-                }
-            }
-        }
-    }
-
-    expandAll() {
-        if (!this.isExpanded) {
-            this.products.forEach((product) =>
-                product && product.name
-                    ? (this.expandedRows[product.name] = true)
-                    : ''
-            );
-        } else {
-            this.expandedRows = {};
-        }
-        this.isExpanded = !this.isExpanded;
-    }
-
-    formatCurrency(value: number) {
-        return value.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        });
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal(
-            (event.target as HTMLInputElement).value,
-            'contains'
-        );
     }
 
     goTo(url) {

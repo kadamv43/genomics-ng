@@ -3,7 +3,6 @@ import { MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from 'src/app/services/http.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-file-upload-form',
@@ -24,8 +23,7 @@ export class FileUploadFormComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.fileNameInput = this.dialogConfig.data.fileNameInput;
-        console.log('~ this.dialogConfig.data:', this.dialogConfig.data);
+        this.fileNameInput = this.dialogConfig.data.fileNameInput;;
         this.fileUploadUrl =
             this.fileUploadUrl + '/' + this.dialogConfig.data.id;
         this.acceptedFiles = this.dialogConfig.data.fileTypes;
@@ -44,13 +42,8 @@ export class FileUploadFormComponent implements OnInit {
     }
 
     async onUpload(event: any) {
-        console.log('ee');
-        console.log(event);
         // Access the uploaded file from the event
-        const uploadedFiles = event.files;
-
-        console.log(uploadedFiles);
-
+        const uploadedFiles = event.files
         // Create form data for the uploaded file
         const formData = new FormData();
         uploadedFiles.forEach((file) => {

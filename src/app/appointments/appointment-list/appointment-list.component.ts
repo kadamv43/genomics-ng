@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Customer, Representative } from 'src/app/demo/api/customer';
-import { Product } from 'src/app/demo/api/product';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,13 +10,9 @@ import { DatePipe } from '@angular/common';
 import {
     debounceTime,
     distinctUntilChanged,
-    first,
-    last,
-    map,
     Subject,
 } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { dA } from '@fullcalendar/core/internal-common';
 
 @Component({
     selector: 'app-appointment-list',
@@ -41,21 +35,8 @@ export class AppointmentListComponent implements OnInit {
     selectedStatus = '';
     selectedDate = [];
     searchText = '';
-    customers1: Customer[] = [];
-
-    customers2: Customer[] = [];
-
-    customers3: Customer[] = [];
-
-    selectedCustomers1: Customer[] = [];
-
-    selectedCustomer: Customer = {};
-
-    representatives: Representative[] = [];
 
     statuses: any[] = [];
-
-    products: Product[] = [];
 
     rowGroupMetadata: any;
 
@@ -93,27 +74,22 @@ export class AppointmentListComponent implements OnInit {
             .subscribe((value) => {
                 this.searchText = value;
                 this.queryParams['search'] = this.searchText;
-                console.log(this.queryParams);
                 let data = { first: 0, rows: 10 };
                 this.loadAppointments(data);
             });
     }
 
-    searchApi(value: string) {
-        console.log('api', value);
-    }
 
     onStatusChange(value: string) {
         this.selectedStatus = value;
         this.queryParams['status'] = value;
-        console.log(this.queryParams);
         let data = { first: 0, rows: 10 };
         this.loadAppointments(data);
     }
 
     onDateChange(value: any) {
         this.selectedDate = value;
-        console.log(this.selectedDate);
+
         if (this.selectedDate[0]) {
             this.queryParams['from'] = this.datePipe.transform(
                 this.selectedDate[0],
@@ -187,7 +163,6 @@ export class AppointmentListComponent implements OnInit {
         }
 
         if (this.selectedDate && this.selectedDate[0]) {
-            console.log(this.selectedDate);
             params['from'] = this.datePipe.transform(
                 this.selectedDate[0],
                 'yyyy-MM-dd'
@@ -213,7 +188,6 @@ export class AppointmentListComponent implements OnInit {
     }
 
     onSearchName(value: any) {
-        console.log(value);
         this.searchSubject.next(value); // Push the value into the subject
     }
 

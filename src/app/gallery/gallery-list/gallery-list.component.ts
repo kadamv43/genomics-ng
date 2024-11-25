@@ -1,11 +1,7 @@
 import { Component } from '@angular/core';
-import { Customer, Representative } from 'src/app/demo/api/customer';
-import { Product } from 'src/app/demo/api/product';
-import { Table } from 'primeng/table';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { ApiService } from 'src/app/services/api.service';
 import { CommonService } from 'src/app/services/common/common.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DatePipe } from '@angular/common';
@@ -31,21 +27,6 @@ export class GalleryListComponent {
     selectedStatus = '';
     selectedDate = '';
     searchText = '';
-    customers1: Customer[] = [];
-
-    customers2: Customer[] = [];
-
-    customers3: Customer[] = [];
-
-    selectedCustomers1: Customer[] = [];
-
-    selectedCustomer: Customer = {};
-
-    representatives: Representative[] = [];
-
-    statuses: any[] = [];
-
-    products: Product[] = [];
 
     rowGroupMetadata: any;
 
@@ -75,7 +56,6 @@ export class GalleryListComponent {
         private authService: AuthService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private api: ApiService,
         private commonService: CommonService,
         private dialogService: DialogService,
         private datePipe: DatePipe
@@ -121,54 +101,6 @@ export class GalleryListComponent {
             this.totalRecords = data.total;
             this.loading = false;
         });
-    }
-
-    onSort() {
-        this.updateRowGroupMetaData();
-    }
-
-    updateRowGroupMetaData() {
-        this.rowGroupMetadata = {};
-
-        if (this.customers3) {
-            for (let i = 0; i < this.customers3.length; i++) {
-                const rowData = this.customers3[i];
-                const representativeName = rowData?.representative?.name || '';
-
-                if (i === 0) {
-                    this.rowGroupMetadata[representativeName] = {
-                        index: 0,
-                        size: 1,
-                    };
-                } else {
-                    const previousRowData = this.customers3[i - 1];
-                    const previousRowGroup =
-                        previousRowData?.representative?.name;
-                    if (representativeName === previousRowGroup) {
-                        this.rowGroupMetadata[representativeName].size++;
-                    } else {
-                        this.rowGroupMetadata[representativeName] = {
-                            index: i,
-                            size: 1,
-                        };
-                    }
-                }
-            }
-        }
-    }
-
-    formatCurrency(value: number) {
-        return value.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        });
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal(
-            (event.target as HTMLInputElement).value,
-            'contains'
-        );
     }
 
     goTo(url) {

@@ -1,8 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { Product } from '../../api/product';
-import { ProductService } from '../../service/product.service';
-import { Subscription, debounceTime } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -15,8 +13,6 @@ import { PendingInvoiceComponent } from './pending-invoice/pending-invoice.compo
 export class DashboardComponent implements OnInit {
     items!: MenuItem[];
 
-    products!: Product[];
-
     chartData: any;
 
     pendingInvoiceCount = 0;
@@ -27,7 +23,6 @@ export class DashboardComponent implements OnInit {
     subscription!: Subscription;
 
     constructor(
-        private productService: ProductService,
         public layoutService: LayoutService,
         private invoiceService: InvoicesService,
         public dialogService: DialogService
@@ -42,8 +37,6 @@ export class DashboardComponent implements OnInit {
                 console.log(res);
             },
         });
-
-        // this.openModal()
     }
 
     openModal() {
