@@ -4,7 +4,6 @@ import { LayoutService } from "./service/app.layout.service";
 import { AuthService } from '../services/auth.service';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { NotepadComponent } from './notepad/notepad.component';
-import { ElectronService } from '../services/electron.service';
 
 @Component({
     selector: 'app-topbar',
@@ -26,7 +25,6 @@ export class AppTopBarComponent {
         public layoutService: LayoutService,
         private authService: AuthService,
         public dialogService: DialogService,
-        private electornService:ElectronService
     ) {}
 
     logout() {
@@ -43,26 +41,4 @@ export class AppTopBarComponent {
         });
     }
 
-    async checkForUpdates() {
-        const updateStatus = await this.electornService.checkForUpdate();
-
-        if (updateStatus.updateAvailable) {
-            const confirmUpdate = confirm(
-                `Update available (v${updateStatus.version}). Download now?`
-            );
-            if (confirmUpdate) {
-                const result = await this.electornService.downloadUpdate(
-                    updateStatus
-                );
-                if (result.success) {
-                    alert('Update downloaded. Restarting...');
-                    (window as any).electron.app.relaunch();
-                } else {
-                    alert(`Update failed: ${result.error}`);
-                }
-            }
-        } else {
-            alert('No updates available.');
-        }
-    }
 }

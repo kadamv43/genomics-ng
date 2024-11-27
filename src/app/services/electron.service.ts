@@ -1,23 +1,40 @@
 import { Injectable } from '@angular/core';
 
-let fs: typeof import('fs');
-let path: typeof import('path');
-let dialog: typeof import('@electron/remote').dialog;
-let app: typeof import('@electron/remote').app;
-
 @Injectable({
     providedIn: 'root',
 })
 export class ElectronService {
+    private ipcRenderer = (window as any).electron?.ipcRenderer;
+
+    on(channel: string, listener: (event: any, ...args: any[]) => void): void {
+        if (!this.ipcRenderer) {
+            console.warn('Electron IPC Renderer is not available.');
+            return;
+        }
+        this.ipcRenderer.on(channel, listener);
+    }
 
     checkForUpdate(): Promise<any> {
-        return (window as any).electron.ipcRenderer.invoke('check-for-update');
+        if (!this.ipcRenderer) {
+            console.error('Electron IPC Renderer is not available.');
+            return Promise.reject('Electron IPC Renderer is not available.');
+        }
+        return this.ipcRenderer.invoke('check-for-update');
     }
 
     downloadUpdate(updateInfo: any): Promise<any> {
-        return (window as any).electron.ipcRenderer.invoke(
-            'download-update',
-            updateInfo
-        );
+        if (!this.ipcRenderer) {
+            console.error('Electron IPC Renderer is not available.');
+            return Promise.reject('Electron IPC Renderer is not available.');
+        }
+        return this.ipcRenderer.invoke('download-update', updateInfo);
+    }
+
+    relaunchApp() {
+        if (!this.ipcRenderer) {
+            console.error('Electron IPC Renderer is not available.');
+            return;
+        }
+        (window as any).electron.app.relaunch();
     }
 }

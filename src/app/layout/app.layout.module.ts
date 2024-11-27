@@ -22,6 +22,7 @@ import { NotepadComponent } from './notepad/notepad.component';
 import { EditorModule } from 'primeng/editor';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @NgModule({
     declarations: [
@@ -49,6 +50,7 @@ import { ToastModule } from 'primeng/toast';
         AppConfigModule,
         OverlayPanelModule,
         EditorModule,
+        ProgressBarModule,
         ButtonModule
     ],
     exports: [AppLayoutComponent]
