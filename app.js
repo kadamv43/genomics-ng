@@ -1,7 +1,6 @@
 const { app, ipcMain, BrowserWindow, ipcRenderer } = require("electron");
 require("@electron/remote/main").initialize();
 const url = require("url");
-const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const AdmZip = require("adm-zip");
@@ -51,49 +50,80 @@ async function downloadAndExtractUpdate(url) {
         const zipPath = path.join(app.getPath("temp"), "update.zip");
         const outputDir = path.join(app.getAppPath(), "resources", "app"); // App folder
 
+        const progressStages = {
+            downloading: 0.6, // 60% weight
+            extracting: 0.2, // 20% weight
+            installing: 0.2, // 20% weight
+        };
+
+        // Progress initialization
+        let totalProgress = 0;
+
+        // Progress helper
+        const updateProgress = (stageProgress) => {
+            totalProgress += stageProgress;
+            mainWindow.webContents.send("progress", {
+                progress: totalProgress,
+            });
+        };
+
+
         progressData.total = 100;
         mainWindow.webContents.send("progress", progressData);
 
         // Download the ZIP file with progress
         const writer = fs.createWriteStream(zipPath);
-        const response = await axios({
-            url,
-            method: "GET",
-            responseType: "stream",
-        });
 
-         const totalLength = parseInt(response.headers["content-length"], 10);
-         let downloaded = 0;
 
-         response.data.on("data", (chunk) => {
-             downloaded += chunk.length;
-             const progress = Math.round((downloaded / totalLength) * 100);
+        const response = await fetch(url);
 
-             // Send progress to renderer
-             mainWindow.webContents.send("progress", {
-                 total: totalLength,
-                 progress,
-             });
-         });
+        if (!response.ok) {
+            throw new Error(
+                `Failed to download update: ${response.statusText}`
+            );
+        }
 
-        response.data.pipe(writer);
+        const totalLength = parseInt(
+            response.headers.get("content-length"),
+            10
+        );
+        let downloaded = 0;
 
-        // Wait for download to finish
-        await new Promise((resolve, reject) => {
-            writer.on("finish", resolve);
-            writer.on("error", reject);
-        });
+        // Create a write stream for saving the downloaded file
+        const readableStream = response.body;
 
-        console.log("Update downloaded.");
+        // Monitor download progress
+        for await (const chunk of readableStream) {
+            writer.write(chunk);
+            downloaded += chunk.length;
+
+            // const progress = Math.round((downloaded / totalLength) * 100);
+
+            // Send progress to renderer
+            const stageProgress =
+                progressStages.downloading * (chunk.length / totalLength) * 100;
+            updateProgress(stageProgress);
+        }
+
+        writer.end();
+
 
         // Extract the ZIP file
         const zip = new AdmZip(zipPath);
         zip.extractAllTo(outputDir, true);
 
+
+         updateProgress(progressStages.extracting * 100);
+
         console.log("Update extracted.");
+
+
+               
 
         // Install dependencies (node_modules) using npm install
         await installDependencies(outputDir);
+
+         updateProgress(progressStages.installing * 100);
 
         // Clean up the temporary files
         fs.unlinkSync(zipPath);
@@ -132,18 +162,25 @@ ipcMain.handle("get-app-version", () => {
 
 ipcMain.handle("check-for-update", async () => {
     try {
-        const updateInfo = await axios.get(
-            "https://stageapi.genomicsivfcentre.com/public/assets/admin-app/version.json"
-        );
-        const currentVersion = app.getVersion();
-        console.log(updateInfo);
+       const response = await fetch(
+           "https://stageapi.genomicsivfcentre.com/public/assets/admin-app/version.json"
+       );
 
-        console.log(app.getVersion());
+       if (!response.ok) {
+           throw new Error(`HTTP error! status: ${response.status}`);
+       }
+
+       const updateInfo = await response.json();
+       const currentVersion = app.getVersion();
+
+       console.log(updateInfo);
+       console.log(currentVersion);
+
         if (updateInfo.latest !== currentVersion) {
             return {
                 updateAvailable: true,
-                version: updateInfo.data.latest,
-                url: updateInfo.data.url,
+                version: updateInfo.latest,
+                url: updateInfo.url,
             };
         }
         return { updateAvailable: false };

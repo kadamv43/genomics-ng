@@ -5,7 +5,7 @@
     </div>
     <div class="layout-main-container">
         <div class="layout-main">
-            <div *ngIf="progress > 0" class="card">
+            <div *ngIf="progress!=''" class="card">
                 <p-progressBar  [value]="progress" />
             </div>
             <router-outlet></router-outlet>

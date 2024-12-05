@@ -10,12 +10,12 @@ import { AppTopBarComponent } from './app.topbar.component';
     templateUrl: './app.layout.component.html',
 })
 export class AppLayoutComponent implements OnInit, OnDestroy {
-    progress = 0;
+    progress = "";
     ngOnInit(): void {
         (window as any).electron?.ipcRenderer.on(
             'progress',
             (event: any, progress: { total: number; progress: number }) => {
-                this.progress = progress.progress;
+                this.progress = progress.progress.toFixed(2);
                 this.cdr.detectChanges(); // Trigger change detection manually
             }
         );
