@@ -50,6 +50,7 @@ async function downloadAndExtractUpdate(url) {
         console.log("Downloading update from:", url);
         const zipPath = path.join(app.getPath("temp"), "update.zip");
         const outputDir = path.join(app.getAppPath(), "resources", "app"); // App folder
+        const writer = fs.createWriteStream(zipPath);
 
         const progressStages = {
             downloading: 0.6, // 60% weight
@@ -73,7 +74,7 @@ async function downloadAndExtractUpdate(url) {
         mainWindow.webContents.send("progress", progressData);
 
         // Download the ZIP file with progress
-        const writer = fs.createWriteStream(zipPath);
+       
 
 
         const response = await fetch(url);
