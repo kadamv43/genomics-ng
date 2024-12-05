@@ -23,6 +23,7 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: true,
             enableRemoteModule: true,
+            nativeWindowOpen:true
         },
     });
 
