@@ -80,8 +80,8 @@ export class AppointmentEditComponent {
         this.appointmentForm = fb.group({
             patientInfo: this.fb.group({
                 first_name: ['', Validators.required],
-                last_name: ['', Validators.required],
-                husband_name: ['', Validators.required],
+                last_name: [''],
+                husband_name: [''],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
                 husband_mobile: ['', [this.mobileNumberValidator]],
                 email: ['', Validators.email],

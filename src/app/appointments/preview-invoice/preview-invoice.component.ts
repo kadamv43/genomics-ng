@@ -15,7 +15,7 @@ import { environment } from 'src/environments/environment';
     templateUrl: './preview-invoice.component.html',
     styleUrl: './preview-invoice.component.scss',
 })
-export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
+export class PreviewInvoiceComponent implements OnInit {
     id = '';
     invoiceDetails;
 
@@ -45,20 +45,6 @@ export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
         private httpService: HttpService,
         private toast: MessageService
     ) {}
-    ngAfterViewInit(): void {
-        const element = document.getElementById('invoice'); // Replace with your element's ID
-
-        html2pdf()
-            .set(this.pdfOptions)
-            .from(element)
-            .toPdf()
-            .get('pdf')
-            .then((pdfObj) => {
-                let url = `invoice/${this.id}`;
-                this.savePdfOnServer(url, pdfObj).subscribe({});
-            });
-    }
-
     ngOnInit(): void {
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
@@ -87,7 +73,17 @@ export class PreviewInvoiceComponent implements OnInit, AfterViewInit {
 
     download() {
         const element = document.getElementById('invoice'); // Replace with your element's ID
-        html2pdf().set(this.pdfOptions).from(element).save();
+
+         html2pdf()
+             .set(this.pdfOptions)
+             .from(element)
+             .toPdf()
+             .get('pdf')
+             .then((pdfObj) => {
+                 let url = `invoice/${this.id}`;
+                 this.savePdfOnServer(url, pdfObj).subscribe({});
+             }).save()
+        // html2pdf().set(this.pdfOptions).from(element).save();
     }
 
     back() {
