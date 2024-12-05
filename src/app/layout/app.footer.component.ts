@@ -37,7 +37,7 @@ export class AppFooterComponent {
         console.log('updateStatus', updateStatus);
 
         if (updateStatus.updateAvailable) {
-            const confirmUpdate = confirm(
+            const confirmUpdate = (window as any).confirm(
                 `Update available (v${updateStatus.version}). Download now?`
             );
             if (confirmUpdate) {
