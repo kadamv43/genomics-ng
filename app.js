@@ -1,220 +1,85 @@
-const { app, ipcMain, BrowserWindow, ipcRenderer } = require("electron");
-require("@electron/remote/main").initialize();
-const url = require("url");
-const fs = require("fs");
+const { app, BrowserWindow, ipcMain } = require("electron");
+const { autoUpdater } = require("electron-updater");
 const path = require("path");
 
-const AdmZip = require("adm-zip");
-const { exec } = require("child_process");
-
 let mainWindow;
-let progressData = { total: 0, progress: 0 };
 
-
-function createWindow() {
+function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        icon: path.join(
-            __dirname,
-            `/dist/sakai-ng/assets/layout/images/logo.ico`
-        ),
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true,
-            contextIsolation: true,
-            enableRemoteModule: true,
-            nativeWindowOpen:true
+            contextIsolation: true, // Required for secure IPC
+            nodeIntegration: false, // Recommended to disable
         },
     });
 
-    require("@electron/remote/main").enable(mainWindow.webContents);
+    // Load the Angular app
+    mainWindow.loadFile(path.join(__dirname, "/dist/sakai-ng/index.html"));
 
-    mainWindow.loadURL(
-        url.format({
-            pathname: path.join(__dirname, `/dist/sakai-ng/index.html`),
-            protocol: "file:",
-            slashes: true,
-        })
-    );
-    // Open the DevTools.
-   // mainWindow.webContents.openDevTools();
+    // Open DevTools for debugging (disable in production)
+    mainWindow.webContents.openDevTools();
 
-    mainWindow.on("closed", function () {
+    mainWindow.on("closed", () => {
         mainWindow = null;
     });
+
+    setupAutoUpdater();
 }
 
-// Function to download and extract the update
-async function downloadAndExtractUpdate(url) {
-    try {
-        console.log("Downloading update from:", url);
-        const zipPath = path.join(app.getPath("temp"), "update.zip");
-        const outputDir = path.join(app.getAppPath(), "resources", "app"); // App folder
-        const writer = fs.createWriteStream(zipPath);
+// Auto-Updater configuration and events
+function setupAutoUpdater() {
+    autoUpdater.on("checking-for-update", () => {
+        sendStatusToRenderer("Checking for updates...");
+    });
 
-        const progressStages = {
-            downloading: 0.6, // 60% weight
-            extracting: 0.2, // 20% weight
-            installing: 0.2, // 20% weight
-        };
+    autoUpdater.on("update-available", (info) => {
+        sendStatusToRenderer("Update available. Downloading...");
+    });
 
-        // Progress initialization
-        let totalProgress = 0;
+    autoUpdater.on("update-not-available", () => {
+        sendStatusToRenderer("No updates available.");
+    });
 
-        // Progress helper
-        const updateProgress = (stageProgress) => {
-            totalProgress += stageProgress;
-            mainWindow.webContents.send("progress", {
-                progress: totalProgress,
-            });
-        };
+    autoUpdater.on("download-progress", (progressObj) => {
+        mainWindow?.webContents.send("download-progress", progressObj);
+    });
 
+    autoUpdater.on("update-downloaded", () => {
+        sendStatusToRenderer("Update downloaded. Ready to install.");
+    });
 
-        progressData.total = 100;
-        mainWindow.webContents.send("progress", progressData);
-
-        // Download the ZIP file with progress
-       
-
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(
-                `Failed to download update: ${response.statusText}`
-            );
-        }
-
-        const totalLength = parseInt(
-            response.headers.get("content-length"),
-            10
-        );
-        let downloaded = 0;
-
-        // Create a write stream for saving the downloaded file
-        const readableStream = response.body;
-
-        // Monitor download progress
-        for await (const chunk of readableStream) {
-            writer.write(chunk);
-            downloaded += chunk.length;
-
-            // const progress = Math.round((downloaded / totalLength) * 100);
-
-            // Send progress to renderer
-            const stageProgress =
-                progressStages.downloading * (chunk.length / totalLength) * 100;
-            updateProgress(stageProgress);
-        }
-
-        writer.end();
-
-
-        // Extract the ZIP file
-        const zip = new AdmZip(zipPath);
-        zip.extractAllTo(outputDir, true);
-
-
-         updateProgress(progressStages.extracting * 100);
-
-        console.log("Update extracted.");
-
-
-               
-
-        // Install dependencies (node_modules) using npm install
-        await installDependencies(outputDir);
-
-         updateProgress(progressStages.installing * 100);
-
-        // Clean up the temporary files
-        fs.unlinkSync(zipPath);
-
-        // Relaunch the app after updating
-        app.relaunch();
-        app.exit(0);
-
-        return { success: true };
-    } catch (error) {
-        console.error("Error downloading or extracting update:", error);
-        return { success: false, error: error.message };
-    }
-}
-
-async function installDependencies(outputDir) {
-    return new Promise((resolve, reject) => {
-        console.log("Installing dependencies...");
-
-        // Execute `npm install` in the app directory (where package.json is located)
-        exec("npm install", { cwd: outputDir }, (error, stdout, stderr) => {
-            if (error) {
-                console.error("Error during npm install:", stderr);
-                reject(error);
-            } else {
-                console.log("Dependencies installed successfully.");
-                resolve();
-            }
-        });
+    autoUpdater.on("error", (err) => {
+        sendStatusToRenderer(`Error: ${err.message}`);
     });
 }
 
-ipcMain.handle("get-app-version", () => {
-    return app.getVersion(); // Return the app version
+// Send messages to Angular app
+function sendStatusToRenderer(message) {
+    mainWindow?.webContents.send("update-status", message);
+}
+
+// IPC Handlers
+ipcMain.on("check-for-updates", () => {
+    autoUpdater.checkForUpdates();
 });
 
-ipcMain.handle("check-for-update", async () => {
-    try {
-       const response = await fetch(
-           "https://stageapi.genomicsivfcentre.com/public/assets/admin-app/version.json"
-       );
+ipcMain.on("install-update", () => {
+    autoUpdater.quitAndInstall();
+});
 
-       if (!response.ok) {
-           throw new Error(`HTTP error! status: ${response.status}`);
-       }
+// App Lifecycle
+app.on("ready", createMainWindow);
 
-       const updateInfo = await response.json();
-       const currentVersion = app.getVersion();
-
-       console.log(updateInfo);
-       console.log(currentVersion);
-
-        if (updateInfo.latest !== currentVersion) {
-            return {
-                updateAvailable: true,
-                version: updateInfo.latest,
-                url: updateInfo.url,
-            };
-        }
-        return { updateAvailable: false };
-    } catch (error) {
-        console.error("Error checking for updates:", error);
-        return { updateAvailable: false, error: error.message };
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        app.quit();
     }
 });
 
-// IPC handler for downloading updates
-ipcMain.handle("download-update", async (event, { url }) => {
-    return await downloadAndExtractUpdate(url);
-});
-
-// Initialize the Electron app
-app.on("ready", () => {
-    createWindow();
-    // updateApp(); // Check for updates on app launch
-});
-
-// app.on("ready", createWindow);
-
-app.on("window-all-closed", function () {
-    if (process.platform !== "darwin") app.quit();
-});
-
-app.on("activate", function () {
-    if (mainWindow === null) createWindow();
-});
-
-ipcMain.on("download-file", (event, url) => {
-    const win = BrowserWindow.getFocusedWindow();
-    win.webContents.downloadURL(url);
+app.on("activate", () => {
+    if (!mainWindow) {
+        createMainWindow();
+    }
 });
