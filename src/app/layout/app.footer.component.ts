@@ -17,8 +17,14 @@ export class AppFooterComponent {
         this.getAppVersion();
     }
 
+    isElectronApp(): boolean {
+        return !!(window && (window as any).electron);
+    }
+
     constructor(private zone: NgZone, public layoutService: LayoutService) {
-        this.listenForUpdates();
+        if (this.isElectronApp()) {
+            this.listenForUpdates();
+        }
     }
 
     async getAppVersion() {

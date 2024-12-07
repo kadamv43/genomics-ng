@@ -32,21 +32,15 @@
     </div>
 
     <div class="grid">
-        <div class="col-2">
-            <button
-                class="secondary"
-                pButton
-                (click)="addPrePostItem()"
-                type="button"
-            >
+        <div class="col-12">
+            <button class="secondary" pButton (click)="addPrePostItem()" type="button">
                 Add Pre/Post Items
             </button>
-        </div>
-        <div class="col-3">
-            <button class="secondary" pButton (click)="addItem()" type="button">
+            <button class="secondary ml-3" pButton (click)="addItem()" type="button">
                 Add Extra Items
             </button>
         </div>
+
     </div>
 
     <div class="grid">
@@ -54,147 +48,90 @@
             <div [formGroup]="extraForm" class="card">
                 <div class="grid border-bottom">
                     <div class="col-2 text-l">SR NO.</div>
-                    <div class="col-4 text-l">PARTICULARS</div>
+                    <div class="col-5 text-l">PARTICULARS</div>
                     <div class="col-3 text-l">AMOUNT</div>
                 </div>
-                <div
-                    class="grid mt-2"
-                    *ngFor="let item of appointmenData?.services; let i = index"
-                >
+                <div class="grid mt-2" *ngFor="let item of appointmenData?.services; let i = index">
                     <div class="col-2">
                         {{ i + 1 }}
                     </div>
-                    <div class="col-4">
+                    <div class="col-5">
                         {{ item?.name }}
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         {{ item?.price }}
                     </div>
                 </div>
                 <div class="" formArrayName="prePostExtras">
-                    <div
-                        class="grid mt-2"
-                        *ngFor="
+                    <div class="grid mt-2" *ngFor="
                             let item of prePostExtras.controls;
                             let i = index
-                        "
-                        [formGroupName]="i"
-                    >
+                        " [formGroupName]="i">
                         <div class="col-2"></div>
 
-                        <div class="col-4">
-                            <p-dropdown
-                                [options]="prePostCharges"
-                                optionLabel="name"
-                                optionValue="code"
-                                formControlName="name"
-                                (change)="onPrePostValueChange(i)"
-                                placeholder="Select Pre Post"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
+                        <div class="col-5">
+                            <p-dropdown class="w-full" [options]="prePostCharges" optionLabel="name" optionValue="code"
+                                formControlName="name" (change)="onPrePostValueChange(i)"
+                                placeholder="Select Pre Post" />
+                            <small class="p-error block" *ngIf="
                                     item.get('name').invalid &&
                                     (item.get('name').dirty ||
                                         item.get('name').touched) &&
                                     item.get('name').hasError('required')
-                                "
-                            >
-                                Particular is required</small
-                            >
+                                ">
+                                Particular is required</small>
                         </div>
 
-                        <div class="col-3">
-                            <input
-                                pInputText
-                                (change)="onPrePostValueChange(i)"
-                                formControlName="price"
-                                type="text"
-                            />
+                        <div class="col-2">
+                            <input class="w-full" pInputText (change)="onPrePostValueChange(i)" formControlName="price"
+                                type="text" />
 
-                            <small
-                                class="p-error block"
-                                *ngIf="
+                            <small class="p-error block" *ngIf="
                                     item.get('price').invalid &&
                                     (item.get('price').dirty ||
                                         item.get('price').touched) &&
                                     item.get('price').hasError('required')
-                                "
-                            >
-                                Price is required</small
-                            >
+                                ">
+                                Price is required</small>
                         </div>
 
                         <div class="col-3">
-                            <button
-                                pButton
-                                pRipple
-                                (click)="removePrePostItem(i)"
-                                type="button"
-                                icon="pi pi-minus"
-                                class="p-button-danger p-button-rounded"
-                            ></button>
+                            <button pButton pRipple (click)="removePrePostItem(i)" type="button" icon="pi pi-minus"
+                                class="p-button-danger p-button-rounded"></button>
                         </div>
                     </div>
                 </div>
                 <div class="" formArrayName="extras">
-                    <div
-                        class="grid mt-2"
-                        *ngFor="let item of extras.controls; let i = index"
-                        [formGroupName]="i"
-                    >
+                    <div class="grid mt-2" *ngFor="let item of extras.controls; let i = index" [formGroupName]="i">
                         <div class="col-2"></div>
 
-                        <div class="col-4">
-                            <input
-                                pInputText
-                                (change)="onExtraValueChange(i)"
-                                formControlName="name"
-                                type="text"
-                            />
-                            <small
-                                class="p-error block"
-                                *ngIf="
+                        <div class="col-5">
+                            <input pInputText (change)="onExtraValueChange(i)" formControlName="name" type="text" />
+                            <small class="p-error block" *ngIf="
                                     item.get('name').invalid &&
                                     (item.get('name').dirty ||
                                         item.get('name').touched) &&
                                     item.get('name').hasError('required')
-                                "
-                            >
-                                Particular is required</small
-                            >
+                                ">
+                                Particular is required</small>
                         </div>
 
-                        <div class="col-3">
-                            <input
-                                pInputText
-                                (change)="onExtraValueChange(i)"
-                                formControlName="price"
-                                type="text"
-                            />
+                        <div class="col-2">
+                            <input class="w-full" pInputText (change)="onExtraValueChange(i)" formControlName="price"
+                                type="text" />
 
-                            <small
-                                class="p-error block"
-                                *ngIf="
+                            <small class="p-error block" *ngIf="
                                     item.get('price').invalid &&
                                     (item.get('price').dirty ||
                                         item.get('price').touched) &&
                                     item.get('price').hasError('required')
-                                "
-                            >
-                                Price is required</small
-                            >
+                                ">
+                                Price is required</small>
                         </div>
 
                         <div class="col-3">
-                            <button
-                                pButton
-                                pRipple
-                                (click)="removeItem(i)"
-                                type="button"
-                                icon="pi pi-minus"
-                                class="p-button-danger p-button-rounded"
-                            ></button>
+                            <button pButton pRipple (click)="removeItem(i)" type="button" icon="pi pi-minus"
+                                class="p-button-danger p-button-rounded"></button>
                         </div>
                     </div>
                 </div>
@@ -219,12 +156,7 @@
                         <label class="font-bold">Discount</label>
                     </div>
                     <div class="col-3">
-                        <input
-                            pInputText
-                            id="firstname2"
-                            type="text"
-                            formControlName="discount"
-                        />
+                        <input pInputText id="firstname2" type="text" formControlName="discount" />
                     </div>
                 </div>
 
@@ -244,42 +176,25 @@
                         <label>Paid</label>
                     </div>
                     <div class="col-3">
-                        <input
-                            pInputText
-                            id="firstname2"
-                            type="text"
-                            formControlName="paid"
-                        />
-                        <small
-                            class="p-error block"
-                            *ngIf="
+                        <input pInputText id="firstname2" type="text" formControlName="paid" />
+                        <small class="p-error block" *ngIf="
                                 paid.invalid &&
                                 (paid.dirty || paid.touched) &&
                                 paid.hasError('required')
-                            "
-                        >
-                            Paid Amount is required</small
-                        >
-                        <small
-                            class="p-error block"
-                            *ngIf="
+                            ">
+                            Paid Amount is required</small>
+                        <small class="p-error block" *ngIf="
                                 paid.invalid &&
                                 (paid.dirty || paid.touched) &&
                                 paid.hasError('pattern')
-                            "
-                        >
-                            Paid Amount is invalid</small
-                        >
-                        <small
-                            class="p-error block"
-                            *ngIf="
+                            ">
+                            Paid Amount is invalid</small>
+                        <small class="p-error block" *ngIf="
                                 paid.invalid &&
                                 (paid.dirty || paid.touched) &&
                                 paid.hasError('max')
-                            "
-                        >
-                            Paid Amount must less than or Equal to Total</small
-                        >
+                            ">
+                            Paid Amount must less than or Equal to Total</small>
                     </div>
                 </div>
 
@@ -287,13 +202,7 @@
                     <!-- <div class="col-3"></div> -->
                     <div class="col-3">Balance</div>
                     <div class="col-3">
-                        <input
-                            pInputText
-                            id="firstname2"
-                            type="text"
-                            readonly
-                            formControlName="balance"
-                        />
+                        <input pInputText id="firstname2" type="text" readonly formControlName="balance" />
                     </div>
                 </div>
 
@@ -301,24 +210,14 @@
                     <!-- <div class="col-3"></div> -->
                     <div class="col-3">Payment Mode</div>
                     <div class="col-3">
-                        <p-dropdown
-                            [options]="paymentModes"
-                            formControlName="payment_mode"
-                            optionLabel="name"
-                            appendTo="body"
-                            optionValue="code"
-                            placeholder="Payment Method"
-                        />
-                        <small
-                            class="p-error block"
-                            *ngIf="
+                        <p-dropdown [options]="paymentModes" formControlName="payment_mode" optionLabel="name"
+                            appendTo="body" optionValue="code" placeholder="Payment Method" />
+                        <small class="p-error block" *ngIf="
                                 payment_mode.invalid &&
                                 (payment_mode.dirty || payment_mode.touched) &&
                                 payment_mode.hasError('required')
-                            "
-                        >
-                            Paid Method is required</small
-                        >
+                            ">
+                            Paid Method is required</small>
                     </div>
                 </div>
             </div>
@@ -365,15 +264,8 @@
         </div>
     </div>
 </div>
-<button
-    [routerLink]="'/appointments'"
-    [queryParams]="queryParams"
-    pButton
-    pRipple
-    class="secondary ml-3"
-    type="button"
-    label="Back"
-></button>
+<button [routerLink]="'/appointments'" [queryParams]="queryParams" pButton pRipple class="secondary ml-3" type="button"
+    label="Back"></button>
 <p-dialog [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
     <span class="ext-red block mb-5">{{message}}</span>
 
@@ -384,13 +276,13 @@
 
 <p-dialog header="VerifY OTP" [modal]="true" [(visible)]="otpVisible" [style]="{ width: '25rem' }">
     <form [formGroup]="otpForm" (ngSubmit)="verifyOTP()">
-    <div class="flex align-items-center gap-3 mb-3">
-        <label for="username" class="font-semibold w-6rem">OTP</label>
-        <input formControlName="otp" pInputText id="username" class="flex-auto" autocomplete="off" />
-    </div>
-    <div class="flex justify-content-end gap-2">
-        <p-button label="Cancel" severity="secondary" (onClick)="visible = false" />
-        <p-button type="submit" label="submit" />
-    </div>
+        <div class="flex align-items-center gap-3 mb-3">
+            <label for="username" class="font-semibold w-6rem">OTP</label>
+            <input formControlName="otp" pInputText id="username" class="flex-auto" autocomplete="off" />
+        </div>
+        <div class="flex justify-content-end gap-2">
+            <p-button label="Cancel" severity="secondary" (onClick)="visible = false" />
+            <p-button type="submit" label="submit" />
+        </div>
     </form>
 </p-dialog>
