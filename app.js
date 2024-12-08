@@ -70,30 +70,28 @@ ipcMain.on("install-update", () => {
 });
 
 ipcMain.handle("print-to-pdf", async (event, htmlContent, options) => {
-    const pdfPath = path.join(__dirname, "output.pdf");
+    const win = new BrowserWindow();
+    win.loadURL(
+        `https://stageapi.genomicsivfcentre.com/web/invoice/${encodeURIComponent(
+            htmlContent
+        )}`
+    );
 
-    // Create a hidden BrowserWindow to load the content
-    const printWindow = new BrowserWindow({
-        show: false, // Hidden window
-        webPreferences: { offscreen: true }, // Required for rendering content offscreen
+    win.webContents.on("did-finish-load", () => {
+        // Use default printing options
+        const pdfPath = path.join(os.homedir(), "Desktop", "temp.pdf");
+        win.webContents
+            .printToPDF({})
+            .then((data) => {
+                fs.writeFile(pdfPath, data, (error) => {
+                    if (error) throw error;
+                    console.log(`Wrote PDF successfully to ${pdfPath}`);
+                });
+            })
+            .catch((error) => {
+                console.log(`Failed to write PDF to ${pdfPath}: `, error);
+            });
     });
-
-    try {
-        // Load the HTML content
-        await printWindow.loadURL(
-            `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`
-        );
-
-        // Generate PDF
-        const pdfData = await printWindow.webContents.printToPDF(options || {});
-        fs.writeFileSync(pdfPath, pdfData); // Save PDF to a file
-
-        printWindow.close(); // Clean up the temporary window
-        return pdfPath; // Return the file path
-    } catch (error) {
-        printWindow.close();
-        throw new Error("Failed to generate PDF: " + error.message);
-    }
 });
 
 // App Lifecycle

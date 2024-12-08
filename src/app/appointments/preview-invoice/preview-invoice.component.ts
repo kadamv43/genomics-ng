@@ -125,16 +125,8 @@ export class PreviewInvoiceComponent implements OnInit {
 
         return this.httpService.patchWithFormData(url, formData);
     }
-    
+
     async printFile() {
-        let element = document.getElementById('invoice');
-
-        if (!element) {
-            console.error('Content element not found');
-            return;
-        }
-
-        const htmlContent = element.outerHTML; // Get the HTML content of the element
         try {
             const options = {
                 marginsType: 1,
@@ -144,7 +136,7 @@ export class PreviewInvoiceComponent implements OnInit {
             };
             const pdfPath = await (window as any).electron?.ipcRenderer.invoke(
                 'print-to-pdf',
-                htmlContent,
+                this.id,
                 options
             );
             console.log('PDF saved at:', pdfPath);
