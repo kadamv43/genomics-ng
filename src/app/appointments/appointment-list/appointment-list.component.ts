@@ -134,12 +134,15 @@ export class AppointmentListComponent implements OnInit {
             this.selectTodaysDate();
             this.searchText = data['search'] ?? '';
             this.selectedStatus = data['status'] ?? '';
-            if (data['from']) {
+            if (data['from'] && data['to']) {
                 this.selectedDate[0] = new Date(data['from']);
+                this.selectedDate[1] = new Date(data['to']);
             }
             if (data['from'] && !data['to']) {
                 this.selectedDate[1] = null
+                this.selectedDate[0] = new Date(data['from']);
             }
+
             this.queryParams = { ...data };
         });
         ;

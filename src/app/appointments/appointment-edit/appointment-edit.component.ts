@@ -249,6 +249,7 @@ export class AppointmentEditComponent {
         if (this.appointmentForm.valid) {
             let appointment: any = {};
             appointment = this.appointmentForm.get('appointmentInfo').value;
+            appointment.appointment_time = this.setAppointmentTime(appointment)
             appointment.patient_id = this.patient_id;
             appointment.doctor_id = appointment.doctor;
             //appointment.services = this.selectedServicesObjects.length > 0 ?? appointment.services
@@ -262,7 +263,9 @@ export class AppointmentEditComponent {
                         detail: 'Appointment updated successfully',
                     });
                     setTimeout(() => {
-                        this.router.navigateByUrl('appointments');
+                        this.router.navigate(['appointments'], {
+                            queryParams: this.queryParams,
+                        });
                     }, 2000);
                 });
         }
@@ -277,4 +280,15 @@ export class AppointmentEditComponent {
             this.remark.setValue(text);
         }
     }
+
+     setAppointmentTime(appData) {
+        let date = new Date(appData.appointment_date);
+        let time = appData.appointment_time;
+        time.setFullYear(date.getFullYear()); // Set year (optional, if not changing)
+        time.setMonth(date.getMonth()); // Set month (0-based, so December is 11)
+        time.setDate(date.getDate());
+        console.log(time)
+        return time;
+    }
+
 }

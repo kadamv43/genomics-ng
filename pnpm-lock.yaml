@@ -77,6 +77,9 @@ importers:
       jspdf-autotable:
         specifier: ^3.8.3
         version: 3.8.3(jspdf@2.5.1)
+      ngx-print:
+        specifier: ^2.0.0
+        version: 2.0.0
       primeflex:
         specifier: ^3.3.1
         version: 3.3.1
@@ -3651,6 +3654,9 @@ packages:
 
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
+
+  ngx-print@2.0.0:
+    resolution: {integrity: sha512-AMdLvMlch2FmqiSI5RLDS5qtvb/4Dvhm4NbOeQ3EvmRXiqmM185vBt7EW1NVWCkqOicYXtfn3Rx87GXqPVyauw==}
 
   nice-napi@1.0.2:
     resolution: {integrity: sha512-px/KnJAJZf5RuBGcfD+Sp2pAKq0ytz8j+1NehvgIGFkvtvFrDM3T8E4x/JJODXK9WZow8RRGrbA9QQ3hs+pDhA==}
@@ -9126,6 +9132,10 @@ snapshots:
   negotiator@0.6.3: {}
 
   neo-async@2.6.2: {}
+
+  ngx-print@2.0.0:
+    dependencies:
+      tslib: 2.6.3
 
   nice-napi@1.0.2:
     dependencies:

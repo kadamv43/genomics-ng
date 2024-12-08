@@ -109,7 +109,7 @@
         <button class="secondary" pButton (click)="download()" type="button">
             Download
         </button>
-        <button class="primary ml-3" pButton (click)="printFile()" type="button">
+        <button class="primary ml-3" [useExistingCss]="true" pButton printSectionId="invoice" ngxPrint type="button">
             Print
         </button>
         <button class="primary ml-3" pButton (click)="whatsapp()" type="button">

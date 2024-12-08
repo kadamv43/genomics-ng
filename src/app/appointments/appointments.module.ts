@@ -37,6 +37,8 @@ import { ChipModule } from 'primeng/chip';
 import { ReportsComponent } from './reports/reports.component';
 import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.component';
 import { DialogModule } from 'primeng/dialog';
+import { NgxPrintModule } from 'ngx-print';
+
 
 
 @NgModule({
@@ -47,7 +49,7 @@ import { DialogModule } from 'primeng/dialog';
         InvoiceComponent,
         PreviewInvoiceComponent,
         FileUploadFormComponent,
-        ReportsComponent
+        ReportsComponent,
     ],
     imports: [
         CommonModule,
@@ -83,6 +85,7 @@ import { DialogModule } from 'primeng/dialog';
         ChipsModule,
         ChipModule,
         DynamicDialogModule,
+        NgxPrintModule,
     ],
 })
 export class AppointmentsModule {}

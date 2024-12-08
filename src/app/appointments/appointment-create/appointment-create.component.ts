@@ -223,6 +223,8 @@ export class AppointmentCreateComponent implements OnInit {
 
                 let appointment: any = {};
                 appointment = this.appointmentForm.get('appointmentInfo').value;
+                appointment.appointment_time =
+                    this.setAppointmentTime(appointment);
                 appointment.patient_id = patient_id;
                 appointment.services = this.selectedServicesObjects;
                 appointment.patient = this.selectedPatient ?? patient_id;
@@ -243,5 +245,14 @@ export class AppointmentCreateComponent implements OnInit {
 
     onChange(e) {
         this.selectedServicesObjects = e.value;
+    }
+
+    setAppointmentTime(appData) {
+        let date = new Date(appData.appointment_date);
+        let time = appData.appointment_time;
+        time.setFullYear(date.getFullYear()); // Set year (optional, if not changing)
+        time.setMonth(date.getMonth()); // Set month (0-based, so December is 11)
+        time.setDate(date.getDate());
+        return time;
     }
 }
