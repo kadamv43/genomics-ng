@@ -1,58 +1,63 @@
-import { Component } from '@angular/core';
-import { LayoutService } from "./service/app.layout.service";
-import { ElectronService } from '../services/electron.service';
+import { Component, NgZone } from '@angular/core';
+import { LayoutService } from './service/app.layout.service';
 
 @Component({
     selector: 'app-footer',
     templateUrl: './app.footer.component.html',
 })
 export class AppFooterComponent {
-    constructor(
-        private electornService: ElectronService,
-        public layoutService: LayoutService
-    ) {}
-
-    downloadProgress = 0; // Track download progress
+    statusMessage = 'Ready';
+    progress: { percent: number; transferred: number; total: number } | null =
+        null;
+    updateReady = false;
 
     appVersion = '';
 
     ngOnInit(): void {
-        // Listen for progress updates from the main process
-        let progress = (window as any).electron?.ipcRenderer.invoke('progress')
-        console.log(progress)
-
-         this.getAppVersion();
+        this.getAppVersion();
     }
 
-    // Get app version from Electron main process
+    isElectronApp(): boolean {
+        return !!(window && (window as any).electron);
+    }
+
+    constructor(private zone: NgZone, public layoutService: LayoutService) {
+        if (this.isElectronApp()) {
+            this.listenForUpdates();
+        }
+    }
+
     async getAppVersion() {
-        this.appVersion = await(window as any).electron?.ipcRenderer.invoke(
+        this.appVersion = await (window as any).electron?.ipcRenderer.invoke(
             'get-app-version'
         );
     }
 
-    async checkForUpdates() {
-        const updateStatus = await this.electornService.checkForUpdate();
+    checkForUpdates() {
+        (window as any)?.electron.checkForUpdates();
+    }
 
-        console.log('updateStatus', updateStatus);
+    installUpdate() {
+        (window as any)?.electron.installUpdate();
+    }
 
-        if (updateStatus.updateAvailable) {
-            const confirmUpdate = (window as any).confirm(
-                `Update available (v${updateStatus.version}). Download now?`
-            );
-            if (confirmUpdate) {
-                const result = await this.electornService.downloadUpdate(
-                    updateStatus
-                );
-                if (result.success) {
-                    alert('Update downloaded. Restarting...');
-                    (window as any).electron.app.relaunch();
-                } else {
-                    alert(`Update failed: ${result.error}`);
-                }
-            }
-        } else {
-            alert('No updates available.');
-        }
+    listenForUpdates() {
+        (window as any)?.electron.onUpdateStatus((message: string) => {
+            this.zone.run(() => {
+                this.statusMessage = message;
+                console.log(message);
+                this.updateReady = message.includes('Ready to install');
+            });
+        });
+
+        (window as any)?.electron.onDownloadProgress((progress: any) => {
+            this.zone.run(() => {
+                this.progress = {
+                    percent: progress.percent,
+                    transferred: progress.transferred,
+                    total: progress.total,
+                };
+            });
+        });
     }
 }

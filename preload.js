@@ -2,6 +2,14 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 // Expose APIs to the renderer process
 contextBridge.exposeInMainWorld("electron", {
+    checkForUpdates: () => ipcRenderer.send("check-for-updates"),
+    installUpdate: () => ipcRenderer.send("install-update"),
+    onUpdateStatus: (callback) =>
+        ipcRenderer.on("update-status", (event, message) => callback(message)),
+    onDownloadProgress: (callback) =>
+        ipcRenderer.on("download-progress", (event, progress) =>
+            callback(progress)
+        ),
     ipcRenderer: {
         invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
         send: (channel, ...args) => ipcRenderer.send(channel, ...args),

@@ -19,7 +19,7 @@ export class ElectronService {
             console.error('Electron IPC Renderer is not available.');
             return Promise.reject('Electron IPC Renderer is not available.');
         }
-        return this.ipcRenderer.invoke('check-for-update');
+        return this.ipcRenderer?.checkForUpdate;
     }
 
     downloadUpdate(updateInfo: any): Promise<any> {
@@ -36,5 +36,21 @@ export class ElectronService {
             return;
         }
         (window as any).electron.app.relaunch();
+    }
+
+    startUpdate() {
+        (window as any).electron?.startUpdate();
+    }
+
+    installUpdate() {
+        (window as any).electron?.installUpdate();
+    }
+
+    onUpdateStatus(callback: (status: string) => void) {
+        (window as any).electron?.onUpdateStatus(callback);
+    }
+
+    onDownloadProgress(callback: (progress: any) => void) {
+        (window as any).electron?.onDownloadProgress(callback);
     }
 }
