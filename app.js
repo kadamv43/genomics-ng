@@ -69,6 +69,33 @@ ipcMain.on("install-update", () => {
     autoUpdater.quitAndInstall();
 });
 
+ipcMain.handle("print-to-pdf", async (event, htmlContent, options) => {
+    const pdfPath = path.join(__dirname, "output.pdf");
+
+    // Create a hidden BrowserWindow to load the content
+    const printWindow = new BrowserWindow({
+        show: false, // Hidden window
+        webPreferences: { offscreen: true }, // Required for rendering content offscreen
+    });
+
+    try {
+        // Load the HTML content
+        await printWindow.loadURL(
+            `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`
+        );
+
+        // Generate PDF
+        const pdfData = await printWindow.webContents.printToPDF(options || {});
+        fs.writeFileSync(pdfPath, pdfData); // Save PDF to a file
+
+        printWindow.close(); // Clean up the temporary window
+        return pdfPath; // Return the file path
+    } catch (error) {
+        printWindow.close();
+        throw new Error("Failed to generate PDF: " + error.message);
+    }
+});
+
 // App Lifecycle
 app.on("ready", createMainWindow);
 

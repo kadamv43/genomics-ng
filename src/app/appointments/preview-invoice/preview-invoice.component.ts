@@ -125,25 +125,31 @@ export class PreviewInvoiceComponent implements OnInit {
 
         return this.httpService.patchWithFormData(url, formData);
     }
-    printFile() {
+    
+    async printFile() {
         let element = document.getElementById('invoice');
 
-        html2pdf()
-            .from(element)
-            .set(this.pdfOptions)
-            .toPdf()
-            .get('pdf')
-            .then((pdfObj) => {
-                const pdfBlob = pdfObj.output('blob'); // Get the PDF as a Blob
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                print({
-                    printable: pdfUrl,
-                    type: 'pdf',
-                    showModal: true,
-                    onPrintDialogClose: () => {
-                        URL.revokeObjectURL(pdfUrl); // Free memory after printing
-                    },
-                });
-            });
+        if (!element) {
+            console.error('Content element not found');
+            return;
+        }
+
+        const htmlContent = element.outerHTML; // Get the HTML content of the element
+        try {
+            const options = {
+                marginsType: 1,
+                pageSize: 'A4',
+                printBackground: true,
+                landscape: false,
+            };
+            const pdfPath = await (window as any).electron?.ipcRenderer.invoke(
+                'print-to-pdf',
+                htmlContent,
+                options
+            );
+            console.log('PDF saved at:', pdfPath);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
     }
 }
