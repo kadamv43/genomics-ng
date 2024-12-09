@@ -1,8 +1,11 @@
 import { Component, NgZone } from '@angular/core';
 import { LayoutService } from './service/app.layout.service';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { UpdateModalComponent } from './update-modal/update-modal.component';
 
 @Component({
     selector: 'app-footer',
+    providers:[DialogService],
     templateUrl: './app.footer.component.html',
 })
 export class AppFooterComponent {
@@ -13,6 +16,8 @@ export class AppFooterComponent {
 
     appVersion = '';
 
+    ref: DynamicDialogRef | undefined;
+
     ngOnInit(): void {
         this.getAppVersion();
     }
@@ -21,7 +26,11 @@ export class AppFooterComponent {
         return !!(window && (window as any).electron);
     }
 
-    constructor(private zone: NgZone, public layoutService: LayoutService) {
+    constructor(
+        private zone: NgZone,
+        public layoutService: LayoutService,
+        public dialogService: DialogService
+    ) {
         if (this.isElectronApp()) {
             this.listenForUpdates();
         }
@@ -58,6 +67,19 @@ export class AppFooterComponent {
                     total: progress.total,
                 };
             });
+        });
+    }
+
+    openModal() {
+        this.ref = this.dialogService.open(UpdateModalComponent, {
+            header: 'Pending Balance',
+            width: '50%',
+            contentStyle: { overflow: 'auto' },
+            baseZIndex: 10000,
+            maximizable: true,
+            data: {
+                data: [],
+            },
         });
     }
 }

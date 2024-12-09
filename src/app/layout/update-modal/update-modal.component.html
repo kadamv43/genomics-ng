@@ -1,0 +1,16 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <label>Current Version : 1.2.2</label>
+        </div>
+    </div>
+    <div class="col-12">
+        <h1>{{ statusMessage }}</h1>
+        <div *ngIf="progress" class="progress-bar">
+            <div class="progress" [style.width.%]="progress.percent"></div>
+        </div>
+    </div>
+    <div class="col-12">
+         <button *ngIf="updateReady" (click)="installUpdate()" type="button" pButton class="primary">Install Update</button>
+    </div>
+</div>

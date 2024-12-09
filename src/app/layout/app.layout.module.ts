@@ -23,6 +23,7 @@ import { EditorModule } from 'primeng/editor';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { UpdateModalComponent } from './update-modal/update-modal.component';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
         AppMenuComponent,
         AppSidebarComponent,
         AppLayoutComponent,
-        NotepadComponent
+        NotepadComponent,
+        UpdateModalComponent
     ],
     imports: [
         BrowserModule,
