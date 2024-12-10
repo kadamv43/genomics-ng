@@ -249,6 +249,7 @@ export class AppointmentEditComponent {
         if (this.appointmentForm.valid) {
             let appointment: any = {};
             appointment = this.appointmentForm.get('appointmentInfo').value;
+            appointment.appointment_date = this.setAppointmentTime(appointment);
             appointment.appointment_time = this.setAppointmentTime(appointment)
             appointment.patient_id = this.patient_id;
             appointment.doctor_id = appointment.doctor;

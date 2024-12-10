@@ -7,6 +7,7 @@ import {
     Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { app } from 'electron';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { lastValueFrom } from 'rxjs';
 import { ApiService } from 'src/app/services/api.service';
@@ -195,6 +196,8 @@ export class AppointmentCreateComponent implements OnInit {
     }
 
     async submitAppointment() {
+        console.log(this.appointmentForm.get('appointmentInfo').value);
+        // return
         this.appointmentForm.markAllAsTouched();
         if (this.appointmentForm.valid) {
             const params = this.commonServie.getHttpParamsByJson({
@@ -223,6 +226,9 @@ export class AppointmentCreateComponent implements OnInit {
 
                 let appointment: any = {};
                 appointment = this.appointmentForm.get('appointmentInfo').value;
+                console.log(appointment)
+                appointment.appointment_date =
+                    this.setAppointmentTime(appointment);
                 appointment.appointment_time =
                     this.setAppointmentTime(appointment);
                 appointment.patient_id = patient_id;
@@ -253,6 +259,7 @@ export class AppointmentCreateComponent implements OnInit {
         time.setFullYear(date.getFullYear()); // Set year (optional, if not changing)
         time.setMonth(date.getMonth()); // Set month (0-based, so December is 11)
         time.setDate(date.getDate());
+
         return time;
     }
 }
