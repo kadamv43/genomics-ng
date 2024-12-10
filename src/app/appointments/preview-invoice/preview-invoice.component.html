@@ -1,4 +1,3 @@
-
 <div id="invoice" class="invoice-container">
     <div class="header">
         <h1>Invoice</h1>
@@ -6,11 +5,8 @@
 
     <div class="invoice-details">
         <div class="left">
-            <img
-                src="https://stageapi.genomicsivfcentre.com/public/assets/logo.png"
-                alt="Clinic Logo5"
-                crossorigin="*"
-            />
+            <img src="https://stageapi.genomicsivfcentre.com/public/assets/logo.png" alt="Clinic Logo5"
+                crossorigin="*" />
         </div>
         <div class="right">
             <p>Genomics infertility & test tube baby centre</p>
@@ -29,8 +25,10 @@
         </div>
         <div class="right">
             <div class="patient-info">
-                <p><strong>Patient Name:</strong> {{invoiceDetails?.patient?.first_name}} {{invoiceDetails?.patient?.last_name}}</p>
-                <p><strong>Doctor Name:</strong> {{invoiceDetails?.doctor?.first_name}} {{invoiceDetails?.doctor?.last_name}}</p>
+                <p><strong>Patient Name:</strong> {{invoiceDetails?.patient?.first_name}}
+                    {{invoiceDetails?.patient?.last_name}}</p>
+                <p><strong>Doctor Name:</strong> {{invoiceDetails?.doctor?.first_name}}
+                    {{invoiceDetails?.doctor?.last_name}}</p>
             </div>
             <!-- <p><strong>Payment Method:</strong>{{invoiceDetails?.payment_mode}}</p>
             <p><strong>Payment Status:</strong> Paid</p> -->
@@ -46,13 +44,13 @@
             </tr>
         </thead>
         <tbody>
-            
+
             <tr *ngFor="let item of invoiceDetails?.particulars; index as i">
                 <td>{{ i+1 }}</td>
                 <td>{{ item?.name }}</td>
                 <td>&#8377;{{ item?.price }}</td>
             </tr>
-            
+
         </tbody>
     </table>
 
@@ -109,17 +107,16 @@
         <button class="secondary" pButton (click)="download()" type="button">
             Download
         </button>
-        <button class="primary ml-3" [useExistingCss]="true" pButton printSectionId="invoice" ngxPrint type="button">
+        <button class="primary ml-3" pButton (click)="printFile()" type="button">
             Print
         </button>
         <button class="primary ml-3" pButton (click)="whatsapp()" type="button">
             Whatsapp
         </button>
-         <button class="light ml-3" (click)="back()" pButton type="button">
+        <button class="light ml-3" (click)="back()" pButton type="button">
             back
         </button>
     </div>
 </div>
 
 <p-toast key="tst"></p-toast>
-

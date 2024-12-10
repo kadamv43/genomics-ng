@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const path = require("path");
+const fs = require("fs");
 
 let mainWindow;
 
@@ -19,7 +20,7 @@ function createMainWindow() {
     mainWindow.loadFile(path.join(__dirname, "/dist/sakai-ng/index.html"));
 
     // Open DevTools for debugging (disable in production)
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 
     mainWindow.on("closed", () => {
         mainWindow = null;
@@ -69,28 +70,53 @@ ipcMain.on("install-update", () => {
     autoUpdater.quitAndInstall();
 });
 
-ipcMain.handle("print-to-pdf", async (event, htmlContent, options) => {
-    const win = new BrowserWindow();
-    win.loadURL(
-        `https://stageapi.genomicsivfcentre.com/web/invoice/${encodeURIComponent(
-            htmlContent
-        )}`
-    );
+ipcMain.handle("getAppVersion", () => {
+    return app.getVersion();
+});
 
-    win.webContents.on("did-finish-load", () => {
-        // Use default printing options
-        const pdfPath = path.join(os.homedir(), "Desktop", "temp.pdf");
-        win.webContents
-            .printToPDF({})
-            .then((data) => {
-                fs.writeFile(pdfPath, data, (error) => {
-                    if (error) throw error;
-                    console.log(`Wrote PDF successfully to ${pdfPath}`);
-                });
-            })
-            .catch((error) => {
-                console.log(`Failed to write PDF to ${pdfPath}: `, error);
-            });
+ipcMain.on("print-url", async (event, url) => {
+    let options = {
+        silent: false,
+        printBackground: true,
+        color: false,
+        margin: {
+            marginType: "printableArea",
+        },
+        landscape: false,
+        pagesPerSheet: 1,
+        collate: false,
+        copies: 1,
+        header: "Header of the Page",
+        footer: "Footer of the Page",
+    };
+
+    let win = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            offscreen: true,
+        },
+    });
+    win.loadURL(url);
+    win.focus();
+
+    // fs.writeFileSync(pdfPath, pdfData);
+
+    win.webContents.on("did-finish-load", async () => {
+        pdfPath = "output.pdf";
+        const pdfData = await win.webContents.print(
+            { silent: false },
+            (success, failureReason) => {
+                if (success) {
+                    console.log("Print preview shown successfully");
+                } else {
+                    console.log("Print failed:", failureReason);
+                }
+            }
+        );
+
+        // Close the print window
+        // win.close();
     });
 });
 

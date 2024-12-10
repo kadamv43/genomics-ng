@@ -74,15 +74,16 @@ export class PreviewInvoiceComponent implements OnInit {
     download() {
         const element = document.getElementById('invoice'); // Replace with your element's ID
 
-         html2pdf()
-             .set(this.pdfOptions)
-             .from(element)
-             .toPdf()
-             .get('pdf')
-             .then((pdfObj) => {
-                 let url = `invoice/${this.id}`;
-                 this.savePdfOnServer(url, pdfObj).subscribe({});
-             }).save()
+        html2pdf()
+            .set(this.pdfOptions)
+            .from(element)
+            .toPdf()
+            .get('pdf')
+            .then((pdfObj) => {
+                let url = `invoice/${this.id}`;
+                this.savePdfOnServer(url, pdfObj).subscribe({});
+            })
+            .save();
         // html2pdf().set(this.pdfOptions).from(element).save();
     }
 
@@ -127,18 +128,10 @@ export class PreviewInvoiceComponent implements OnInit {
     }
 
     async printFile() {
+        let url = environment.baseUrl + 'web/invoice/' + this.id;
+        console.log(url);
         try {
-            const options = {
-                marginsType: 1,
-                pageSize: 'A4',
-                printBackground: true,
-                landscape: false,
-            };
-            const pdfPath = await (window as any).electron?.ipcRenderer.invoke(
-                'print-to-pdf',
-                this.id,
-                options
-            );
+            const pdfPath = await (window as any).electron?.printUrl(url);
             console.log('PDF saved at:', pdfPath);
         } catch (error) {
             console.error('Error generating PDF:', error);

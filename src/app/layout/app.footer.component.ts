@@ -5,7 +5,7 @@ import { UpdateModalComponent } from './update-modal/update-modal.component';
 
 @Component({
     selector: 'app-footer',
-    providers:[DialogService],
+    providers: [DialogService],
     templateUrl: './app.footer.component.html',
 })
 export class AppFooterComponent {
@@ -72,7 +72,7 @@ export class AppFooterComponent {
 
     openModal() {
         this.ref = this.dialogService.open(UpdateModalComponent, {
-            header: 'Pending Balance',
+            // header: 'Pending Balance',
             width: '50%',
             contentStyle: { overflow: 'auto' },
             baseZIndex: 10000,

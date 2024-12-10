@@ -10,11 +10,18 @@ export class UpdateModalComponent {
     progress: { percent: number; transferred: number; total: number } | null =
         null;
     updateReady = false;
+    appVersion = '';
 
     constructor(private zone: NgZone) {
         if (this.isElectronApp()) {
-        this.listenForUpdates();
+            this.getAppVersion();
+            this.checkForUpdates();
+            this.listenForUpdates();
         }
+    }
+
+    async getAppVersion() {
+        this.appVersion = await (window as any).electron?.getAppVersion();
     }
 
     checkForUpdates() {

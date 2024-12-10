@@ -2,15 +2,7 @@
     <!-- <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Logo" height="20" class="mr-2"/> -->
     Developed by
     <span class="font-medium ml-2">Shree Swami Samartha Media Pvt Ltd</span>
-    <span class="text-primary ml-5">Version : - {{appVersion}}</span>
+    <!-- <span class="text-primary ml-5">Version : - {{appVersion}}</span> -->
 
-    <div class="update-status">
-        <h1>{{ statusMessage }}</h1>
-        <div *ngIf="progress" class="progress-bar">
-            <div class="progress" [style.width.%]="progress.percent"></div>
-        </div>
-        <!-- <button (click)="checkForUpdates()">Check for Updates</button> -->
-        <button (click)="installUpdate()" *ngIf="updateReady">Install Update</button>
-    </div>
     <button (click)="openModal()" pButton type="button" class="primary ml-5">Check For Update</button>
 </div>
