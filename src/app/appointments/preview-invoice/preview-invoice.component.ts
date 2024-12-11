@@ -1,8 +1,5 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import {Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import * as print from 'print-js';
 import html2pdf from 'html2pdf.js';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
 import { HttpService } from 'src/app/services/http.service';

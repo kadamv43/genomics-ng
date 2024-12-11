@@ -10,6 +10,7 @@ import { MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ApiService } from 'src/app/services/api.service';
 import { send } from 'process';
+import { it } from 'node:test';
 
 @Component({
     selector: 'app-invoice',
@@ -33,6 +34,7 @@ export class InvoiceComponent implements OnInit {
     role = '';
     serviceTotal = 0;
     extraSum = 0;
+
     paymentModes = [
         { name: 'Cash', code: 'Cash' },
         { name: 'Debit Card', code: 'Debit Card' },
@@ -49,12 +51,14 @@ export class InvoiceComponent implements OnInit {
         items: [],
         prepost: [],
         extras: [],
+        extraServices: [],
     };
 
     queryParams = {};
     config: any = {};
     otpVisible = false;
     prePostCharges: any = [];
+    serviceList: any = [];
 
     constructor(
         private route: ActivatedRoute,
@@ -69,17 +73,29 @@ export class InvoiceComponent implements OnInit {
         this.invoiceForm = fb.group({
             paid: [0],
             balance: [0, Validators.required],
-            payment_mode: ['', Validators.required],
+            payment_mode1: fb.group({
+                mode: ['', Validators.required],
+                price: [0, Validators.required],
+            }),
+            payment_mode2: fb.group({
+                mode: [''],
+                price: [0],
+            }),
             discount: [0],
         });
 
         this.extraForm = fb.group({
             extras: this.fb.array([]),
             prePostExtras: this.fb.array([]),
+            extraServices: this.fb.array([]),
         });
 
         this.otpForm = fb.group({
             otp: ['', Validators.required],
+        });
+
+        this.api.getProducts().subscribe((res) => {
+            this.serviceList = res;
         });
 
         this.onChanges();
@@ -98,8 +114,44 @@ export class InvoiceComponent implements OnInit {
     onChanges(): void {
         this.invoiceForm.get('paid')?.valueChanges.subscribe((value) => {
             this.calculateInvoice();
+            this.invoiceForm.get('payment_mode1').patchValue({
+                price: value,
+            });
             this.invoiceForm.get('balance')?.setValue(this.invoiceData.balance);
         });
+
+        this.invoiceForm
+            .get('payment_mode1')
+            .get('price')
+            ?.valueChanges.subscribe((value) => {
+                this.calculateInvoice();
+                let pm2 = this.paid.value - value;
+                this.invoiceForm.get('payment_mode2').patchValue({
+                    price: pm2 >= 0 ? pm2 : 0,
+                });
+
+                if (pm2 > 0) {
+                    this.invoiceForm
+                        .get('payment_mode2')
+                        .get('mode')
+                        ?.setValidators([Validators.required])
+
+                    this.invoiceForm
+                        .get('payment_mode2')
+                        .get('mode')
+                        ?.updateValueAndValidity();
+                }else{
+                    this.invoiceForm.get('payment_mode2').get('mode')?.removeValidators(Validators.required)
+                    this.invoiceForm
+                        .get('payment_mode2')
+                        .get('mode')
+                        ?.updateValueAndValidity();
+                }
+
+                this.invoiceForm
+                    .get('balance')
+                    ?.setValue(this.invoiceData.balance);
+            });
 
         this.invoiceForm.get('discount')?.valueChanges.subscribe((value) => {
             this.calculateInvoice();
@@ -119,8 +171,12 @@ export class InvoiceComponent implements OnInit {
         return this.invoiceForm.get('paid');
     }
 
-    get payment_mode() {
-        return this.invoiceForm.get('payment_mode');
+    get payment_mode1() {
+        return this.invoiceForm.get('payment_mode1');
+    }
+
+    get payment_mode2() {
+        return this.invoiceForm.get('payment_mode2');
     }
 
     get discount() {
@@ -133,6 +189,10 @@ export class InvoiceComponent implements OnInit {
 
     get prePostExtras(): FormArray {
         return this.extraForm.get('prePostExtras') as FormArray;
+    }
+
+    get extraServices(): FormArray {
+        return this.extraForm.get('extraServices') as FormArray;
     }
 
     ngOnInit(): void {
@@ -202,6 +262,10 @@ export class InvoiceComponent implements OnInit {
             this.prePostCharges = data;
         });
 
+        this.api.getProducts().subscribe((res) => {
+            this.serviceList = res;
+        });
+
         this.config = JSON.parse(localStorage.getItem('config') as string);
     }
 
@@ -209,6 +273,18 @@ export class InvoiceComponent implements OnInit {
         const control = this.createItem(name, price);
         this.prePostExtras.push(control);
         this.invoiceData.prepost.push({ name, price, type: 'prepost' });
+    }
+
+    addService(name = '', price = ''): void {
+        const control = this.createItem(name, price);
+        this.extraServices.push(control);
+        this.invoiceData.extraServices.push({ name, price, type: 'services' });
+    }
+
+    removeExtraServiceItem(index: number): void {
+        this.extraServices.removeAt(index);
+        this.invoiceData.extraServices.splice(index, 1);
+        this.calculateInvoice();
     }
 
     createPrePostItem(name, price): FormGroup {
@@ -268,9 +344,38 @@ export class InvoiceComponent implements OnInit {
     }
 
     onPrePostValueChange(i) {
+        console.log(i);
         this.invoiceData.prepost[i] = {
             type: 'prepost',
             ...this.prePostExtras.at(i).value,
+        };
+        this.calculateInvoice();
+    }
+
+    onExtraServicesChange(i) {
+        let value = this.serviceList.find((item) => {
+            return item.name === this.extraServices.at(i).value.name;
+        });
+
+        this.extraServices.at(i).patchValue({
+            price: value.price,
+        });
+        this.invoiceData.extraServices[i] = {
+            type: 'service',
+            ...this.extraServices.at(i).value,
+        };
+        this.calculateInvoice();
+    }
+
+    onExtraServicesValueChange(i) {
+        let value = this.extraServices.controls.at(i).value.price;
+
+        this.extraServices.controls.at(i).patchValue({
+            price: value,
+        });
+        this.invoiceData.extraServices[i] = {
+            type: 'service',
+            ...this.extraServices.at(i).value,
         };
         this.calculateInvoice();
     }
@@ -289,7 +394,12 @@ export class InvoiceComponent implements OnInit {
             0
         );
 
-        let total = itemSum + extrasum + prePostSum;
+        let extraServicesSum = this.invoiceData.extraServices.reduce(
+            (sum, item) => (sum = sum + Number(item.price)),
+            0
+        );
+
+        let total = itemSum + extrasum + prePostSum + extraServicesSum;
         let discount = this.discount.value;
         let discountedTotal = 0;
         let paid = this.paid.value;
@@ -314,6 +424,7 @@ export class InvoiceComponent implements OnInit {
     }
 
     saveAndPreview() {
+        console.log(this.invoiceData);
         this.extraForm.markAllAsTouched();
         this.invoiceForm.markAllAsTouched();
 
@@ -350,7 +461,8 @@ export class InvoiceComponent implements OnInit {
             paid: this.paid.value,
             balance: this.balance.value,
             discount: this.discount.value,
-            payment_mode: this.payment_mode.value,
+            payment_mode1: this.payment_mode1.value,
+            payment_mode2: this.payment_mode2.value,
             particulars: [],
         };
 
@@ -406,7 +518,7 @@ export class InvoiceComponent implements OnInit {
                         this.saveInvoice();
                     },
                     error: (err) => {
-                        this.message = err.error.message
+                        this.message = err.error.message;
                         this.visible = true;
                     },
                 });

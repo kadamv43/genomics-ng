@@ -92,7 +92,7 @@ export class AppointmentEditComponent {
                 reference_by: [''],
             }),
             appointmentInfo: this.fb.group({
-                services: ['', Validators.required],
+                services: [''],
                 doctor: [''],
                 appointment_date: [new Date(), Validators.required],
                 appointment_time: [new Date(), Validators.required],

@@ -14,7 +14,7 @@
                 >
                     <div class="p-fluid p-formgrid grid">
                         <div class="field col-12 md:col-4">
-                            <label htmlFor="firstname">First Name (Wife)</label>
+                            <label htmlFor="firstname">Patient Name</label>
                             <span class="required">*</span>
                             <input
                                 pInputText
@@ -29,12 +29,12 @@
                                     (first_name.dirty || first_name.touched)
                                 "
                             >
-                                Firstname is required</small
+                                Patient Name is required</small
                             >
                         </div>
 
                         <div class="field col-12 md:col-4">
-                            <label htmlFor="husband_name">First Name (Husband)</label>
+                            <label htmlFor="husband_name">Middle Name</label>
                             <span class="required"></span>
                             <input
                                 pInputText
@@ -49,7 +49,7 @@
                                     (husband_name.dirty || husband_name.touched)
                                 "
                             >
-                                husband name is required</small
+                                Middle name is required</small
                             >
                         </div>
                         <div class="field col-12 md:col-4">
@@ -206,7 +206,7 @@
                     class="line-height-3 m-5"
                 >
                     <div class="p-fluid p-formgrid grid">
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-2">
                             <label htmlFor="lastname2">Appointment Date</label>
                             <span class="required">*</span>
                             <p-calendar
@@ -229,7 +229,7 @@
                                 Appointment Date is required</small
                             >
                         </div>
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-2">
                             <label htmlFor="lastname2">Appointment Time</label>
                             <span class="required">*</span>
                             <p-calendar
@@ -250,7 +250,7 @@
                                 Appointment Time is required</small
                             >
                         </div>
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-3">
                             <label htmlFor="firstname2">Doctor</label>
                             <span class="required">*</span>
                             <p-dropdown
@@ -261,9 +261,9 @@
                                 placeholder="Select Doctor"
                             />
                         </div>
-                        <div class="field col-8">
+                        <div class="field col-5">
                             <label htmlFor="lastname2">Service</label>
-                            <span class="required">*</span>
+                            <span class="required"></span>
                             <p-multiSelect
                                 [options]="serviceList"
                                 formControlName="services"
@@ -285,18 +285,7 @@
                             >
                         </div>
 
-                        <div class="field col-12">
-                            <label htmlFor="lastname2"
-                                >Reason for Visit (note)</label
-                            >
-                            <input
-                                pInputText
-                                id="lastname2"
-                                type="text"
-                                formControlName="reason"
-                            />
-                        </div>
-                        <div class="field col-12 md:col-4">
+                        <div class="field col-12 md:col-6">
                             <label htmlFor="firstname2">Status</label>
                             <p-dropdown
                                 [options]="statusList"
@@ -307,6 +296,19 @@
                                 placeholder="Select Status"
                             />
                         </div>
+                        
+                        <div class="field col-6">
+                            <label htmlFor="lastname2"
+                                >Reason for Visit (note)</label
+                            >
+                            <input
+                                pInputText
+                                id="lastname2"
+                                type="text"
+                                formControlName="reason"
+                            />
+                        </div>
+                        
                         <div class="field col-12">
                             <label htmlFor="lastname2">Remark</label>
                             <div class="col-12">

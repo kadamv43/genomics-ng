@@ -90,7 +90,7 @@ export class AppointmentCreateComponent implements OnInit {
                 reference_by: [''],
             }),
             appointmentInfo: this.fb.group({
-                services: ['', Validators.required],
+                services: [''],
                 doctor: ['', Validators.required],
                 appointment_date: [new Date(), Validators.required],
                 appointment_time: [new Date(), Validators.required],
