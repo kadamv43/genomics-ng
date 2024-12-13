@@ -38,6 +38,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.component';
 import { DialogModule } from 'primeng/dialog';
 import { NgxPrintModule } from 'ngx-print';
+import { CheckboxModule } from 'primeng/checkbox';
 
 
 
@@ -86,6 +87,7 @@ import { NgxPrintModule } from 'ngx-print';
         ChipModule,
         DynamicDialogModule,
         NgxPrintModule,
+        CheckboxModule
     ],
 })
 export class AppointmentsModule {}

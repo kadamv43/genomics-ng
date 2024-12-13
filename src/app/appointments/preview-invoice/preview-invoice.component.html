@@ -74,9 +74,23 @@
                     <td class="balance">&#8377;{{invoiceDetails?.balance}}</td>
                 </tr>
 
-                <tr>
-                    <th>Payment Method:</th>
-                    <td class="balance">{{invoiceDetails?.payment_mode}}</td>
+                 <tr *ngIf="invoiceDetails?.payment_mode">
+                    <th>Payment Mode:</th>
+                    <td class="balance">{{invoiceDetails?.payment_modes}}</td>
+                </tr>
+
+                <tr *ngIf="!invoiceDetails?.partial_payment && invoiceDetails?.payment_mode1">
+                    <th>Payment Mode:</th>
+                    <td class="balance">{{invoiceDetails?.payment_mode1?.mode}}</td>
+                </tr>
+
+                <tr *ngIf="invoiceDetails?.partial_payment">
+                    <th>Payment 1:</th>
+                    <td class="balance">&#8377;{{invoiceDetails?.payment_mode1?.price}} ({{invoiceDetails?.payment_mode1?.mode}})</td>
+                </tr>
+                <tr *ngIf="invoiceDetails?.partial_payment">
+                    <th>Payment 2:</th>
+                    <td class="balance">&#8377;{{invoiceDetails?.payment_mode2?.price}} ({{invoiceDetails?.payment_mode2?.mode}})</td>
                 </tr>
                 <tr>
                     <th>Payment status:</th>

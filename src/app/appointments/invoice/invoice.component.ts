@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
@@ -34,6 +34,7 @@ export class InvoiceComponent implements OnInit {
     role = '';
     serviceTotal = 0;
     extraSum = 0;
+    showPayment2 = false;
 
     paymentModes = [
         { name: 'Cash', code: 'Cash' },
@@ -71,7 +72,7 @@ export class InvoiceComponent implements OnInit {
         private dialogService: DialogService
     ) {
         this.invoiceForm = fb.group({
-            paid: [0],
+            paid: [0,[Validators.required,this.greaterThanZeroValidator()]],
             balance: [0, Validators.required],
             payment_mode1: fb.group({
                 mode: ['', Validators.required],
@@ -82,6 +83,7 @@ export class InvoiceComponent implements OnInit {
                 price: [0],
             }),
             discount: [0],
+            partial_payment: [0],
         });
 
         this.extraForm = fb.group({
@@ -186,6 +188,10 @@ export class InvoiceComponent implements OnInit {
         return this.invoiceForm.get('discount');
     }
 
+    get partial_payment() {
+        return this.invoiceForm.get('partial_payment');
+    }
+
     get extras(): FormArray {
         return this.extraForm.get('extras') as FormArray;
     }
@@ -232,6 +238,7 @@ export class InvoiceComponent implements OnInit {
                     });
 
                     let services = res?.services.map((element, i) => {
+                        this.addService(element.name, element.price);
                         return {
                             name: element.name,
                             price: element.price,
@@ -246,13 +253,14 @@ export class InvoiceComponent implements OnInit {
                     this.appointmenData.total = this.total;
                 } else {
                     let services = res?.services.map((element, i) => {
+                        this.addService(element.name, element.price);
                         return {
                             name: element.name,
                             price: element.price,
                             type: 'service',
                         };
                     });
-                    this.invoiceData.items = services;
+                    // this.invoiceData.items = services;
                     res.services = services;
                     this.appointmenData = res;
                 }
@@ -428,8 +436,16 @@ export class InvoiceComponent implements OnInit {
         this.invoiceData.discountedTotal = discountedTotal;
     }
 
+    greaterThanZeroValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            return value > 0 ? null : { greaterThanZero: true };
+        };
+    }
+
     saveAndPreview() {
         console.log(this.invoiceData);
+
         this.extraForm.markAllAsTouched();
         this.invoiceForm.markAllAsTouched();
 
@@ -468,6 +484,7 @@ export class InvoiceComponent implements OnInit {
             discount: this.discount.value,
             payment_mode1: this.payment_mode1.value,
             payment_mode2: this.payment_mode2.value,
+            partial_payment: this.partial_payment.value.length,
             particulars: [],
         };
 
@@ -529,5 +546,10 @@ export class InvoiceComponent implements OnInit {
                     },
                 });
         }
+    }
+
+    onPartialPaymentChecked() {
+        this.showPayment2 =
+            this.partial_payment.value.length > 0 ? true : false;
     }
 }
