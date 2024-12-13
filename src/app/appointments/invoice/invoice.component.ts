@@ -1,6 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    FormArray,
+    FormBuilder,
+    FormGroup,
+    ValidationErrors,
+    ValidatorFn,
+    Validators,
+} from '@angular/forms';
 
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
@@ -39,6 +47,7 @@ export class InvoiceComponent implements OnInit {
     paymentModes = [
         { name: 'Cash', code: 'Cash' },
         { name: 'Debit Card', code: 'Debit Card' },
+        { name: 'Cheque', code: 'Cheque' },
         { name: 'Credit Card', code: 'Credit Card' },
         { name: 'UPI', code: 'UPI' },
     ];
@@ -72,7 +81,7 @@ export class InvoiceComponent implements OnInit {
         private dialogService: DialogService
     ) {
         this.invoiceForm = fb.group({
-            paid: [0,[Validators.required,this.greaterThanZeroValidator()]],
+            paid: [0, [Validators.required, this.greaterThanZeroValidator()]],
             balance: [0, Validators.required],
             payment_mode1: fb.group({
                 mode: ['', Validators.required],
