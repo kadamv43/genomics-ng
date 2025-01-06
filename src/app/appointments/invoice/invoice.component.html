@@ -24,7 +24,7 @@
                             {{ appointmenData?.created_at | date : "dd-MM-Y" }}
                         </p>
                         <p class="text-xl">
-                            OPD - {{ appointmenData?.appointment_number }}
+                            OPD - {{ appointmenData?.patient?.patient_number }}
                         </p>
                     </div>
                 </div>

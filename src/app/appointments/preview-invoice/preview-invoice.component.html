@@ -22,6 +22,8 @@
         <div class="left">
             <p class="date">Date: {{invoiceDetails?.created_at | date:'dd-MM-Y'}}</p>
             <p class="invoice-number">Invoice No : {{invoiceDetails?.invoice_number}}</p>
+            <p class="invoice-number">OPD No:{{ invoiceDetails?.patient?.patient_number }}</p>
+
         </div>
         <div class="right">
             <div class="patient-info">
