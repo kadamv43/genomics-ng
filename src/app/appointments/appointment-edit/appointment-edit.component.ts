@@ -1,4 +1,4 @@
-
+import { DatePipe } from '@angular/common';
 import { Component } from '@angular/core';
 import {
     AbstractControl,
@@ -8,7 +8,8 @@ import {
     Validators,
 } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import {  MessageService } from 'primeng/api';
+import { app } from 'electron/main';
+import { MessageService } from 'primeng/api';
 
 import { ApiService } from 'src/app/services/api.service';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
@@ -19,7 +20,7 @@ import { PatientService } from 'src/app/services/patient/patient.service';
     selector: 'app-appointment-edit',
     templateUrl: './appointment-edit.component.html',
     styleUrl: './appointment-edit.component.scss',
-    providers: [MessageService],
+    providers: [MessageService, DatePipe],
 })
 export class AppointmentEditComponent {
     appointmentForm: FormGroup;
@@ -32,6 +33,7 @@ export class AppointmentEditComponent {
     patient_id;
     queryParams;
     selectedServicesObjects = [];
+    showFollowUpDate = false;
 
     conditions = [
         { name: 'Hypertension', code: 'Hypertension' },
@@ -75,6 +77,7 @@ export class AppointmentEditComponent {
         private appointmentService: AppointmentService,
         private toast: MessageService,
         private router: Router,
+        private datePipe: DatePipe,
         private route: ActivatedRoute
     ) {
         this.appointmentForm = fb.group({
@@ -99,6 +102,7 @@ export class AppointmentEditComponent {
                 reason: [''],
                 status: [''],
                 remark: [''],
+                follow_up: [''],
             }),
         });
     }
@@ -119,7 +123,7 @@ export class AppointmentEditComponent {
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
-                this.patient_id = res.patient_id;
+                this.patient_id = res.patient?._id;
 
                 this.appointmentForm.get('appointmentInfo').patchValue({
                     appointment_date: new Date(res.appointment_date),
@@ -195,6 +199,10 @@ export class AppointmentEditComponent {
         return this.appointmentForm.get('appointmentInfo.remark');
     }
 
+    get follow_up() {
+        return this.appointmentForm.get('appointmentInfo.follow_up');
+    }
+
     get age() {
         return this.appointmentForm.get('patientInfo.age');
     }
@@ -246,11 +254,13 @@ export class AppointmentEditComponent {
 
     async submitAppointment() {
         this.appointmentForm.markAllAsTouched();
+        console.log(this.appointmentForm.value);
+        // return;
         if (this.appointmentForm.valid) {
             let appointment: any = {};
             appointment = this.appointmentForm.get('appointmentInfo').value;
             appointment.appointment_date = this.setAppointmentTime(appointment);
-            appointment.appointment_time = this.setAppointmentTime(appointment)
+            appointment.appointment_time = this.setAppointmentTime(appointment);
             appointment.patient_id = this.patient_id;
             appointment.doctor_id = appointment.doctor;
             //appointment.services = this.selectedServicesObjects.length > 0 ?? appointment.services
@@ -276,20 +286,38 @@ export class AppointmentEditComponent {
         this.selectedServicesObjects = e.value;
     }
 
-    onClickChips(text) {
+    followUpDateChange() {
+        console.log(this.follow_up.value);
+
+        let text = 'asked for follow-up ';
+
+        this.remark.patchValue(
+            text +
+                ' ' +
+                this.datePipe.transform(this.follow_up.value, 'dd-MM-Y hh:mm a')
+        );
+    }
+
+    onClickChips(text: string) {
         if (!this.appointmentForm.disabled) {
+            if (text.includes('follow-up')) {
+                this.showFollowUpDate = true;
+            } else {
+                this.showFollowUpDate = false;
+                this.follow_up.patchValue('');
+            }
+
             this.remark.setValue(text);
         }
     }
 
-     setAppointmentTime(appData) {
+    setAppointmentTime(appData) {
         let date = new Date(appData.appointment_date);
         let time = appData.appointment_time;
         time.setFullYear(date.getFullYear()); // Set year (optional, if not changing)
         time.setMonth(date.getMonth()); // Set month (0-based, so December is 11)
         time.setDate(date.getDate());
-        console.log(time)
+        console.log(time);
         return time;
     }
-
 }

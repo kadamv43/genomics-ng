@@ -17,8 +17,8 @@
                                 Patient name is required</small>
                         </div>
                         <div class="field col-12 md:col-4">
-                            <label htmlFor="firstname">First Name (husband)</label>
-                            <span class="required">*</span>
+                            <label htmlFor="firstname">Middle Name</label>
+                            <span class="required"></span>
                             <input pInputText id="firstname" type="text" formControlName="husband_name" />
                             <small class="p-error block" *ngIf="
                                     husband_name.invalid &&
@@ -28,7 +28,7 @@
                         </div>
                         <div class="field col-12 md:col-4">
                             <label htmlFor="lastname2">Last name</label>
-                            <span class="required">*</span>
+                            <span class="required"></span>
                             <input pInputText id="lastname2" type="text" formControlName="last_name" />
                             <small class="p-error block" *ngIf="
                                     last_name.invalid &&

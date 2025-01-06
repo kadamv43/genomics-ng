@@ -86,13 +86,10 @@ export class PatientCreateComponent {
         this.patientForm = fb.group({
             patientInfo: this.fb.group({
                 first_name: ['', Validators.required],
-                husband_name: ['', Validators.required],
-                last_name: ['', Validators.required],
+                husband_name: [''],
+                last_name: [''],
                 mobile: ['', [Validators.required, this.mobileNumberValidator]],
-                husband_mobile: [
-                    '',
-                    [this.mobileNumberValidator],
-                ],
+                husband_mobile: [''],
                 email: ['', Validators.email],
                 dob: [''],
                 address: [''],
@@ -164,8 +161,8 @@ export class PatientCreateComponent {
 
     mobileNumberValidator(control: AbstractControl): ValidationErrors | null {
         const mobilePattern = /^[0-9]{10}$/;
-        if(control.value == ""){
-            return null
+        if (control.value == '') {
+            return null;
         }
         return mobilePattern.test(control.value)
             ? null
