@@ -16,6 +16,7 @@ export class NewPasswordComponent implements OnInit {
 
     id: string;
     display = false;
+    visible: boolean = false;
 
     loginForm: FormGroup;
 
@@ -54,24 +55,27 @@ export class NewPasswordComponent implements OnInit {
     checkEmail() {
         this.loginForm.markAllAsTouched();
         if (this.loginForm.valid) {
-            this.apiService.resetPassword(this.id,this.loginForm.value).subscribe(
-                (res: any) => {
-                   this.router.navigateByUrl('auth/login')
-                },
-                (err) => {
-                    if (err.status == 401) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Invalid code provided',
-                            detail: 'Invalid code',
-                        });
+            this.apiService
+                .resetPassword(this.id, this.loginForm.value)
+                .subscribe(
+                    (res: any) => {
+                        this.visible = true;
+                        // this.router.navigateByUrl('auth/login');
+                    },
+                    (err) => {
+                        if (err.status == 401) {
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Invalid code provided',
+                                detail: 'Invalid code',
+                            });
 
-                        setTimeout(() => {
-                            this.messageService.clear();
-                        }, 3000);
+                            setTimeout(() => {
+                                this.messageService.clear();
+                            }, 3000);
+                        }
                     }
-                }
-            );
+                );
         }
     }
     goTo(url) {

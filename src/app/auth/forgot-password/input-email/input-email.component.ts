@@ -16,6 +16,8 @@ export class InputEmailComponent {
 
     display = false;
 
+    loading = false;
+
     loginForm: FormGroup;
 
     constructor(
@@ -37,19 +39,22 @@ export class InputEmailComponent {
     checkEmail() {
         this.loginForm.markAllAsTouched();
         if (this.loginForm.valid) {
-            this.apiService.userSearchBy(this.loginForm.value).subscribe(
+            this.loading = true;
+            this.apiService.userSearchByEmail(this.loginForm.value).subscribe(
                 (res: any) => {
                     if (res.length > 0) {
                         let user = res[0];
                         this.apiService
                             .forgotPassword(user._id)
                             .subscribe(() => {
+                                this.loading = false;
                                 this.router.navigateByUrl(
                                     '/auth/forgot-password/new-password/' +
                                         user._id
                                 );
                             });
                     } else {
+                        this.loading = false;
                         this.messageService.add({
                             severity: 'error',
                             summary: 'invalid',

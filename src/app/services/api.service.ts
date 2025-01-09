@@ -87,12 +87,12 @@ export class ApiService {
     }
 
     forgotPassword(id: string) {
-        const url = 'users/forgot-password/' + id;
+        const url = 'auth/forgot-password/' + id;
         return this.httpService.get(url);
     }
 
     resetPassword(id: string, params) {
-        const url = 'users/reset-password/' + id;
+        const url = 'auth/reset-password/' + id;
         return this.httpService.post(url, params);
     }
 
@@ -109,5 +109,10 @@ export class ApiService {
     verifyOTp(data: any) {
         const url = 'otp/verify-otp';
         return this.httpService.post(url, data);
+    }
+
+    userSearchByEmail(params: HttpParams) {
+        const url = 'auth/email/search';
+        return this.httpService.get(url, params);
     }
 }

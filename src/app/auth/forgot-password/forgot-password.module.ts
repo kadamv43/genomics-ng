@@ -11,8 +11,7 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-
-
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
     declarations: [NewPasswordComponent, InputEmailComponent],
@@ -23,6 +22,7 @@ import { InputTextModule } from 'primeng/inputtext';
         MessagesModule,
         PasswordModule,
         ButtonModule,
+        DialogModule,
         ForgotPasswordRoutingModule,
         InputTextModule,
     ],
