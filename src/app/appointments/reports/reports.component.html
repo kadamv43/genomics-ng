@@ -1,20 +1,30 @@
 <div class="grid" *ngIf="documents?.length > 0">
-    <div *ngFor="let doc of documents" class="col-3">
-        <img
-            click="donload(doc?.file)"
-            *ngIf="doc?.file_type != 'pdf'"
-            class="mx-auto block cursor-pointer report-icons"
-            src="{{ uploadPath + doc?.file }}"
-        />
-        <img
-            click="donload(doc?.file)"
-            *ngIf="doc?.file_type == 'pdf'"
-            class="mx-auto block cursor-pointer report-icons"
-            src="assets/layout/images/pdf.png"
-        />
-        <h3 class="text-center">{{ doc.file_name }}</h3>
+    <div *ngFor="let doc of documents" class="col-4">
+        <div class="card">
+            <div class="card-body">
+                <img click="donload(doc?.file)" *ngIf="doc?.file_type != 'pdf'"
+                    class="mx-auto block cursor-pointer report-icons w-50 " src="{{ uploadPath + doc?.file }}" />
+
+
+                <iframe *ngIf="doc?.file_type == 'pdf'" [src]="uploadPath+doc?.file | safeUrl" height="100%"
+                    frameborder="0"></iframe>
+
+
+
+
+
+                <!-- <img click=" donload(doc?.file)" class="mx-auto block cursor-pointer report-icons"
+                    src="assets/layout/images/pdf.png" /> -->
+                <!-- <h4>{{uploadPath+doc?.file}}</h4> -->
+                <h3 class="text-center">{{ doc.file_name }}</h3>
+            </div>
+            <div class="card-footer text-center mt-4">
+                <p-button (click)="delete(doc?.id)" class="mx-auto" label="Delete" severity="danger" />
+            </div>
+        </div>
     </div>
 </div>
+
 
 <div *ngIf="documents?.length == 0" class="grid">
     <div class="col-12">
@@ -29,15 +39,8 @@
 <div class="grid">
     <div class="col-12">
         <div class="card">
-            <button
-                [routerLink]="'/appointments'"
-                pButton
-                pRipple
-                [queryParams]="queryParams"
-                class="secondary ml-3"
-                type="button"
-                label="Back"
-            ></button>
+            <button [routerLink]="'/appointments'" pButton pRipple [queryParams]="queryParams" class="secondary ml-3"
+                type="button" label="Back"></button>
         </div>
     </div>
 </div>

@@ -39,8 +39,8 @@ import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.compo
 import { DialogModule } from 'primeng/dialog';
 import { NgxPrintModule } from 'ngx-print';
 import { CheckboxModule } from 'primeng/checkbox';
-
-
+import { UploadReportsComponent } from './upload-reports/upload-reports.component';
+import { SafeUrlPipe } from '../safe-url.pipe';
 
 @NgModule({
     declarations: [
@@ -50,6 +50,7 @@ import { CheckboxModule } from 'primeng/checkbox';
         InvoiceComponent,
         PreviewInvoiceComponent,
         FileUploadFormComponent,
+        UploadReportsComponent,
         ReportsComponent,
     ],
     imports: [
@@ -87,7 +88,8 @@ import { CheckboxModule } from 'primeng/checkbox';
         ChipModule,
         DynamicDialogModule,
         NgxPrintModule,
-        CheckboxModule
+        CheckboxModule,
+        SafeUrlPipe,
     ],
 })
 export class AppointmentsModule {}
