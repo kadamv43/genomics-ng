@@ -41,6 +41,7 @@ import { NgxPrintModule } from 'ngx-print';
 import { CheckboxModule } from 'primeng/checkbox';
 import { UploadReportsComponent } from './upload-reports/upload-reports.component';
 import { SafeUrlPipe } from '../safe-url.pipe';
+import { ShowFullDocumentsComponent } from './show-full-documents/show-full-documents.component';
 
 @NgModule({
     declarations: [
@@ -52,6 +53,7 @@ import { SafeUrlPipe } from '../safe-url.pipe';
         FileUploadFormComponent,
         UploadReportsComponent,
         ReportsComponent,
+        ShowFullDocumentsComponent,
     ],
     imports: [
         CommonModule,

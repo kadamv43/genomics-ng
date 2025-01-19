@@ -1,0 +1,9 @@
+<div class="card">
+    <div class="card-body">
+        <img style="width: 50%;" click="donload(doc?.file)" *ngIf="doc?.file_type != 'pdf'"
+            class="mx-auto block cursor-pointer report-icons" src="{{ uploadPath + doc?.file }}" />
+        <iframe *ngIf="doc?.file_type == 'pdf'" [src]="uploadPath+doc?.file | safeUrl" height="500px" width="100%"
+            frameborder="0"></iframe>
+        <h3 class="text-center">{{ doc.file_name }}</h3>
+    </div>
+</div>
