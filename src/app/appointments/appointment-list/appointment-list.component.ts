@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UploadReportsComponent } from '../upload-reports/upload-reports.component';
+import { DoctorsService } from 'src/app/services/doctors/doctors.service';
 
 @Component({
     selector: 'app-appointment-list',
@@ -30,8 +31,10 @@ export class AppointmentListComponent implements OnInit {
 
     display = false;
     selectedStatus = '';
+    selectedDoctor = '';
     selectedDate = [];
     searchText = '';
+    doctors: any = [];
 
     statuses: any[] = [];
 
@@ -59,6 +62,7 @@ export class AppointmentListComponent implements OnInit {
 
     constructor(
         private appointmentService: AppointmentService,
+        private doctorService: DoctorsService,
         private authService: AuthService,
         private commonService: CommonService,
         private dialogService: DialogService,
@@ -81,6 +85,29 @@ export class AppointmentListComponent implements OnInit {
         this.queryParams['status'] = value;
         let data = { first: 0, rows: 10 };
         this.loadAppointments(data);
+    }
+
+    onDoctorChange(value: string) {
+        this.selectedDoctor = value;
+        this.queryParams['doctor'] = value;
+        let data = { first: 0, rows: 10 };
+        this.loadAppointments(data);
+    }
+
+    getDoctors() {
+        let params = {};
+        params['page'] = 0;
+        params['size'] = 50;
+        this.doctorService.getAll(params).subscribe({
+            next: (res: any) => {
+                this.doctors = res?.data.map((item: any) => {
+                    return {
+                        name: item?.first_name + ' ' + item?.last_name,
+                        code: item?._id,
+                    };
+                });
+            },
+        });
     }
 
     onDateChange(value: any) {
@@ -142,6 +169,7 @@ export class AppointmentListComponent implements OnInit {
             this.queryParams = { ...data };
         });
         this.role = this.authService.getRole();
+        this.getDoctors();
     }
 
     loadAppointments(event: any) {
@@ -158,6 +186,10 @@ export class AppointmentListComponent implements OnInit {
 
         if (this.selectedStatus) {
             params['status'] = this.selectedStatus;
+        }
+
+        if (this.selectedDoctor) {
+            params['doctor'] = this.selectedDoctor;
         }
 
         if (this.selectedDate && this.selectedDate[0]) {
@@ -192,6 +224,7 @@ export class AppointmentListComponent implements OnInit {
     async clear(event) {
         this.selectedStatus = '';
         this.searchText = '';
+        this.selectedDoctor = '';
         let data = { first: 0, rows: 10 };
         this.loadAppointments(data);
     }

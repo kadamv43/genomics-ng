@@ -65,11 +65,11 @@
                 </div>
                 <div class="col-2">
                     <label>Appointment Date</label>
-                    <p>{{ item?.appointment_date }}</p>
+                    <p>{{ item?.appointment_date | date:'dd-MM-yyyy'}}</p>
                 </div>
                 <div class="col-2">
                     <label>Appointment Time</label>
-                    <p>{{ item?.appointment_time }}</p>
+                    <p>{{ item?.appointment_time | date:'hh:mm a'}}</p>
                 </div>
                 <div class="col-2">
                     <label>Doctor</label>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="col-2">
                     <label>Discount</label>
-                    <p>Rs.{{ item?.invoice?.dicount ?? 0 }}</p>
+                    <p>Rs.{{ item?.invoice?.discount ?? 0 }}</p>
                 </div>
                 <div class="col-2">
                     <label>Paid</label>
@@ -104,15 +104,44 @@
                     <label>Balance</label>
                     <p>Rs.{{ item?.invoice?.balance }}</p>
                 </div>
+            </div>
+            <div class="grid">
                 <div class="col-2">
                     <label>Received By</label>
                     <p>{{ item?.invoice?.received_by }}</p>
                 </div>
-            </div>
-            <div class="grid">
+                <div class="col-2" *ngIf="item?.invoice?.payment_mode">
+                    <label>Payment Mode</label>
+                    <p>{{ item?.invoice?.payment_mode}}</p>
+                </div>
+                <div class="col-2" *ngIf="!item?.invoice?.partial_payment && item?.invoice?.payment_mode1">
+                    <label>Payment Mode</label>
+                    <p>{{item?.invoice?.payment_mode1.mode }}</p>
+                </div>
+                <div class="col-2" *ngIf="item?.invoice?.partial_payment">
+                    <label>Payment Mode 1</label>
+                    <p>{{item?.invoice?.payment_mode1.mode }}</p>
+                </div>
+                <div class="col-2" *ngIf="item?.invoice?.partial_payment">
+                    <label>Payment Mode 2</label>
+                    <p>{{item?.invoice?.payment_mode2.mode }}</p>
+                </div>
                 <div class="col-6">
                     <label>Services</label>
                     <p>{{ item?.services }}</p>
+                </div>
+
+            </div>
+            <div class="grid">
+                <div class="col-2">
+                    <button *ngIf="item?.files.length > 0" [routerLink]="'/appointments/reports/'+item?._id"
+                        [queryParams]="{ from: 'patient' }" pButton class="primary">View
+                        Reports</button>
+                </div>
+                <div class="col-3">
+                    <button (click)="showDialog(item?.invoice?._id)"
+                        *ngIf="item?.status === 'Completed' && item?.invoice?._id" pButton class="primary">View
+                        Invoice</button>
                 </div>
             </div>
         </div>
@@ -120,11 +149,15 @@
 </div>
 <div class="grid mt-3">
     <div class="col-12">
-        <button
-            pButton
-            label="Back"
-            class="secondary ml-3"
-            [routerLink]="['/patients']"
-        ></button>
+        <button pButton label="Back" class="secondary ml-3" [routerLink]="['/patients']"></button>
     </div>
 </div>
+
+<p-dialog [modal]="true" [(visible)]="visible" [style]="{ width: '80vw',height:'1000px' }">
+    <div class="grid">
+        <div class="col-12">
+            <iframe [src]="pageUrl | safeUrl" width="100%" height="890px" style="border: none;"></iframe>
+        </div>
+    </div>
+
+</p-dialog>

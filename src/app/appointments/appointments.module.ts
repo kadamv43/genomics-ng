@@ -42,6 +42,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { UploadReportsComponent } from './upload-reports/upload-reports.component';
 import { SafeUrlPipe } from '../safe-url.pipe';
 import { ShowFullDocumentsComponent } from './show-full-documents/show-full-documents.component';
+import { ChequeDetailsComponent } from './cheque-details/cheque-details.component';
+import { InvoicesModule } from '../invoices/invoices.module';
 
 @NgModule({
     declarations: [
@@ -54,6 +56,7 @@ import { ShowFullDocumentsComponent } from './show-full-documents/show-full-docu
         UploadReportsComponent,
         ReportsComponent,
         ShowFullDocumentsComponent,
+        ChequeDetailsComponent,
     ],
     imports: [
         CommonModule,
@@ -92,6 +95,7 @@ import { ShowFullDocumentsComponent } from './show-full-documents/show-full-docu
         NgxPrintModule,
         CheckboxModule,
         SafeUrlPipe,
+        InvoicesModule,
     ],
 })
 export class AppointmentsModule {}

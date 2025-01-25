@@ -1,0 +1,52 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="grid" style="width: 500px;">
+        <div class="col-12">
+            <input type="text" formControlName="account_holder" placeholder="Account Holder" class="w-full"
+                pInputText />
+            <small class="p-error block" *ngIf="
+            account_holder.invalid &&
+                    (account_holder.dirty || account_holder.touched)
+                ">
+                account holder is required</small>
+        </div>
+
+        <div class="col-6">
+            <input type="text" formControlName="bank_name" placeholder="Bank" class="w-full" pInputText />
+            <small class="p-error block" *ngIf="
+            bank_name.invalid &&
+                (bank_name.dirty || bank_name.touched)
+            ">
+                bank name is required</small>
+        </div>
+
+        <div class="col-6">
+            <input type="text" formControlName="branch_name" placeholder="Branch" class="w-full" pInputText />
+            <small class="p-error block" *ngIf="
+            branch_name.invalid &&
+                (branch_name.dirty || branch_name.touched)
+            ">
+                branch name is required</small>
+        </div>
+        <div class="col-6">
+            <input type="text" formControlName="cheque_number" placeholder="Cheque Number" class="w-full" pInputText />
+            <small class="p-error block" *ngIf="
+            cheque_number.invalid &&
+                (cheque_number.dirty || cheque_number.touched)
+            ">
+                cheque number is required</small>
+        </div>
+
+        <div class="col-6">
+            <input type="text" formControlName="cheque_amount" placeholder="Cheque Amount" class="w-full" pInputText />
+            <small class="p-error block" *ngIf="
+            cheque_amount.invalid &&
+                (cheque_amount.dirty || cheque_amount.touched)
+            ">
+                cheque amount is required</small>
+        </div>
+        <div class="col-6">
+            <button type="submit" pButton class="primary">Submit</button>
+        </div>
+    </div>
+
+</form>

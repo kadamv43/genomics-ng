@@ -167,7 +167,7 @@ export class AppointmentCreateComponent implements OnInit {
         this.patientService.globalSearch(query).subscribe((data: []) => {
             this.filteredItems = data.map((item: any) => {
                 return {
-                    fullname: `${item.first_name}  ${item.last_name}`,
+                    fullname: `${item.first_name}  ${item.last_name} (OPD - ${item?.patient_number})`,
                     ...item,
                 };
             });
@@ -226,7 +226,7 @@ export class AppointmentCreateComponent implements OnInit {
 
                 let appointment: any = {};
                 appointment = this.appointmentForm.get('appointmentInfo').value;
-                console.log(appointment)
+                console.log(appointment);
                 appointment.appointment_date =
                     this.setAppointmentTime(appointment);
                 appointment.appointment_time =

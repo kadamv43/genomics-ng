@@ -22,14 +22,16 @@ import { MessageModule } from 'primeng/message';
 import { RippleModule } from 'primeng/ripple';
 import { DialogModule } from 'primeng/dialog';
 import { PatientProfileComponent } from './patient-profile/patient-profile.component';
-
+import { ReportsComponent } from './reports/reports.component';
+import { SafeUrlPipe } from '../safe-url.pipe';
 
 @NgModule({
     declarations: [
         PatientCreateComponent,
         PatientEditComponent,
         PatientListComponent,
-        PatientProfileComponent
+        PatientProfileComponent,
+        ReportsComponent,
     ],
     imports: [
         CommonModule,
@@ -49,7 +51,8 @@ import { PatientProfileComponent } from './patient-profile/patient-profile.compo
         MessageModule,
         MessagesModule,
         ChipsModule,
-        DialogModule
+        SafeUrlPipe,
+        DialogModule,
     ],
 })
 export class PatientsModule {}

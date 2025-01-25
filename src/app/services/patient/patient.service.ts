@@ -48,4 +48,9 @@ export class PatientService {
         const url = `${this.baseUrl}/global-search/?q=${query}`;
         return this.httpService.get(url);
     }
+
+    deleteReport(id: string, image_id: number) {
+        const url = `${this.baseUrl}/reports/${id}`;
+        return this.httpService.patch(url, { image_id });
+    }
 }

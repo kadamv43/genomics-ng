@@ -1,0 +1,22 @@
+<div class="grid">
+    <div class="col-12">
+        <iframe [src]="pageUrl | safeUrl" width="100%" height="500px" style="border: none;"></iframe>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="col-6">
+        <button class="secondary" pButton (click)="download()" type="button">
+            Download
+        </button>
+        <button class="primary ml-3" pButton (click)="printFile()" type="button">
+            Print
+        </button>
+        <button class="primary ml-3" pButton (click)="whatsapp()" type="button">
+            Whatsapp
+        </button>
+        <button class="light ml-3" (click)="back()" pButton type="button">
+            back
+        </button>
+    </div>
+</div>

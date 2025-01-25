@@ -11,23 +11,27 @@ import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { InvoiceDetailsComponent } from './invoice-details/invoice-details.component';
 import { ToastModule } from 'primeng/toast';
-
+import { SafeUrlPipe } from '../safe-url.pipe';
+import { InvoiceViewComponent } from './invoice-view/invoice-view.component';
 
 @NgModule({
-  declarations: [
-    InvoicesListComponent,
-    InvoicesCreateComponent,
-    InvoicesEditComponent,
-    InvoiceDetailsComponent
-  ],
-  imports: [
-    CommonModule,
-    ToolbarModule,
-    ButtonModule,
-    TableModule,
-    InputTextModule,
-    InvoicesRoutingModule,
-    ToastModule
-  ]
+    declarations: [
+        InvoicesListComponent,
+        InvoicesCreateComponent,
+        InvoicesEditComponent,
+        InvoiceDetailsComponent,
+        InvoiceViewComponent,
+    ],
+    imports: [
+        CommonModule,
+        ToolbarModule,
+        ButtonModule,
+        TableModule,
+        InputTextModule,
+        InvoicesRoutingModule,
+        ToastModule,
+        SafeUrlPipe,
+    ],
+    exports: [InvoiceViewComponent],
 })
-export class InvoicesModule { }
+export class InvoicesModule {}

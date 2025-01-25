@@ -19,6 +19,8 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ApiService } from 'src/app/services/api.service';
 import { send } from 'process';
 import { it } from 'node:test';
+import { AuthService } from 'src/app/services/auth.service';
+import { ChequeDetailsComponent } from '../cheque-details/cheque-details.component';
 
 @Component({
     selector: 'app-invoice',
@@ -43,6 +45,8 @@ export class InvoiceComponent implements OnInit {
     serviceTotal = 0;
     extraSum = 0;
     showPayment2 = false;
+    btnDisabled = false;
+    showChequeButton = false;
 
     paymentModes = [
         { name: 'Cash', code: 'Cash' },
@@ -78,6 +82,7 @@ export class InvoiceComponent implements OnInit {
         private invoiceService: InvoicesService,
         private toast: MessageService,
         private api: ApiService,
+        private authService: AuthService,
         private dialogService: DialogService
     ) {
         this.invoiceForm = fb.group({
@@ -103,10 +108,6 @@ export class InvoiceComponent implements OnInit {
 
         this.otpForm = fb.group({
             otp: ['', Validators.required],
-        });
-
-        this.api.getProducts().subscribe((res) => {
-            this.serviceList = res;
         });
 
         this.onChanges();
@@ -222,6 +223,11 @@ export class InvoiceComponent implements OnInit {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
                 if (res?.invoice) {
+                    if (this.authService.getRole() != 'admin') {
+                        this.btnDisabled = true;
+                        this.invoiceForm.disable();
+                    }
+
                     this.invoiceForm
                         ?.get('discount')
                         .setValue(res?.invoice?.discount ?? 0);
@@ -232,9 +238,17 @@ export class InvoiceComponent implements OnInit {
                         ?.get('balance')
                         .setValue(res?.invoice?.balance ?? 0);
 
-                    // this.invoiceForm
-                    //     ?.get('payment_mode')
-                    //     .setValue(res?.invoice?.payment_mode ?? '');
+                    if (res?.invoice?.partial_payment) {
+                        this.invoiceForm?.get('payment_mode2').setValue({
+                            mode: res?.invoice?.payment_mode2.mode,
+                            price: res?.invoice?.payment_mode2?.price,
+                        });
+                    }
+
+                    this.invoiceForm?.get('payment_mode1').setValue({
+                        mode: res?.invoice?.payment_mode1.mode,
+                        price: res?.invoice?.payment_mode1?.price,
+                    });
 
                     res?.invoice?.particulars.forEach((item) => {
                         if (item.type == 'extra') {
@@ -255,6 +269,15 @@ export class InvoiceComponent implements OnInit {
                         };
                     });
 
+                    this.invoiceForm?.get('partial_payment').patchValue(1);
+
+                    if (res?.invoice?.cheque_details) {
+                        localStorage.setItem(
+                            'cheque',
+                            JSON.stringify(res?.invoice?.cheque_details)
+                        );
+                        this.showChequeButton = true;
+                    }
                     // this.invoiceData = res?.invoice;
                     this.invoiceData.items = services;
                     res.services = services;
@@ -284,8 +307,16 @@ export class InvoiceComponent implements OnInit {
             this.prePostCharges = data;
         });
 
-        this.api.getProducts().subscribe((res) => {
-            this.serviceList = res;
+        this.api.getProducts().subscribe((res: any) => {
+            this.serviceList = res?.map((item) => {
+                console.log('vk', item);
+                return {
+                    name: item?.name,
+                    name_show: `${item?.name}  (Rs.${item?.price})`,
+                    price: item?.price,
+                };
+            });
+            console.log(this.serviceList);
         });
 
         this.config = JSON.parse(localStorage.getItem('config') as string);
@@ -300,7 +331,7 @@ export class InvoiceComponent implements OnInit {
     addService(name = '', price = ''): void {
         const control = this.createItem(name, price);
         this.services.push(control);
-        this.invoiceData.services.push({ name, price, type: 'services' });
+        this.invoiceData.services.push({ name, price, type: 'service' });
     }
 
     removeExtraServiceItem(index: number): void {
@@ -452,6 +483,32 @@ export class InvoiceComponent implements OnInit {
         };
     }
 
+    onChangePaymentMode(e) {
+        if (e.value == 'Cheque') {
+            this.showChequeButton = true;
+            this.openChequeDialog();
+        } else {
+            this.showChequeButton = false;
+        }
+    }
+
+    openChequeDialog() {
+        this.ref = this.dialogService.open(ChequeDetailsComponent, {
+            data: {
+                fileNameInput: false,
+                fileTypes: '.png,.jpg,.jpeg,.JPEG,.pdf',
+                fileUploadUrl: 'appointments/upload-files/' + '',
+            },
+            header: 'Enter Cheque Details',
+        });
+
+        this.ref.onClose.subscribe(() => {
+            let cheque = localStorage.getItem('cheque');
+            if (cheque) {
+                this.showChequeButton = true;
+            }
+        });
+    }
     saveAndPreview() {
         console.log(this.invoiceData);
 
@@ -497,6 +554,15 @@ export class InvoiceComponent implements OnInit {
             particulars: [],
         };
 
+        if (
+            this.payment_mode1.value == 'Cheque' ||
+            this.payment_mode2.value == 'Cheque'
+        ) {
+            invoiceDatum['cheque_details'] = JSON.parse(
+                localStorage.getItem('cheque')
+            );
+        }
+
         invoiceDatum.particulars = [
             ...this.invoiceData.items,
             ...this.invoiceData.extras,
@@ -508,6 +574,7 @@ export class InvoiceComponent implements OnInit {
             this.invoiceService
                 .update(this.appointmenData?.invoice._id, invoiceDatum)
                 .subscribe((res: any) => {
+                    localStorage.removeItem('cheque');
                     this.router.navigate([
                         'appointments',
                         'preview-invoice',
@@ -516,6 +583,7 @@ export class InvoiceComponent implements OnInit {
                 });
         } else {
             this.invoiceService.create(invoiceDatum).subscribe((res: any) => {
+                localStorage.removeItem('cheque');
                 this.router.navigate([
                     'appointments',
                     'preview-invoice',

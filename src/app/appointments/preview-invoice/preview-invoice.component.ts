@@ -1,4 +1,4 @@
-import {Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import html2pdf from 'html2pdf.js';
 import { InvoicesService } from 'src/app/services/invoices/invoices.service';
@@ -88,7 +88,7 @@ export class PreviewInvoiceComponent implements OnInit {
         this.router.navigate([
             'appointments',
             'generate-invoice',
-            this.invoiceDetails?.appointment,
+            this.invoiceDetails?.appointment?._id,
         ]);
     }
 

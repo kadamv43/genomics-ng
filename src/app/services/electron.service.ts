@@ -53,4 +53,16 @@ export class ElectronService {
     onDownloadProgress(callback: (progress: any) => void) {
         (window as any).electron?.onDownloadProgress(callback);
     }
+
+    downloadInvoice(url) {
+        (window as any).electron?.generatePdf(url, 'download');
+    }
+
+    printInvoice(url) {
+        (window as any).electron?.generatePdf(url, 'print');
+    }
+
+    getInvoicePdf(url) {
+        (window as any).electron?.generatePdf(url, 'pdfblob');
+    }
 }

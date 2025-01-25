@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
 
 import { ApiService } from 'src/app/services/api.service';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { CommonService } from 'src/app/services/common/common.service';
 import { PatientService } from 'src/app/services/patient/patient.service';
 
@@ -34,6 +35,7 @@ export class AppointmentEditComponent {
     queryParams;
     selectedServicesObjects = [];
     showFollowUpDate = false;
+    role = '';
 
     conditions = [
         { name: 'Hypertension', code: 'Hypertension' },
@@ -75,6 +77,7 @@ export class AppointmentEditComponent {
         private api: ApiService,
         private patientService: PatientService,
         private appointmentService: AppointmentService,
+        private authService: AuthService,
         private toast: MessageService,
         private router: Router,
         private datePipe: DatePipe,
@@ -114,6 +117,8 @@ export class AppointmentEditComponent {
             this.serviceList = res;
         });
 
+        this.role = this.authService.getRole();
+
         this.api.getDoctors().subscribe((res: any) => {
             this.doctors = res?.data?.map((item) => {
                 return { name: item.first_name + item.last_name, ...item };
@@ -150,7 +155,10 @@ export class AppointmentEditComponent {
                     reference_by: res?.patient?.reference_by,
                 });
 
-                if (res?.status == 'Completed' || res?.status == 'Cancelled') {
+                if (
+                    this.role != 'admin' &&
+                    (res?.status == 'Completed' || res?.status == 'Cancelled')
+                ) {
                     this.appointmentForm.disable();
                 }
             });

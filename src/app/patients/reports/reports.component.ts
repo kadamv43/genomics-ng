@@ -5,8 +5,9 @@ import { AppointmentService } from 'src/app/services/appointment/appointment.ser
 import { environment } from 'src/environments/environment';
 import { SafeUrlPipe } from 'src/app/safe-url.pipe';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ShowFullDocumentsComponent } from '../show-full-documents/show-full-documents.component';
 import { AuthService } from 'src/app/services/auth.service';
+import { ShowFullDocumentsComponent } from 'src/app/appointments/show-full-documents/show-full-documents.component';
+import { PatientService } from 'src/app/services/patient/patient.service';
 
 @Component({
     selector: 'app-reports',
@@ -14,7 +15,7 @@ import { AuthService } from 'src/app/services/auth.service';
     styleUrl: './reports.component.scss',
     providers: [MessageService, SafeUrlPipe, DialogService],
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent {
     uploadPath = environment.uploadPath;
     pdfSrc = 'https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf';
     ref: DynamicDialogRef | undefined;
@@ -23,11 +24,11 @@ export class ReportsComponent implements OnInit {
     queryParams = {};
     patienId = '';
     role = '';
-    backLink = '/appointments';
+    backLink = '/patients';
 
     constructor(
         private route: ActivatedRoute,
-        private appointmentService: AppointmentService,
+        private patientService: PatientService,
         private toast: MessageService,
         private dialogService: DialogService,
         private authService: AuthService
@@ -35,8 +36,8 @@ export class ReportsComponent implements OnInit {
     ngOnInit(): void {
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.id = params.get('id');
-            this.appointmentService.findById(this.id).subscribe((res: any) => {
-                this.patienId = res?.patient?._id;
+            this.patientService.findById(this.id).subscribe((res: any) => {
+                // this.patienId = res?.patient?._id;
                 this.documents = res?.files;
                 this.route.queryParams.subscribe((params) => {
                     this.queryParams = params;
@@ -52,7 +53,7 @@ export class ReportsComponent implements OnInit {
     }
 
     delete(id) {
-        this.appointmentService.deleteReport(this.id, id).subscribe((res) => {
+        this.patientService.deleteReport(this.id, id).subscribe((res) => {
             this.documents = this.documents.filter((item: any) => {
                 return item.id != id;
             });

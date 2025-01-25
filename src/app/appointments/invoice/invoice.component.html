@@ -34,13 +34,13 @@
 
     <div class="grid">
         <div class="col-12">
-            <button class="secondary" pButton (click)="addService()" type="button">
+            <button class="secondary" [disabled]="btnDisabled" pButton (click)="addService()" type="button">
                 Add Service
             </button>
-            <button class="secondary ml-3" pButton (click)="addPrePostItem()" type="button">
+            <button class="secondary ml-3" [disabled]="btnDisabled" pButton (click)="addPrePostItem()" type="button">
                 Add Pre/Post Items
             </button>
-            <button class="secondary ml-3" pButton (click)="addItem()" type="button">
+            <button class="secondary ml-3" [disabled]="btnDisabled" pButton (click)="addItem()" type="button">
                 Add Extra Items
             </button>
         </div>
@@ -59,8 +59,8 @@
                         <div class="col-2"></div>
 
                         <div class="col-5">
-                            <p-dropdown class="w-full" [options]="serviceList" optionLabel="name" optionValue="name"
-                                formControlName="name" (onChange)="onExtraServicesChange(i)"
+                            <p-dropdown class="w-full" [options]="serviceList" optionLabel="name_show"
+                                optionValue="name" formControlName="name" (onChange)="onExtraServicesChange(i)"
                                 placeholder="Select Service" />
                             <small class="p-error block" *ngIf="
                                     item.get('name').invalid &&
@@ -85,8 +85,8 @@
                         </div>
 
                         <div class="col-3">
-                            <button pButton pRipple (click)="removeExtraServiceItem(i)" type="button" icon="pi pi-minus"
-                                class="p-button-danger p-button-rounded"></button>
+                            <button [disabled]="btnDisabled" pButton pRipple (click)="removeExtraServiceItem(i)"
+                                type="button" icon="pi pi-minus" class="p-button-danger p-button-rounded"></button>
                         </div>
                     </div>
                 </div>
@@ -124,8 +124,8 @@
                         </div>
 
                         <div class="col-3">
-                            <button pButton pRipple (click)="removePrePostItem(i)" type="button" icon="pi pi-minus"
-                                class="p-button-danger p-button-rounded"></button>
+                            <button [disabled]="btnDisabled" pButton pRipple (click)="removePrePostItem(i)"
+                                type="button" icon="pi pi-minus" class="p-button-danger p-button-rounded"></button>
                         </div>
                     </div>
                 </div>
@@ -158,8 +158,8 @@
                         </div>
 
                         <div class="col-3">
-                            <button pButton pRipple (click)="removeItem(i)" type="button" icon="pi pi-minus"
-                                class="p-button-danger p-button-rounded"></button>
+                            <button [disabled]="btnDisabled" pButton pRipple (click)="removeItem(i)" type="button"
+                                icon="pi pi-minus" class="p-button-danger p-button-rounded"></button>
                         </div>
                     </div>
                 </div>
@@ -248,8 +248,9 @@
                     <!-- <div class="col-3"></div> -->
                     <!-- <div class="col-3">Payment Mode</div> -->
                     <div class="col-6">
-                        <p-dropdown [options]="paymentModes" formControlName="mode" optionLabel="name" appendTo="body"
-                            optionValue="code" placeholder="Payment Method" />
+                        <p-dropdown (onChange)="onChangePaymentMode($event)" [options]="paymentModes"
+                            formControlName="mode" optionLabel="name" appendTo="body" optionValue="code"
+                            placeholder="Payment Method" />
                         <small class="p-error block" *ngIf="
                                 payment_mode1.get('mode').invalid &&
                                 (payment_mode1.get('mode').dirty ||
@@ -266,8 +267,9 @@
                     <!-- <div class="col-3"></div> -->
                     <!-- <div class="col-3">Payment Mode</div> -->
                     <div class="col-6">
-                        <p-dropdown [options]="paymentModes" formControlName="mode" optionLabel="name" appendTo="body"
-                            optionValue="code" placeholder="Payment Method 2" />
+                        <p-dropdown (onChange)="onChangePaymentMode($event)" [options]="paymentModes"
+                            formControlName="mode" optionLabel="name" appendTo="body" optionValue="code"
+                            placeholder="Payment Method 2" />
                         <small class="p-error block" *ngIf="
                                 payment_mode2.get('mode').invalid &&
                                 (payment_mode2.get('mode').dirty ||
@@ -280,6 +282,9 @@
                         <input class="w-full" pInputText type="text" formControlName="price" />
                     </div>
                 </div>
+                <div *ngIf="showChequeButton" class="grid mt-3">
+                    <button pButton (click)="openChequeDialog()" class="primary">View Cheque Details</button>
+                </div>
             </div>
         </div>
     </div>
@@ -287,7 +292,7 @@
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <button class="primary" (click)="saveAndPreview()" pButton>
+                <button class="primary" [disabled]="btnDisabled" (click)="saveAndPreview()" pButton>
                     <i class="pi pi-download"></i> &nbsp;&nbsp;Save and Preview
                 </button>
             </div>
