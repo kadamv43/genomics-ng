@@ -12,7 +12,7 @@
         <button class="primary ml-3" pButton (click)="printFile()" type="button">
             Print
         </button>
-        <button class="primary ml-3" pButton (click)="whatsapp()" type="button">
+        <button [loading]="loading" class="primary ml-3" pButton (click)="whatsapp()" type="button">
             Whatsapp
         </button>
         <button class="light ml-3" (click)="back()" pButton type="button">
@@ -20,3 +20,4 @@
         </button>
     </div>
 </div>
+<p-toast key="tst"></p-toast>

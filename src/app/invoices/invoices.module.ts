@@ -13,6 +13,8 @@ import { InvoiceDetailsComponent } from './invoice-details/invoice-details.compo
 import { ToastModule } from 'primeng/toast';
 import { SafeUrlPipe } from '../safe-url.pipe';
 import { InvoiceViewComponent } from './invoice-view/invoice-view.component';
+import { MessageModule } from 'primeng/message';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
     declarations: [
@@ -31,6 +33,8 @@ import { InvoiceViewComponent } from './invoice-view/invoice-view.component';
         InvoicesRoutingModule,
         ToastModule,
         SafeUrlPipe,
+        MessageModule,
+        MessagesModule,
     ],
     exports: [InvoiceViewComponent],
 })

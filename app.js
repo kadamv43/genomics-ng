@@ -106,12 +106,12 @@ ipcMain.on("print-url", async (event, url, operation) => {
     win.loadURL(url);
     win.focus();
 
-    console.log(url);
-    console.log(operation);
+    // console.log(url);
+    // console.log(operation);
     // fs.writeFileSync(pdfPath, pdfData);
 
     win.webContents.on("did-finish-load", async () => {
-        console.log("dd", operation);
+        // console.log("dd", operation);
         if (operation === "download") {
             console.log("download");
             const { canceled, filePath } = await dialog.showSaveDialog({
@@ -140,16 +140,40 @@ ipcMain.on("print-url", async (event, url, operation) => {
                 filePath,
             });
         } else if (operation === "pdfblob") {
+            console.log("vk");
+            const path = require("path");
+            const os = require("os");
+
+            // Generate a temporary file path
+            const tempDir = os.tmpdir();
+            const tempFilePath = path.join(tempDir, `output_${Date.now()}.pdf`);
+
+            // Generate the PDF
             const pdfData = await win.webContents.printToPDF({
                 marginsType: 1,
                 pageSize: "A4",
                 printBackground: true,
             });
 
+            // Save the PDF to the temporary file
+            fs.writeFileSync(tempFilePath, pdfData);
+
+            // Read the file and encode it to base64
+            const base64Data = pdfData.toString("base64");
+
+            // Send the file data to the Angular component
             event.reply("operation-done", {
-                message: "PDF blob generated successfully!",
-                pdfBlob: pdfData.toString("base64"),
+                message: "PDF generated successfully!",
+                filePath: tempFilePath, // Temporary file path
+                pdfBlob: base64Data, // Base64-encoded PDF blob
             });
+
+            // Optionally clean up the temporary file after use
+            setTimeout(() => {
+                if (fs.existsSync(tempFilePath)) {
+                    fs.unlinkSync(tempFilePath); // Delete the temp file
+                }
+            }, 60000); // Deletes file after 60 seconds
         } else if (operation === "print") {
             win.webContents.print(
                 {

@@ -10,36 +10,17 @@ import { SafeUrlPipe } from 'src/app/safe-url.pipe';
 @Component({
     selector: 'app-invoice-view',
     templateUrl: './invoice-view.component.html',
-    providers: [SafeUrlPipe],
+    providers: [SafeUrlPipe, MessageService],
     styleUrl: './invoice-view.component.scss',
 })
 export class InvoiceViewComponent {
     private ipcRenderer = (window as any).electron?.ipcRenderer;
 
+    loading = false;
     id = '';
     invoiceDetails;
 
-    logoUrl = '';
-
-    uploadPath = environment.uploadPath;
-
-    pdfOptions = {
-        margin: 10,
-        filename: 'invoice.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-
-        html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: true,
-            dpi: 192,
-            letterRendering: true,
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    };
-
     pageUrl = '';
-    // 'http://localhost:3000/web/invoice/6791800909d05c7a3a7b30a6';
 
     constructor(
         private invoiceService: InvoicesService,
@@ -60,23 +41,9 @@ export class InvoiceViewComponent {
 
         if (this.ipcRenderer) {
             this.ipcRenderer.on('operation-done', (event, data) => {
-                console.log(data.message);
+                console.log('vinayak');
                 if (data.pdfBlob) {
-                    console.log('PDF Blob:', data.pdfBlob);
-                    let url = `invoice/${this.id}?send=whatsapp`;
-                    this.savePdfOnServer(url, data.pdfObj).subscribe({
-                        next: (res: any) => {
-                            this.toast.add({
-                                key: 'tst',
-                                severity: 'success',
-                                summary: 'Success Message',
-                                detail: 'Invoice Sent successfully',
-                            });
-                        },
-                    });
-                }
-                if (data.filePath) {
-                    console.log('Saved PDF Path:', data.filePath);
+                    this.sendFileToWhatsapp(data);
                 }
             });
         }
@@ -95,57 +62,49 @@ export class InvoiceViewComponent {
     }
 
     whatsapp() {
-        this.electronService.getInvoicePdf(this.pageUrl);
-        // const element = document.getElementById('invoice'); // Replace with your element's ID
-
-        // html2pdf()
-        //     .set(this.pdfOptions)
-        //     .from(element)
-        //     .toPdf()
-        //     .get('pdf')
-        //     .then((pdfObj) => {
-        //         let url = `invoice/${this.id}?send=whatsapp`;
-        //         this.savePdfOnServer(url, pdfObj).subscribe({
-        //             next: (res: any) => {
-        //                 this.toast.add({
-        //                     key: 'tst',
-        //                     severity: 'success',
-        //                     summary: 'Success Message',
-        //                     detail: 'Invoice Sent successfully',
-        //                 });
-        //             },
-        //         });
-        //     });
-    }
-
-    base64ToBlob(base64: string, mimeType: string): Blob {
-        const byteCharacters = atob(base64); // Decode base64 string to byte characters
-        const byteArrays = [];
-
-        // Create a byte array from the base64 string
-        for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-            const slice = byteCharacters.slice(offset, offset + 1024);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-
-        return new Blob(byteArrays, { type: mimeType });
-    }
-
-    savePdfOnServer(url, pdfObj) {
-        const pdfBlob = this.base64ToBlob(pdfObj, 'application/pdf');
-
-        const formData = new FormData();
-        formData.append('file', pdfBlob, `${this.id}.pdf`);
-
-        return this.httpService.patchWithFormData(url, formData);
+        this.loading = true;
+        setTimeout(() => {
+            this.electronService.getInvoicePdf(this.pageUrl);
+            this.loading = false;
+        }, 2000);
     }
 
     async printFile() {
         this.electronService.printInvoice(this.pageUrl);
+    }
+
+    sendFileToWhatsapp(data) {
+        const pdfBlob = data.pdfBlob; // Base64 PDF data
+        const binary = atob(pdfBlob); // Decode base64
+
+        const array = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            array[i] = binary.charCodeAt(i);
+        }
+
+        // Create a Blob from the binary data
+        const blob = new Blob([array], {
+            type: 'application/pdf',
+        });
+        // Upload the file using base64 data or file path
+        const formData = new FormData();
+        formData.append('file', blob, 'invoice_' + this.id + '.pdf');
+
+        let url = `invoice/${this.id}?send=whatsapp`;
+
+        return this.httpService.patchWithFormData(url, formData).subscribe({
+            next: (res: any) => {
+                this.loading = false;
+                this.toast.add({
+                    key: 'tst',
+                    severity: 'success',
+                    summary: 'Success Message',
+                    detail: 'Invoice Sent successfully',
+                });
+            },
+            error: () => {
+                this.loading = false;
+            },
+        });
     }
 }
