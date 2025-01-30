@@ -45,6 +45,8 @@ import { ShowFullDocumentsComponent } from './show-full-documents/show-full-docu
 import { ChequeDetailsComponent } from './cheque-details/cheque-details.component';
 import { InvoicesModule } from '../invoices/invoices.module';
 import { BalanceInvoiceComponent } from './balance-invoice/balance-invoice.component';
+import { NotepadComponent } from './notepad/notepad.component';
+import { EditorModule } from 'primeng/editor';
 
 @NgModule({
     declarations: [
@@ -59,6 +61,7 @@ import { BalanceInvoiceComponent } from './balance-invoice/balance-invoice.compo
         ShowFullDocumentsComponent,
         ChequeDetailsComponent,
         BalanceInvoiceComponent,
+        NotepadComponent,
     ],
     imports: [
         CommonModule,
@@ -98,6 +101,7 @@ import { BalanceInvoiceComponent } from './balance-invoice/balance-invoice.compo
         CheckboxModule,
         SafeUrlPipe,
         InvoicesModule,
+        EditorModule,
     ],
 })
 export class AppointmentsModule {}

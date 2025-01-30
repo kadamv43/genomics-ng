@@ -7,6 +7,7 @@ import { ShowFullDocumentsComponent } from 'src/app/appointments/show-full-docum
 import { InvoiceViewComponent } from 'src/app/invoices/invoice-view/invoice-view.component';
 import { AppointmentService } from 'src/app/services/appointment/appointment.service';
 import { environment } from 'src/environments/environment';
+import { DialogComponent } from '../dialog/dialog.component';
 
 @Component({
     selector: 'app-patient-profile',
@@ -56,6 +57,19 @@ export class PatientProfileComponent implements OnInit {
     showDialog(id) {
         this.pageUrl = environment.baseUrl + 'web/invoice/' + id;
         this.visible = true;
+    }
+
+    openNote(note) {
+        this.ref = this.dialogService.open(DialogComponent, {
+            width: '70%',
+            contentStyle: { overflow: 'auto' },
+            baseZIndex: 10000,
+            maximizable: true,
+            data: {
+                note,
+            },
+            // header: 'File Upload',
+        });
     }
 
     openDialog(doc: string) {

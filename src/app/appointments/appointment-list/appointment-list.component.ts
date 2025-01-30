@@ -11,6 +11,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UploadReportsComponent } from '../upload-reports/upload-reports.component';
 import { DoctorsService } from 'src/app/services/doctors/doctors.service';
+import { NotepadComponent } from '../notepad/notepad.component';
 
 @Component({
     selector: 'app-appointment-list',
@@ -227,6 +228,19 @@ export class AppointmentListComponent implements OnInit {
         this.selectedDoctor = '';
         let data = { first: 0, rows: 10 };
         this.loadAppointments(data);
+    }
+
+    openNotePad(id: string) {
+        this.ref = this.dialogService.open(NotepadComponent, {
+            data: {
+                id,
+                fileNameInput: false,
+                fileTypes: '.png,.jpg,.jpeg,.JPEG,.pdf',
+                fileUploadUrl: 'appointments/upload-files/' + id,
+            },
+            width: '50%',
+            header: 'Notes',
+        });
     }
 
     openDialog(id: string) {

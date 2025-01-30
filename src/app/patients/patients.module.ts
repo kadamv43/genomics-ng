@@ -10,7 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToolbarModule } from 'primeng/toolbar';
 import { FileUploadModule } from 'primeng/fileupload';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PanelModule } from 'primeng/panel';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
@@ -24,6 +24,8 @@ import { DialogModule } from 'primeng/dialog';
 import { PatientProfileComponent } from './patient-profile/patient-profile.component';
 import { ReportsComponent } from './reports/reports.component';
 import { SafeUrlPipe } from '../safe-url.pipe';
+import { DialogComponent } from './dialog/dialog.component';
+import { EditorModule } from 'primeng/editor';
 
 @NgModule({
     declarations: [
@@ -32,6 +34,7 @@ import { SafeUrlPipe } from '../safe-url.pipe';
         PatientListComponent,
         PatientProfileComponent,
         ReportsComponent,
+        DialogComponent,
     ],
     imports: [
         CommonModule,
@@ -53,6 +56,8 @@ import { SafeUrlPipe } from '../safe-url.pipe';
         ChipsModule,
         SafeUrlPipe,
         DialogModule,
+        FormsModule,
+        EditorModule,
     ],
 })
 export class PatientsModule {}

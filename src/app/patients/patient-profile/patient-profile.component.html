@@ -143,6 +143,15 @@
                         *ngIf="item?.status === 'Completed' && item?.invoice?._id" pButton class="primary">View
                         Invoice</button>
                 </div>
+                <div class="col-3">
+                    <button (click)="showDialog(item?.balance_invoice)" *ngIf="item?.balance_invoice" pButton
+                        class="primary">View
+                        Balance Invoice</button>
+                </div>
+                <div class="col-3">
+                    <button (click)="openNote(item?.doctor_note)" *ngIf="item?.doctor_note" pButton class="primary">View
+                        Doctor's note</button>
+                </div>
             </div>
         </div>
     </div>
