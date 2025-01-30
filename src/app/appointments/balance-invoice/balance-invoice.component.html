@@ -33,20 +33,6 @@
     </div>
 
     <div class="grid">
-        <div class="col-12">
-            <button class="secondary" [disabled]="btnDisabled" pButton (click)="addService()" type="button">
-                Add Service
-            </button>
-            <button class="secondary ml-3" [disabled]="btnDisabled" pButton (click)="addPrePostItem()" type="button">
-                Add Pre/Post Items
-            </button>
-            <button class="secondary ml-3" [disabled]="btnDisabled" pButton (click)="addItem()" type="button">
-                Add Extra Items
-            </button>
-        </div>
-    </div>
-
-    <div class="grid">
         <div class="col-7">
             <div [formGroup]="extraForm" class="card">
                 <div class="grid border-bottom">
@@ -83,11 +69,6 @@
                                 ">
                                 Price is required</small>
                         </div>
-
-                        <div class="col-3">
-                            <button [disabled]="btnDisabled" pButton pRipple (click)="removeExtraServiceItem(i)"
-                                type="button" icon="pi pi-minus" class="p-button-danger p-button-rounded"></button>
-                        </div>
                     </div>
                 </div>
                 <div class="" formArrayName="prePostExtras">
@@ -98,8 +79,8 @@
                         <div class="col-2"></div>
 
                         <div class="col-5">
-                            <p-dropdown class="w-full" [options]="prePostCharges" optionLabel="name" optionValue="code"
-                                formControlName="name" (change)="onPrePostValueChange(i)"
+                            <p-dropdown [disabled]="true" class="w-full" [options]="prePostCharges" optionLabel="name"
+                                optionValue="code" formControlName="name" (change)="onPrePostValueChange(i)"
                                 placeholder="Select Pre Post" />
                             <small class="p-error block" *ngIf="
                                     item.get('name').invalid &&
@@ -121,11 +102,6 @@
                                     item.get('price').hasError('required')
                                 ">
                                 Price is required</small>
-                        </div>
-
-                        <div class="col-3">
-                            <button [disabled]="btnDisabled" pButton pRipple (click)="removePrePostItem(i)"
-                                type="button" icon="pi pi-minus" class="p-button-danger p-button-rounded"></button>
                         </div>
                     </div>
                 </div>
@@ -157,10 +133,7 @@
                                 Price is required</small>
                         </div>
 
-                        <div class="col-3">
-                            <button [disabled]="btnDisabled" pButton pRipple (click)="removeItem(i)" type="button"
-                                icon="pi pi-minus" class="p-button-danger p-button-rounded"></button>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -174,7 +147,38 @@
                     </div>
 
                     <div class="col-3">
-                        {{ invoiceData.total | currency : "INR" }}
+                        {{ invoiceRes.total_amount | currency : "INR" }}
+                    </div>
+                </div>
+                <div class="grid mt-2">
+                    <!-- <div class="col-3"></div> -->
+                    <div class="col-3">
+                        <label class="text-right font-bold">Paid</label>
+                    </div>
+
+                    <div class="col-3">
+                        {{ invoiceData.paid | currency : "INR" }}
+                    </div>
+                </div>
+                <div class="grid mt-2">
+                    <!-- <div class="col-3"></div> -->
+                    <div class="col-3">
+                        <label class="text-right font-bold">Discount (old)</label>
+                    </div>
+
+                    <div class="col-3">
+                        {{ oldDiscount | currency : "INR" }}
+                    </div>
+                </div>
+
+                <div class="grid mt-2">
+                    <!-- <div class="col-3"></div> -->
+                    <div class="col-3">
+                        <label class="text-right font-bold">Pending Balance</label>
+                    </div>
+
+                    <div class="col-3">
+                        {{ invoiceData.balance | currency : "INR" }}
                     </div>
                 </div>
 
@@ -198,42 +202,14 @@
                     </div>
                 </div>
 
-                <div class="grid mt-2">
-                    <!-- <div class="col-3"></div> -->
-                    <div class="col-3">
-                        <label>Paid</label>
-                    </div>
-                    <div class="col-3">
-                        <input pInputText id="firstname2" type="text" formControlName="paid" />
-                        <small class="p-error block" *ngIf="
-                                paid.invalid &&
-                                (paid.dirty || paid.touched) &&
-                                paid.hasError('required')
-                            ">
-                            Paid Amount is required</small>
-                        <small class="p-error block" *ngIf="
-                                paid.invalid &&
-                                (paid.dirty || paid.touched) &&
-                                !paid.hasError('required') &&
-                                paid.hasError('greaterThanZero')
-                            ">
-                            Paid Amount is invalid</small>
-                        <small class="p-error block" *ngIf="
-                                paid.invalid &&
-                                (paid.dirty || paid.touched) &&
-                                paid.hasError('max')
-                            ">
-                            Paid Amount must less than or Equal to Total</small>
-                    </div>
-                </div>
 
-                <div class="grid mt-2">
-                    <!-- <div class="col-3"></div> -->
-                    <div class="col-3">Balance</div>
+                <!-- <div class="grid mt-2"> -->
+                <!-- <div class="col-3"></div> -->
+                <!-- <div class="col-3">Balance</div>
                     <div class="col-3">
                         <input pInputText id="firstname2" type="text" readonly formControlName="balance" />
-                    </div>
-                </div>
+                    </div> -->
+                <!-- </div> -->
                 <div class="grid mt-2">
                     <!-- <div class="col-3"></div> -->
                     <!-- <div class="col-3">Balance</div> -->

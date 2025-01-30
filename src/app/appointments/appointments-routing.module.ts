@@ -6,12 +6,14 @@ import { AppointmentEditComponent } from './appointment-edit/appointment-edit.co
 import { InvoiceComponent } from './invoice/invoice.component';
 import { ReportsComponent } from './reports/reports.component';
 import { PreviewInvoiceComponent } from './preview-invoice/preview-invoice.component';
+import { BalanceInvoiceComponent } from './balance-invoice/balance-invoice.component';
 
 const routes: Routes = [
     { path: '', component: AppointmentListComponent },
     { path: 'create', component: AppointmentCreateComponent },
     { path: 'edit/:id', component: AppointmentEditComponent },
     { path: 'generate-invoice/:id', component: InvoiceComponent },
+    { path: 'balance-invoice/:id', component: BalanceInvoiceComponent },
     { path: 'preview-invoice/:id', component: PreviewInvoiceComponent },
     { path: 'reports/:id', component: ReportsComponent },
 ];

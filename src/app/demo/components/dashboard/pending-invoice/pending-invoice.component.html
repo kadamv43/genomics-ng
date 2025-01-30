@@ -2,83 +2,59 @@
     <div class="col-12">
         <div class="card">
             <h5>Pending Balace</h5>
-            <p-table
-                #dt1
-                [value]="invoices"
-                dataKey="id"
-                [lazy]="true"
-                [rows]="10"
-                [totalRecords]="totalRecords"
-                [rowHover]="true"
-                styleClass="p-datatable-gridlines"
-                [globalFilterFields]="[
+            <p-table #dt1 [value]="invoices" dataKey="id" [lazy]="true" [rows]="10" [totalRecords]="totalRecords"
+                [rowHover]="true" styleClass="p-datatable-gridlines" [globalFilterFields]="[
                     'name',
                     'country.name',
                     'representative.name',
                     'status'
-                ]"
-                responsiveLayout="scroll"
-            >
+                ]" responsiveLayout="scroll">
                 <ng-template pTemplate="caption">
-                    <div
-                        class="flex justify-content-between flex-column sm:flex-row"
-                    >
+                    <div class="flex justify-content-between flex-column sm:flex-row">
                         <!-- <button pButton type="button" label="New" icon="pi pi-plus" class="mr-2"></button> -->
                     </div>
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
                         <th style="min-width: 12rem">
-                            <div
-                                class="flex justify-content-between align-items-center"
-                            >
+                            <div class="flex justify-content-between align-items-center">
                                 Invoice Number
                                 <!-- <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter> -->
                             </div>
                         </th>
                         <th style="min-width: 12rem">
-                            <div
-                                class="flex justify-content-between align-items-center"
-                            >
+                            <div class="flex justify-content-between align-items-center">
                                 Appointment
                                 <!-- <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter> -->
                             </div>
                         </th>
-                        <th style="min-width: 12rem">
-                            <div
-                                class="flex justify-content-between align-items-center"
-                            >
+                        <th style="min-width: 10rem">
+                            <div class="flex justify-content-between align-items-center">
                                 Patient
                                 <!-- <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter> -->
                             </div>
                         </th>
 
-                        <th style="min-width: 12rem">
-                            <div
-                                class="flex justify-content-between align-items-center"
-                            >
+                        <th style="min-width: 8rem">
+                            <div class="flex justify-content-between align-items-center">
                                 Mobile
                                 <!-- <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter> -->
                             </div>
                         </th>
 
-                        <th style="min-width: 12rem">
-                            <div
-                                class="flex justify-content-between align-items-center"
-                            >
+                        <th style="min-width: 8rem">
+                            <div class="flex justify-content-between align-items-center">
                                 Balance
                                 <!-- <p-columnFilter type="text" field="country.name" display="menu" placeholder="Search by country"></p-columnFilter> -->
                             </div>
                         </th>
 
-                        <!-- <th style="min-width: 8rem">
-                            <div
-                                class="flex justify-content-between align-items-center"
-                            >
+                        <th style="min-width: 8rem">
+                            <div class="flex justify-content-between align-items-center">
                                 Action
-                                <p-columnFilter type="boolean" field="verified" display="menu"></p-columnFilter>
+                                <!-- <p-columnFilter type="boolean" field="verified" display="menu"></p-columnFilter> -->
                             </div>
-                        </th> -->
+                        </th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
@@ -102,13 +78,13 @@
                             {{ product.balance }}
                         </td>
 
-                        <!-- <td class="text-center">
-                            <i
-                            [routerLink]="['/patients','edit',product._id]" class="pi mx-4 true-icon pi-pencil text-green-500"
-                            ></i>
-                            <i (click)="confirm2($event,product)" class="pi false-icon pi-trash text-pink-500"></i>
-                             <p-confirmPopup key="confirm2"></p-confirmPopup>
-                        </td> -->
+                        <td class="text-center">
+                            <button (click)="goTo(product)" class="primary" pButton>Receive Payment</button>
+                            <!-- <i [routerLink]="['/patients','edit',product._id]" -->
+                            <!-- class="pi mx-4 true-icon pi-pencil text-green-500"></i> -->
+                            <!-- <i (click)="confirm2($event,product)" class="pi false-icon pi-trash text-pink-500"></i> -->
+                            <!-- <p-confirmPopup key="confirm2"></p-confirmPopup> -->
+                        </td>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="emptymessage">

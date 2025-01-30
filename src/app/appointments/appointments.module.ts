@@ -44,6 +44,7 @@ import { SafeUrlPipe } from '../safe-url.pipe';
 import { ShowFullDocumentsComponent } from './show-full-documents/show-full-documents.component';
 import { ChequeDetailsComponent } from './cheque-details/cheque-details.component';
 import { InvoicesModule } from '../invoices/invoices.module';
+import { BalanceInvoiceComponent } from './balance-invoice/balance-invoice.component';
 
 @NgModule({
     declarations: [
@@ -57,6 +58,7 @@ import { InvoicesModule } from '../invoices/invoices.module';
         ReportsComponent,
         ShowFullDocumentsComponent,
         ChequeDetailsComponent,
+        BalanceInvoiceComponent,
     ],
     imports: [
         CommonModule,

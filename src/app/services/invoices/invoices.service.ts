@@ -14,6 +14,11 @@ export class InvoicesService {
         return this.httpService.post(url, user);
     }
 
+    createBalance(user) {
+        const url = this.baseUrl + '/balance';
+        return this.httpService.post(url, user);
+    }
+
     update(id: string, user) {
         const url = `${this.baseUrl}/${id}`;
         return this.httpService.patch(url, user);
