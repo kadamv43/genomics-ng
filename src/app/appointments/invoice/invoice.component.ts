@@ -263,7 +263,7 @@ export class InvoiceComponent implements OnInit {
                         }
                     });
 
-                    let services = res?.services.map((element, i) => {
+                    let services = res?.services?.map((element, i) => {
                         this.addService(element.name, element.price);
                         return {
                             name: element.name,
@@ -440,11 +440,11 @@ export class InvoiceComponent implements OnInit {
     }
 
     calculateInvoice() {
-        let itemSum = this.invoiceData.items.reduce(
+        let itemSum = this.invoiceData?.items?.reduce(
             (sum, item) => (sum = sum + Number(item.price)),
             0
         );
-        let extrasum = this.invoiceData.extras.reduce(
+        let extrasum = this.invoiceData?.extras?.reduce(
             (sum, item) => (sum = sum + Number(item.price)),
             0
         );

@@ -224,11 +224,6 @@ export class BalanceInvoiceComponent {
             this.id = params.get('id');
             this.appointmentService.findById(this.id).subscribe((res: any) => {
                 if (res?.invoice) {
-                    if (this.authService.getRole() != 'admin') {
-                        this.btnDisabled = true;
-                        this.invoiceForm.get('');
-                    }
-
                     this.invoiceRes = res?.invoice;
                     this.invoiceData.total = res?.invoice?.total_amount;
                     this.invoiceData.balance = res?.invoice?.balance;
