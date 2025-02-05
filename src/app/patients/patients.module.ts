@@ -26,6 +26,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { SafeUrlPipe } from '../safe-url.pipe';
 import { DialogComponent } from './dialog/dialog.component';
 import { EditorModule } from 'primeng/editor';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 
 @NgModule({
     declarations: [
@@ -58,6 +59,7 @@ import { EditorModule } from 'primeng/editor';
         DialogModule,
         FormsModule,
         EditorModule,
+        ConfirmPopupModule,
     ],
 })
 export class PatientsModule {}

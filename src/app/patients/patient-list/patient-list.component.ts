@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { CommonService } from 'src/app/services/common/common.service';
 import { PatientService } from 'src/app/services/patient/patient.service';
 import * as FileSaver from 'file-saver';
@@ -12,7 +12,7 @@ import { UploadReportsComponent } from 'src/app/appointments/upload-reports/uplo
     selector: 'app-patient-list',
     templateUrl: './patient-list.component.html',
     styleUrl: './patient-list.component.scss',
-    providers: [MessageService, DialogService],
+    providers: [MessageService, DialogService, ConfirmationService],
 })
 export class PatientListComponent implements OnInit {
     patients: any = [];
@@ -28,7 +28,9 @@ export class PatientListComponent implements OnInit {
         private router: Router,
         private dialogService: DialogService,
         private commonService: CommonService,
-        private authService: AuthService
+        private authService: AuthService,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService
     ) {}
 
     ngOnInit(): void {
@@ -125,6 +127,35 @@ export class PatientListComponent implements OnInit {
         formData.append('file', file, file.name);
         this.patientService.importExcel(formData).subscribe((res) => {
             console.log(res);
+        });
+    }
+
+    confirm2(event: Event, user) {
+        this.confirmationService.confirm({
+            key: 'confirm2',
+            target: event.target || new EventTarget(),
+            message: 'Are you sure that you want to proceed?',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.patientService.delete(user._id).subscribe((res) => {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Deleted',
+                        detail: 'Appointments Deleted Successfully',
+                    });
+                    let removedItemIndex = this.patients.findIndex(
+                        (item) => item._id == user._id
+                    );
+                    this.patients.splice(removedItemIndex, 1);
+                });
+            },
+            reject: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Rejected',
+                    detail: 'Unable to delete Appointments',
+                });
+            },
         });
     }
 
