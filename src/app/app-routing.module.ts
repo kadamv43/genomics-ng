@@ -100,6 +100,14 @@ import { AuthGuard } from './auth.guard';
                                     (m) => m.BannersModule
                                 ),
                         },
+                        {
+                            path: 'action-logs',
+                            canActivate: [AuthGuard],
+                            loadChildren: () =>
+                                import('./action-logs/action-logs.module').then(
+                                    (m) => m.ActionLogsModule
+                                ),
+                        },
                     ],
                 },
                 {

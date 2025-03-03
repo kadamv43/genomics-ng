@@ -92,6 +92,16 @@ export class AppMenuComponent implements OnInit {
                 },
                 {
                     label: '',
+                    items: [
+                        {
+                            label: 'Action Logs',
+                            icon: 'pi pi-fw pi-wrench',
+                            routerLink: ['action-logs'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
                     icon: 'pi pi-fw pi-briefcase',
                     items: [
                         {
@@ -152,6 +162,16 @@ export class AppMenuComponent implements OnInit {
                             label: 'Invoices',
                             icon: 'pi pi-fw pi-file',
                             routerLink: ['invoices'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Action Logs',
+                            icon: 'pi pi-fw pi-file',
+                            routerLink: ['action-logs'],
                         },
                     ],
                 },
