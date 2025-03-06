@@ -117,8 +117,7 @@
                             <i [routerLink]="['/patients','reports',product._id]" [queryParams]="queryParams"
                                 class="pi mx-3 true-icon pi-file text-green-500 cursor"></i>
 
-                            <i *ngIf="role=='admin'" (click)="confirm2($event,product)"
-                                class="pi mx-2 false-icon pi-trash text-pink-500"></i>
+                            <i (click)="confirm2($event,product)" class="pi mx-2 false-icon pi-trash text-pink-500"></i>
                             <p-confirmPopup key="confirm2"></p-confirmPopup>
                         </td>
                     </tr>
