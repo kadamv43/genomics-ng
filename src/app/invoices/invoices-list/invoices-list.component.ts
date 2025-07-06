@@ -9,12 +9,13 @@ import { DatePipe } from '@angular/common';
     selector: 'app-invoices-list',
     templateUrl: './invoices-list.component.html',
     styleUrl: './invoices-list.component.scss',
-    providers:[DatePipe]
+    providers: [DatePipe],
 })
 export class InvoicesListComponent {
     invoices: any = [];
     loading = false;
     totalRecords = 0;
+    searchText = '';
 
     constructor(
         private invoiceService: InvoicesService,
@@ -28,12 +29,17 @@ export class InvoicesListComponent {
         const page = event.first / event.rows;
         const size = event.rows;
 
-        let params = this.commonService.getHttpParamsByJson({
-            page: page.toString(),
-            size: size.toString(),
-        });
+        let params = {};
+        if (this.searchText != '') {
+            params['q'] = this.searchText;
+        }
 
-        this.invoiceService.getAll(params).subscribe((data: any) => {
+        params['page'] = page;
+        params['size'] = size;
+
+        let queryParams = this.commonService.getHttpParamsByJson(params);
+
+        this.invoiceService.getAll(queryParams).subscribe((data: any) => {
             this.invoices = data.data;
             this.totalRecords = data.total;
             this.loading = false;
@@ -71,6 +77,11 @@ export class InvoicesListComponent {
             });
             this.saveAsExcelFile(excelBuffer, 'doctors');
         });
+    }
+
+    search(table, event) {
+        this.searchText = event.target.value;
+        this.loadPatients(table);
     }
 
     saveAsExcelFile(buffer: any, fileName: string): void {
