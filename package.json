@@ -1,8 +1,8 @@
 {
-    "name": "Genomics",
-    "version": "1.2.19",
+    "name": "IVF",
+    "version": "1.2.20",
     "author": "Shree Swami Samarth Media Pvt Ltd",
-    "description": "Genomics Admin App",
+    "description": "IVF",
     "main": "app.js",
     "license": "MIT",
     "scripts": {
@@ -17,7 +17,7 @@
     },
     "build": {
         "appId": "com.example.app",
-        "productName": "Genomics Admin",
+        "productName": "IVF",
         "directories": {
             "output": "dist"
         },

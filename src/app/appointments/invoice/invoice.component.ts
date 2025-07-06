@@ -560,13 +560,14 @@ export class InvoiceComponent implements OnInit {
             partial_payment: this.partial_payment.value,
             balance_paid: this.balance.value > 0 ? false : true,
             particulars: [],
+            cheque_details: [],
         };
 
         if (
-            this.payment_mode1.value == 'Cheque' ||
-            this.payment_mode2.value == 'Cheque'
+            this.payment_mode1.value.mode == 'Cheque' ||
+            this.payment_mode2.value.mode == 'Cheque'
         ) {
-            invoiceDatum['cheque_details'] = JSON.parse(
+            invoiceDatum.cheque_details = JSON.parse(
                 localStorage.getItem('cheque')
             );
         }
