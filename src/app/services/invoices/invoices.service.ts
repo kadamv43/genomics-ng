@@ -34,6 +34,11 @@ export class InvoicesService {
         return this.httpService.get(url);
     }
 
+    getByPatient(patientId: string) {
+        const url = `${this.baseUrl}/by-patient/${patientId}`;
+        return this.httpService.get(url);
+    }
+
     getPrePostCharges() {
         const url = this.baseUrl + '/pre-post-charges';
         return this.httpService.get(url);
