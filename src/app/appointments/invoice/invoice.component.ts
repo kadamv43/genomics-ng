@@ -73,6 +73,7 @@ export class InvoiceComponent implements OnInit {
     otpVisible = false;
     prePostCharges: any = [];
     serviceList: any = [];
+    previousInvoices: any[] = [];
 
     constructor(
         private route: ActivatedRoute,
@@ -98,6 +99,8 @@ export class InvoiceComponent implements OnInit {
             }),
             discount: [0],
             partial_payment: [0],
+            already_paid: [false],
+            old_invoice: [''],
         });
 
         this.extraForm = fb.group({
@@ -202,6 +205,19 @@ export class InvoiceComponent implements OnInit {
         return this.invoiceForm.get('partial_payment');
     }
 
+    get already_paid() {
+        return this.invoiceForm.get('already_paid');
+    }
+
+    get old_invoice() {
+        return this.invoiceForm.get('old_invoice');
+    }
+
+    get selectedOldInvoice() {
+        const id = this.old_invoice?.value;
+        return this.previousInvoices.find((inv) => inv._id === id) ?? null;
+    }
+
     get extras(): FormArray {
         return this.extraForm.get('extras') as FormArray;
     }
@@ -302,6 +318,8 @@ export class InvoiceComponent implements OnInit {
                     res.services = services;
                     this.appointmenData = res;
                 }
+
+                this.loadPreviousInvoices(res?.patient?._id);
 
                 //this.balance =  total - this.paid
                 this.calculateInvoice();
@@ -474,6 +492,12 @@ export class InvoiceComponent implements OnInit {
             // this.setMaxValidation(total);
         }
 
+        if (this.already_paid?.value) {
+            paid = discount > 0 ? discountedTotal : total;
+            balance = 0;
+            this.paid.setValue(paid, { emitEvent: false });
+        }
+
         this.invoiceData.balance = balance;
         this.invoiceData.paid = paid;
         this.invoiceData.discount = discount;
@@ -559,8 +583,12 @@ export class InvoiceComponent implements OnInit {
             payment_mode2: this.payment_mode2.value,
             partial_payment: this.partial_payment.value,
             balance_paid: this.balance.value > 0 ? false : true,
+            already_paid: this.already_paid.value,
+            old_invoice: this.already_paid.value
+                ? this.old_invoice.value
+                : null,
             particulars: [],
-            cheque_details: [],
+            cheque_details: null,
         };
 
         if (
@@ -637,5 +665,74 @@ export class InvoiceComponent implements OnInit {
     onPartialPaymentChecked(event) {
         console.log(event);
         this.showPayment2 = event?.target?.checked;
+    }
+
+    loadPreviousInvoices(patientId: string) {
+        if (!patientId) {
+            return;
+        }
+        this.invoiceService.getByPatient(patientId).subscribe((res: any) => {
+            this.previousInvoices = (res || [])
+                .filter(
+                    (inv: any) => inv?._id !== this.appointmenData?.invoice?._id
+                )
+                .map((inv: any) => ({
+                    ...inv,
+                    label: `${inv.invoice_number} - ${inv.paid} paid on ${new Date(
+                        inv.created_at
+                    ).toLocaleDateString('en-IN')}`,
+                }));
+        });
+    }
+
+    onAlreadyPaidChecked(event) {
+        const checked = event?.target?.checked;
+
+        if (checked) {
+            this.showPayment2 = false;
+            this.invoiceForm.get('partial_payment')?.setValue(false);
+
+            this.old_invoice?.setValidators([Validators.required]);
+            this.old_invoice?.updateValueAndValidity();
+
+            this.payment_mode1
+                .get('mode')
+                ?.removeValidators(Validators.required);
+            this.payment_mode1
+                .get('price')
+                ?.removeValidators(Validators.required);
+            this.payment_mode1.patchValue(
+                { mode: 'Already Paid', price: 0 },
+                { emitEvent: false }
+            );
+            this.payment_mode1.get('mode')?.updateValueAndValidity();
+            this.payment_mode1.get('price')?.updateValueAndValidity();
+            this.payment_mode1.disable();
+            this.payment_mode2.disable();
+            this.paid.disable();
+            this.calculateInvoice();
+        } else {
+            this.old_invoice?.clearValidators();
+            this.old_invoice?.setValue('');
+            this.old_invoice?.updateValueAndValidity();
+
+            this.payment_mode1.enable();
+            this.payment_mode2.enable();
+            this.payment_mode1
+                .get('mode')
+                ?.setValidators([Validators.required]);
+            this.payment_mode1
+                .get('price')
+                ?.setValidators([Validators.required]);
+            this.payment_mode1.patchValue(
+                { mode: '', price: 0 },
+                { emitEvent: false }
+            );
+            this.payment_mode1.get('mode')?.updateValueAndValidity();
+            this.payment_mode1.get('price')?.updateValueAndValidity();
+
+            this.paid.enable();
+            this.paid.setValue(0);
+        }
     }
 }
