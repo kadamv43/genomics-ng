@@ -612,20 +612,26 @@ export class InvoiceComponent implements OnInit {
                 .update(this.appointmenData?.invoice._id, invoiceDatum)
                 .subscribe((res: any) => {
                     localStorage.removeItem('cheque');
+
+                    setTimeout(() => {
+                        this.router.navigate([
+                            'appointments',
+                            'preview-invoice',
+                            res?._id,
+                        ]);
+                    }, 100);
+                });
+        } else {
+            this.invoiceService.create(invoiceDatum).subscribe((res: any) => {
+                localStorage.removeItem('cheque');
+
+                setTimeout(() => {
                     this.router.navigate([
                         'appointments',
                         'preview-invoice',
                         res?._id,
                     ]);
-                });
-        } else {
-            this.invoiceService.create(invoiceDatum).subscribe((res: any) => {
-                localStorage.removeItem('cheque');
-                this.router.navigate([
-                    'appointments',
-                    'preview-invoice',
-                    res?._id,
-                ]);
+                }, 100);
             });
         }
     }
