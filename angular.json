@@ -41,7 +41,41 @@
                                     "maximumError": "4kb"
                                 }
                             ],
-                            "outputHashing": "all"
+                            "outputHashing": "all",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                }
+                            ]
+                        },
+                        "dev": {
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "vendorChunk": true,
+                            "extractLicenses": false,
+                            "sourceMap": true,
+                            "namedChunks": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.dev.ts"
+                                }
+                            ]
+                        },
+                        "local": {
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "vendorChunk": true,
+                            "extractLicenses": false,
+                            "sourceMap": true,
+                            "namedChunks": true,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.local.ts"
+                                }
+                            ]
                         },
                         "development": {
                             "buildOptimizer": false,
@@ -59,6 +93,12 @@
                     "configurations": {
                         "production": {
                             "buildTarget": "sakai-ng:build:production"
+                        },
+                        "dev": {
+                            "buildTarget": "sakai-ng:build:dev"
+                        },
+                        "local": {
+                            "buildTarget": "sakai-ng:build:local"
                         },
                         "development": {
                             "buildTarget": "sakai-ng:build:development"
