@@ -198,7 +198,7 @@
                     </div>
                 </div>
 
-                <div class="grid mt-2">
+                <div class="grid mt-2" *ngIf="!already_paid.value">
                     <!-- <div class="col-3"></div> -->
                     <div class="col-3">
                         <label>Paid</label>
@@ -234,7 +234,40 @@
                         <input pInputText id="firstname2" type="text" readonly formControlName="balance" />
                     </div>
                 </div>
+
                 <div class="grid mt-2">
+                    <div class="col-12">
+                        <input formControlName="already_paid" (change)="onAlreadyPaidChecked($event)"
+                            type="checkbox" id="already_paid">
+
+                        <label for="already_paid" class="ml-2">Full Amount Already Paid</label>
+                    </div>
+                </div>
+
+                <div class="grid mt-2" *ngIf="already_paid.value">
+                    <div class="col-12">
+                        <p-dropdown class="w-full" [options]="previousInvoices" optionLabel="label" optionValue="_id"
+                            formControlName="old_invoice" appendTo="body"
+                            placeholder="Select Previous Invoice" />
+                        <small class="p-error block" *ngIf="
+                                old_invoice.invalid &&
+                                (old_invoice.dirty || old_invoice.touched) &&
+                                old_invoice.hasError('required')
+                            ">
+                            Please select the invoice against which the amount was already
+                            paid</small>
+
+                        <p class="mt-2" *ngIf="selectedOldInvoice">
+                            Amount already paid:
+                            {{ selectedOldInvoice.paid | currency : "INR" }}
+                            via {{ selectedOldInvoice.invoice_number }}
+                            on
+                            {{ selectedOldInvoice.created_at | date : "dd-MM-Y" }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid mt-2" *ngIf="!already_paid.value">
                     <!-- <div class="col-3"></div> -->
                     <!-- <div class="col-3">Balance</div> -->
                     <div class="col-12">
@@ -245,46 +278,48 @@
                     </div>
                 </div>
 
-                <div [formGroup]="payment_mode1" class="grid mt-2">
-                    <!-- <div class="col-3"></div> -->
-                    <!-- <div class="col-3">Payment Mode</div> -->
-                    <div class="col-6">
-                        <p-dropdown (onChange)="onChangePaymentMode($event)" [options]="paymentModes"
-                            formControlName="mode" optionLabel="name" appendTo="body" optionValue="code"
-                            placeholder="Payment Method" />
-                        <small class="p-error block" *ngIf="
-                                payment_mode1.get('mode').invalid &&
-                                (payment_mode1.get('mode').dirty ||
-                                    payment_mode1.get('mode').touched) &&
-                                payment_mode1.get('mode').hasError('required')
-                            ">
-                            Paid Method is required</small>
+                <div *ngIf="!already_paid.value">
+                    <div [formGroup]="payment_mode1" class="grid mt-2">
+                        <!-- <div class="col-3"></div> -->
+                        <!-- <div class="col-3">Payment Mode</div> -->
+                        <div class="col-6">
+                            <p-dropdown (onChange)="onChangePaymentMode($event)" [options]="paymentModes"
+                                formControlName="mode" optionLabel="name" appendTo="body" optionValue="code"
+                                placeholder="Payment Method" />
+                            <small class="p-error block" *ngIf="
+                                    payment_mode1.get('mode').invalid &&
+                                    (payment_mode1.get('mode').dirty ||
+                                        payment_mode1.get('mode').touched) &&
+                                    payment_mode1.get('mode').hasError('required')
+                                ">
+                                Paid Method is required</small>
+                        </div>
+                        <div class="col-4">
+                            <input class="w-full" pInputText type="text" formControlName="price" />
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <input class="w-full" pInputText type="text" formControlName="price" />
+                    <div *ngIf="showPayment2" [formGroup]="payment_mode2" class="grid mt-2">
+                        <!-- <div class="col-3"></div> -->
+                        <!-- <div class="col-3">Payment Mode</div> -->
+                        <div class="col-6">
+                            <p-dropdown (onChange)="onChangePaymentMode($event)" [options]="paymentModes"
+                                formControlName="mode" optionLabel="name" appendTo="body" optionValue="code"
+                                placeholder="Payment Method 2" />
+                            <small class="p-error block" *ngIf="
+                                    payment_mode2.get('mode').invalid &&
+                                    (payment_mode2.get('mode').dirty ||
+                                        payment_mode2.get('mode').touched) &&
+                                    payment_mode2.get('mode').hasError('required')
+                                ">
+                                Paid Method is required</small>
+                        </div>
+                        <div class="col-4">
+                            <input class="w-full" pInputText type="text" formControlName="price" />
+                        </div>
                     </div>
-                </div>
-                <div *ngIf="showPayment2" [formGroup]="payment_mode2" class="grid mt-2">
-                    <!-- <div class="col-3"></div> -->
-                    <!-- <div class="col-3">Payment Mode</div> -->
-                    <div class="col-6">
-                        <p-dropdown (onChange)="onChangePaymentMode($event)" [options]="paymentModes"
-                            formControlName="mode" optionLabel="name" appendTo="body" optionValue="code"
-                            placeholder="Payment Method 2" />
-                        <small class="p-error block" *ngIf="
-                                payment_mode2.get('mode').invalid &&
-                                (payment_mode2.get('mode').dirty ||
-                                    payment_mode2.get('mode').touched) &&
-                                payment_mode2.get('mode').hasError('required')
-                            ">
-                            Paid Method is required</small>
+                    <div *ngIf="showChequeButton" class="grid mt-3">
+                        <button pButton (click)="openChequeDialog()" class="primary">View Cheque Details</button>
                     </div>
-                    <div class="col-4">
-                        <input class="w-full" pInputText type="text" formControlName="price" />
-                    </div>
-                </div>
-                <div *ngIf="showChequeButton" class="grid mt-3">
-                    <button pButton (click)="openChequeDialog()" class="primary">View Cheque Details</button>
                 </div>
             </div>
         </div>
