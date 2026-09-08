@@ -215,7 +215,7 @@
                                 paid.invalid &&
                                 (paid.dirty || paid.touched) &&
                                 !paid.hasError('required') &&
-                                paid.hasError('greaterThanZero')
+                                paid.hasError('nonNegative')
                             ">
                             Paid Amount is invalid</small>
                         <small class="p-error block" *ngIf="

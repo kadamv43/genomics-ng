@@ -54,6 +54,7 @@ export class InvoiceComponent implements OnInit {
         { name: 'Cheque', code: 'Cheque' },
         { name: 'Credit Card', code: 'Credit Card' },
         { name: 'UPI', code: 'UPI' },
+        { name: 'Pay Later', code: 'Pay Later' },
     ];
 
     invoiceData = {
@@ -87,7 +88,7 @@ export class InvoiceComponent implements OnInit {
         private dialogService: DialogService
     ) {
         this.invoiceForm = fb.group({
-            paid: [0, [Validators.required, this.greaterThanZeroValidator()]],
+            paid: [0, [Validators.required, this.nonNegativeValidator()]],
             balance: [0, Validators.required],
             payment_mode1: fb.group({
                 mode: ['', Validators.required],
@@ -502,20 +503,24 @@ export class InvoiceComponent implements OnInit {
         this.invoiceData.paid = paid;
         this.invoiceData.discount = discount;
         this.invoiceData.total = total;
-        this.invoiceData.balance = balance;
         this.invoiceData.discountedTotal = discountedTotal;
         this.invoiceForm.get('balance')?.setValue(balance);
     }
 
-    greaterThanZeroValidator(): ValidatorFn {
+    nonNegativeValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value;
-            return value > 0 ? null : { greaterThanZero: true };
+            return value !== null && value !== undefined && Number(value) >= 0 ? null : { nonNegative: true };
         };
     }
 
     onChangePaymentMode(e) {
-        if (e.value == 'Cheque') {
+        if (e.value == 'Pay Later') {
+            this.paid.setValue(0);
+            this.payment_mode1.patchValue({ price: 0 });
+            this.calculateInvoice();
+            this.showChequeButton = false;
+        } else if (e.value == 'Cheque') {
             this.showChequeButton = true;
             this.openChequeDialog();
         } else {
@@ -540,6 +545,7 @@ export class InvoiceComponent implements OnInit {
             }
         });
     }
+
     saveAndPreview() {
         console.log(this.invoiceData);
 
@@ -571,6 +577,12 @@ export class InvoiceComponent implements OnInit {
     }
 
     saveInvoice() {
+        if (this.invoiceData.total <= 0) {
+            this.message = 'Invoice total must be greater than 0.';
+            this.visible = true;
+            return;
+        }
+
         let invoiceDatum = {
             appointment: this.appointmenData?._id,
             patient: this.appointmenData?.patient?._id,

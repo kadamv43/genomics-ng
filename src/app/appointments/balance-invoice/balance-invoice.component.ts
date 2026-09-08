@@ -436,6 +436,12 @@ export class BalanceInvoiceComponent {
     }
 
     saveInvoice() {
+        if (this.invoiceData.total <= 0) {
+            this.message = 'Payment amount must be greater than 0.';
+            this.visible = true;
+            return;
+        }
+
         let invoiceDatum = {
             appointment: this.appointmenData?._id,
             old_invoice: this.appointmenData?.invoice,
