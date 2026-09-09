@@ -91,7 +91,7 @@ export class BalanceInvoiceComponent {
         this.invoiceForm = fb.group({
             payment_mode1: fb.group({
                 mode: ['', Validators.required],
-                price: [0, Validators.required],
+                price: [0, [Validators.required, this.pendingAmountValidator()]],
             }),
             payment_mode2: fb.group({
                 mode: [''],
@@ -99,6 +99,8 @@ export class BalanceInvoiceComponent {
             }),
             discount: [0],
             partial_payment: [0],
+        }, {
+            validators: this.pendingPaymentSplitValidator(),
         });
 
         this.extraForm = fb.group({
@@ -173,6 +175,13 @@ export class BalanceInvoiceComponent {
             this.calculateInvoice();
             // this.invoiceForm.get('balance')?.setValue(this.invoiceData.balance);
         });
+
+        this.invoiceForm
+            .get('payment_mode2')
+            .get('price')
+            ?.valueChanges.subscribe(() => {
+                this.invoiceForm.updateValueAndValidity();
+            });
     }
 
     get balance() {
@@ -229,6 +238,10 @@ export class BalanceInvoiceComponent {
                     this.invoiceData.balance = res?.invoice?.balance;
                     this.invoiceData.paid = res?.invoice?.paid;
                     this.oldDiscount = res?.invoice?.discount;
+                    this.calculateInvoice();
+                    this.payment_mode1.patchValue({
+                        price: this.pendingPaymentAmount,
+                    });
                     res?.invoice?.particulars.forEach((item) => {
                         if (item.type == 'extra') {
                             this.addItem(item.name, item.price);
@@ -237,15 +250,6 @@ export class BalanceInvoiceComponent {
                         } else if (item.type == 'service') {
                             this.addService(item.name, item.price);
                         }
-                    });
-
-                    let services = res?.services.map((element, i) => {
-                        this.addService(element.name, element.price);
-                        return {
-                            name: element.name,
-                            price: element.price,
-                            type: 'service',
-                        };
                     });
 
                     // this.invoiceForm?.get('partial_payment').patchValue(1);
@@ -257,9 +261,6 @@ export class BalanceInvoiceComponent {
                         );
                         this.showChequeButton = true;
                     }
-                    // this.invoiceData = res?.invoice;
-                    this.invoiceData.items = services;
-                    res.services = services;
                     this.appointmenData = res;
                     this.appointmenData.total = this.total;
                     this.extraForm.get('extras')?.disable();
@@ -353,13 +354,12 @@ export class BalanceInvoiceComponent {
     }
 
     calculateInvoice() {
-        let total = this.invoiceData.balance;
-        let discount = this.discount.value;
+        let total = this.pendingPaymentAmount;
+        let discount = Number(this.discount.value ?? 0);
         let discountedTotal = 0;
 
         if (discount > 0) {
-            discountedTotal = total - discount;
-            total = discountedTotal;
+            discountedTotal = total;
             // this.setMaxValidation(discountedTotal);
         }
 
@@ -369,6 +369,9 @@ export class BalanceInvoiceComponent {
         this.invoiceData.total = total;
         // this.invoiceData.balance = balance;
         this.invoiceData.discountedTotal = discountedTotal;
+        this.payment_mode1.get('price')?.updateValueAndValidity({
+            emitEvent: false,
+        });
         // this.invoiceForm.get('balance')?.setValue(balance);
     }
 
@@ -376,6 +379,51 @@ export class BalanceInvoiceComponent {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value;
             return value > 0 ? null : { greaterThanZero: true };
+        };
+    }
+
+    pendingAmountValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const invoiceForm = control.parent?.parent as FormGroup | null;
+
+            if (invoiceForm?.get('partial_payment')?.value) {
+                return null;
+            }
+
+            return Number(control.value) === this.pendingPaymentAmount
+                ? null
+                : { pendingAmountMismatch: true };
+        };
+    }
+
+    get pendingPaymentAmount(): number {
+        const discount = Number(this.invoiceForm?.get('discount')?.value ?? 0);
+        return Math.max(Number(this.invoiceData.balance) - discount, 0);
+    }
+
+    pendingPaymentSplitValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const form = control as FormGroup;
+            const discount = Number(form.get('discount')?.value ?? 0);
+            const firstPayment = Number(form.get('payment_mode1.price')?.value ?? 0);
+            const secondPayment = Number(form.get('payment_mode2.price')?.value ?? 0);
+            const paymentTotal = form.get('partial_payment')?.value
+                ? firstPayment + secondPayment
+                : firstPayment;
+            const errors: ValidationErrors = {};
+
+            if (discount < 0 || discount > Number(this.invoiceData.balance)) {
+                errors['discountInvalid'] = true;
+            }
+            if (
+                firstPayment < 0 ||
+                secondPayment < 0 ||
+                Math.abs(paymentTotal - this.pendingPaymentAmount) >= 0.01
+            ) {
+                errors['paymentSplitMismatch'] = true;
+            }
+
+            return Object.keys(errors).length ? errors : null;
         };
     }
 
@@ -444,7 +492,9 @@ export class BalanceInvoiceComponent {
 
         let invoiceDatum = {
             appointment: this.appointmenData?._id,
-            old_invoice: this.appointmenData?.invoice,
+            old_invoice:
+                this.appointmenData?.invoice?._id ??
+                this.appointmenData?.invoice,
             patient: this.appointmenData?.patient?._id,
             doctor: this.appointmenData?.doctor?._id,
             total_amount: this.invoiceData.balance,
@@ -458,8 +508,8 @@ export class BalanceInvoiceComponent {
         };
 
         if (
-            this.payment_mode1.value == 'Cheque' ||
-            this.payment_mode2.value == 'Cheque'
+            this.payment_mode1.value.mode == 'Cheque' ||
+            this.payment_mode2.value.mode == 'Cheque'
         ) {
             invoiceDatum['cheque_details'] = JSON.parse(
                 localStorage.getItem('cheque')
@@ -468,7 +518,11 @@ export class BalanceInvoiceComponent {
 
         if (this.appointmenData?.balance_invoice) {
             this.invoiceService
-                .update(this.appointmenData?.invoice._id, invoiceDatum)
+                .update(
+                    this.appointmenData?.balance_invoice?._id ??
+                        this.appointmenData?.balance_invoice,
+                    invoiceDatum
+                )
                 .subscribe((res: any) => {
                     localStorage.removeItem('cheque');
                     this.router.navigate([
@@ -525,5 +579,7 @@ export class BalanceInvoiceComponent {
 
     onPartialPaymentChecked(event) {
         this.showPayment2 = event?.target?.checked;
+        this.payment_mode1.get('price')?.updateValueAndValidity();
+        this.invoiceForm.updateValueAndValidity();
     }
 }

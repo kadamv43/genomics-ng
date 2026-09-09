@@ -224,6 +224,16 @@
                                 paid.hasError('max')
                             ">
                             Paid Amount must less than or Equal to Total</small>
+                        <small class="p-error block" *ngIf="
+                                invoiceForm.hasError('paidAmountRequiredForPayment') &&
+                                (paid.dirty || paid.touched)
+                            ">
+                            Paid Amount must be greater than 0 for the selected payment method</small>
+                        <small class="p-error block" *ngIf="
+                                invoiceForm.hasError('paidExceedsTotal') &&
+                                (paid.dirty || paid.touched)
+                            ">
+                            Paid Amount cannot be greater than the invoice total after discount</small>
                     </div>
                 </div>
 
@@ -296,6 +306,12 @@
                         </div>
                         <div class="col-4">
                             <input class="w-full" pInputText type="text" formControlName="price" />
+                            <small class="p-error block" *ngIf="
+                                    invoiceForm.hasError('paymentAmountMismatch') &&
+                                    (payment_mode1.get('price').dirty ||
+                                        payment_mode1.get('price').touched)
+                                ">
+                                Payment method amounts must equal the Paid Amount</small>
                         </div>
                     </div>
                     <div *ngIf="showPayment2" [formGroup]="payment_mode2" class="grid mt-2">
