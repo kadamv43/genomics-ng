@@ -54,6 +54,7 @@ export class InvoiceComponent implements OnInit {
         { name: 'Cheque', code: 'Cheque' },
         { name: 'Credit Card', code: 'Credit Card' },
         { name: 'UPI', code: 'UPI' },
+        { name: 'Pay Later', code: 'Pay Later' },
     ];
 
     invoiceData = {
@@ -87,7 +88,7 @@ export class InvoiceComponent implements OnInit {
         private dialogService: DialogService
     ) {
         this.invoiceForm = fb.group({
-            paid: [0, [Validators.required, this.greaterThanZeroValidator()]],
+            paid: [0, [Validators.required, this.nonNegativeValidator()]],
             balance: [0, Validators.required],
             payment_mode1: fb.group({
                 mode: ['', Validators.required],
@@ -101,6 +102,11 @@ export class InvoiceComponent implements OnInit {
             partial_payment: [0],
             already_paid: [false],
             old_invoice: [''],
+        }, {
+            validators: [
+                this.paidAmountForPaymentValidator(),
+                this.invoicePaymentTotalsValidator(),
+            ],
         });
 
         this.extraForm = fb.group({
@@ -175,6 +181,13 @@ export class InvoiceComponent implements OnInit {
             this.calculateInvoice();
             // this.invoiceForm.get('balance')?.setValue(this.invoiceData.balance);
         });
+
+        this.invoiceForm
+            .get('payment_mode2')
+            .get('price')
+            ?.valueChanges.subscribe(() => {
+                this.invoiceForm.updateValueAndValidity();
+            });
     }
 
     get balance() {
@@ -244,29 +257,35 @@ export class InvoiceComponent implements OnInit {
                         this.invoiceForm.disable();
                     }
 
-                    this.invoiceForm
-                        ?.get('discount')
-                        .setValue(res?.invoice?.discount ?? 0);
-                    this.invoiceForm
-                        ?.get('paid')
-                        .setValue(res?.invoice?.paid ?? 0);
-                    this.invoiceForm
-                        ?.get('balance')
-                        .setValue(res?.invoice?.balance ?? 0);
+                    const savedInvoice = res.invoice;
+                    const oldInvoice = savedInvoice.old_invoice;
 
-                    console.log(res?.invoice?.partial_payment);
-                    if (res?.invoice?.partial_payment) {
-                        console.log('sjss');
+                    this.invoiceForm?.patchValue({
+                        discount: savedInvoice.discount ?? 0,
+                        paid: savedInvoice.paid ?? 0,
+                        balance: savedInvoice.balance ?? 0,
+                        partial_payment: savedInvoice.partial_payment ?? false,
+                        already_paid: savedInvoice.already_paid ?? false,
+                        old_invoice:
+                            typeof oldInvoice === 'object'
+                                ? oldInvoice?._id ?? ''
+                                : oldInvoice ?? '',
+                    });
+
+                    if (savedInvoice.partial_payment) {
                         this.showPayment2 = true;
                         this.invoiceForm?.get('payment_mode2').setValue({
-                            mode: res?.invoice?.payment_mode2.mode,
-                            price: res?.invoice?.payment_mode2?.price,
+                            mode: savedInvoice.payment_mode2?.mode ?? '',
+                            price: savedInvoice.payment_mode2?.price ?? 0,
                         });
                     }
 
                     this.invoiceForm?.get('payment_mode1').setValue({
-                        mode: res?.invoice?.payment_mode1.mode,
-                        price: res?.invoice?.payment_mode1?.price,
+                        mode:
+                            savedInvoice.payment_mode1?.mode ??
+                            savedInvoice.payment_mode ??
+                            '',
+                        price: savedInvoice.payment_mode1?.price ?? 0,
                     });
 
                     res?.invoice?.particulars.forEach((item) => {
@@ -279,20 +298,6 @@ export class InvoiceComponent implements OnInit {
                         }
                     });
 
-                    let services = res?.services?.map((element, i) => {
-                        this.addService(element.name, element.price);
-                        return {
-                            name: element.name,
-                            price: element.price,
-                            type: 'service',
-                        };
-                    });
-
-                    this.invoiceForm?.patchValue({
-                        partial_payment: res?.invoice?.partial_payment,
-                    });
-                    // this.invoiceForm.updateValueAndValidity();
-
                     if (res?.invoice?.cheque_details) {
                         localStorage.setItem(
                             'cheque',
@@ -300,9 +305,6 @@ export class InvoiceComponent implements OnInit {
                         );
                         this.showChequeButton = true;
                     }
-                    // this.invoiceData = res?.invoice;
-                    this.invoiceData.items = services;
-                    res.services = services;
                     this.appointmenData = res;
                     this.appointmenData.total = this.total;
                 } else {
@@ -502,20 +504,81 @@ export class InvoiceComponent implements OnInit {
         this.invoiceData.paid = paid;
         this.invoiceData.discount = discount;
         this.invoiceData.total = total;
-        this.invoiceData.balance = balance;
         this.invoiceData.discountedTotal = discountedTotal;
         this.invoiceForm.get('balance')?.setValue(balance);
     }
 
-    greaterThanZeroValidator(): ValidatorFn {
+    nonNegativeValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value;
-            return value > 0 ? null : { greaterThanZero: true };
+            return value !== null && value !== undefined && Number(value) >= 0 ? null : { nonNegative: true };
+        };
+    }
+
+    paidAmountForPaymentValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const form = control as FormGroup;
+
+            if (form.get('already_paid')?.value) {
+                return null;
+            }
+
+            const paymentModes = [
+                form.get('payment_mode1.mode')?.value,
+                form.get('payment_mode2.mode')?.value,
+            ];
+            const hasImmediatePayment = paymentModes.some(
+                (mode) => mode && mode !== 'Pay Later'
+            );
+
+            return hasImmediatePayment && Number(form.get('paid')?.value) <= 0
+                ? { paidAmountRequiredForPayment: true }
+                : null;
+        };
+    }
+
+    invoicePaymentTotalsValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const form = control as FormGroup;
+            const total = Number(this.invoiceData.total);
+            const discount = Number(form.get('discount')?.value ?? 0);
+            const paid = Number(form.get('paid')?.value ?? 0);
+            const payableAmount = total - discount;
+            const paymentModes = [
+                form.get('payment_mode1')?.value,
+                form.get('payment_mode2')?.value,
+            ].filter((paymentMode) => paymentMode?.mode);
+            const paymentTotal = paymentModes.reduce(
+                (sum, paymentMode) => sum + Number(paymentMode.price ?? 0),
+                0
+            );
+            const errors: ValidationErrors = {};
+
+            if (discount < 0 || discount > total) {
+                errors['discountInvalid'] = true;
+            }
+            if (paid > payableAmount) {
+                errors['paidExceedsTotal'] = true;
+            }
+            if (
+                !form.get('already_paid')?.value &&
+                paymentModes.length &&
+                Math.abs(paymentTotal - paid) >= 0.01
+            ) {
+                errors['paymentAmountMismatch'] = true;
+            }
+
+            return Object.keys(errors).length ? errors : null;
         };
     }
 
     onChangePaymentMode(e) {
-        if (e.value == 'Cheque') {
+        if (e.value == 'Pay Later') {
+            this.paid.setValue(0);
+            this.payment_mode1.patchValue({ price: 0 });
+            this.calculateInvoice();
+            this.showChequeButton = false;
+        } else if (e.value == 'Cheque') {
             this.showChequeButton = true;
             this.openChequeDialog();
         } else {
@@ -540,6 +603,7 @@ export class InvoiceComponent implements OnInit {
             }
         });
     }
+
     saveAndPreview() {
         console.log(this.invoiceData);
 
@@ -571,6 +635,12 @@ export class InvoiceComponent implements OnInit {
     }
 
     saveInvoice() {
+        if (this.invoiceData.total <= 0) {
+            this.message = 'Invoice total must be greater than 0.';
+            this.visible = true;
+            return;
+        }
+
         let invoiceDatum = {
             appointment: this.appointmenData?._id,
             patient: this.appointmenData?.patient?._id,
