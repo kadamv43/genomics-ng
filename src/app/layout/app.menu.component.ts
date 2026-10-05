@@ -89,6 +89,56 @@ export class AppMenuComponent implements OnInit {
                             routerLink: ['invoices'],
                         },
                     ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Blogs',
+                            icon: 'pi pi-fw pi-pencil',
+                            routerLink: ['blogs'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Banners',
+                            icon: 'pi pi-fw pi-image',
+                            routerLink: ['banners'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Gallery',
+                            icon: 'pi pi-fw pi-images',
+                            routerLink: ['gallery'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Contact Details',
+                            icon: 'pi pi-fw pi-phone',
+                            routerLink: ['contact-details'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Action Logs',
+                            icon: 'pi pi-fw pi-history',
+                            routerLink: ['action-logs'],
+                        },
+                    ],
                 }
             );
         } else if (this.role == 'staff') {
@@ -120,6 +170,46 @@ export class AppMenuComponent implements OnInit {
                             label: 'Invoices',
                             icon: 'pi pi-fw pi-file',
                             routerLink: ['invoices'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Blogs',
+                            icon: 'pi pi-fw pi-pencil',
+                            routerLink: ['blogs'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Banners',
+                            icon: 'pi pi-fw pi-image',
+                            routerLink: ['banners'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Gallery',
+                            icon: 'pi pi-fw pi-images',
+                            routerLink: ['gallery'],
+                        },
+                    ],
+                },
+                {
+                    label: '',
+                    items: [
+                        {
+                            label: 'Contact Details',
+                            icon: 'pi pi-fw pi-phone',
+                            routerLink: ['contact-details'],
                         },
                     ],
                 }

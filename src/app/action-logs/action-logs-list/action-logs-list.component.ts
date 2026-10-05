@@ -1,247 +1,166 @@
-import { Component, OnInit } from '@angular/core';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { AppointmentService } from 'src/app/services/appointment/appointment.service';
-import { AuthService } from 'src/app/services/auth.service';
-import * as FileSaver from 'file-saver';
-import { CommonService } from 'src/app/services/common/common.service';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActionLogsService } from 'src/app/services/action-logs/action-logs.service';
+import { CommonService } from 'src/app/services/common/common.service';
 
 @Component({
     selector: 'app-action-logs-list',
     templateUrl: './action-logs-list.component.html',
     styleUrl: './action-logs-list.component.scss',
-    providers: [ConfirmationService, MessageService, DialogService, DatePipe],
+    providers: [DatePipe],
 })
 export class ActionLogsListComponent {
     private searchSubject: Subject<string> = new Subject();
 
-    statusList = [
-        { name: 'Select Status', code: null },
-        { name: 'Created', code: 'Created' },
-        { name: 'Ongoing', code: 'Ongoing' },
-        { name: 'Completed', code: 'Completed' },
-        { name: 'Cancelled', code: 'Cancelled' },
+    moduleList = [
+        { name: 'All Modules', code: null },
+        { name: 'Auth (Login)', code: 'auth' },
+        { name: 'Appointments', code: 'appointments' },
+        { name: 'Invoices', code: 'invoice' },
+        { name: 'Patients', code: 'patients' },
+        { name: 'Staff / Users', code: 'users' },
+        { name: 'Doctors', code: 'doctors' },
+        { name: 'Services', code: 'products' },
+        { name: 'Blogs', code: 'blogs' },
+        { name: 'Banners', code: 'banners' },
+        { name: 'Gallery', code: 'gallery' },
+        { name: 'Gallery Images', code: 'gallery-images' },
+        { name: 'Contact Details', code: 'contact-details' },
+        { name: 'App Config', code: 'app-config' },
     ];
 
-    display = false;
-    selectedStatus = '';
-    selectedDoctor = '';
-    selectedDate = [];
+    actionList = [
+        { name: 'All Actions', code: null },
+        { name: 'Created', code: 'CREATE' },
+        { name: 'Updated', code: 'UPDATE' },
+        { name: 'Deleted', code: 'DELETE' },
+        { name: 'Login', code: 'LOGIN' },
+        { name: 'Failed Login', code: 'LOGIN_FAILED' },
+    ];
+
+    roleList = [
+        { name: 'All Roles', code: null },
+        { name: 'Admin', code: 'admin' },
+        { name: 'Staff', code: 'staff' },
+        { name: 'Doctor', code: 'doctor' },
+    ];
+
     searchText = '';
-    doctors: any = [];
+    selectedModule: string | null = null;
+    selectedAction: string | null = null;
+    selectedRole: string | null = null;
+    selectedDate: Date[] = [];
 
-    statuses: any[] = [];
-
-    rowGroupMetadata: any;
-
-    activityValues: number[] = [0, 100];
-
-    isExpanded: boolean = false;
-
-    idFrozen: boolean = false;
-
-    loading: boolean = false;
-
-    appointments: any = [];
-
-    role = '';
-
-    minDate;
-
+    logs: any[] = [];
     totalRecords = 0;
+    loading = false;
+    lastEvent: any = { first: 0, rows: 10 };
 
-    ref: DynamicDialogRef | undefined;
-
-    queryParams = {};
+    detailVisible = false;
+    selectedLog: any = null;
 
     constructor(
-        private appointmentService: AppointmentService,
-        private authService: AuthService,
+        private actionLogsService: ActionLogsService,
         private commonService: CommonService,
-        private dialogService: DialogService,
-        private datePipe: DatePipe,
-        private route: ActivatedRoute
+        private datePipe: DatePipe
     ) {
         this.searchSubject
             .pipe(debounceTime(400), distinctUntilChanged())
             .subscribe((value) => {
                 this.searchText = value;
-                this.queryParams['search'] = this.searchText;
-                let data = { first: 0, rows: 10 };
-                this.loadAppointments(data);
+                this.reload();
             });
     }
 
-    onStatusChange(value: string) {
-        this.selectedStatus = value;
-        this.queryParams['status'] = value;
-        let data = { first: 0, rows: 10 };
-        this.loadAppointments(data);
+    onSearch(value: string) {
+        this.searchSubject.next(value);
     }
 
-    onDoctorChange(value: string) {
-        this.selectedDoctor = value;
-        this.queryParams['doctor'] = value;
-        let data = { first: 0, rows: 10 };
-        this.loadAppointments(data);
+    reload() {
+        this.loadLogs({ first: 0, rows: this.lastEvent.rows ?? 10 });
     }
 
-    onDateChange(value: any) {
-        this.selectedDate = value;
+    clear() {
+        this.searchText = '';
+        this.selectedModule = null;
+        this.selectedAction = null;
+        this.selectedRole = null;
+        this.selectedDate = [];
+        this.reload();
+    }
 
-        if (this.selectedDate[0]) {
-            this.queryParams['from'] = this.datePipe.transform(
+    loadLogs(event: any) {
+        this.lastEvent = event;
+
+        const params: any = {
+            page: event.first / event.rows,
+            size: event.rows,
+        };
+        if (this.searchText) params.q = this.searchText;
+        if (this.selectedModule) params.module = this.selectedModule;
+        if (this.selectedAction) params.action = this.selectedAction;
+        if (this.selectedRole) params.role = this.selectedRole;
+        if (this.selectedDate?.[0]) {
+            params.from = this.datePipe.transform(
                 this.selectedDate[0],
                 'yyyy-MM-dd'
             );
-        }
-
-        if (this.selectedDate[1]) {
-            this.queryParams['to'] = this.datePipe.transform(
-                this.selectedDate[1],
+            params.to = this.datePipe.transform(
+                this.selectedDate[1] ?? this.selectedDate[0],
                 'yyyy-MM-dd'
             );
         }
 
-        let data = { first: 0, rows: 10 };
-        this.loadAppointments(data);
-    }
-
-    selectTodaysDate() {
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        this.selectedDate = [yesterday, today];
-
-        if (this.selectedDate[0]) {
-            this.queryParams['from'] = this.datePipe.transform(
-                this.selectedDate[0],
-                'yyyy-MM-dd'
-            );
-        }
-
-        if (this.selectedDate[1]) {
-            this.queryParams['to'] = this.datePipe.transform(
-                this.selectedDate[1],
-                'yyyy-MM-dd'
-            );
-        }
-    }
-
-    ngOnInit() {
-        this.route.queryParams.subscribe((data) => {
-            this.selectTodaysDate();
-            this.searchText = data['search'] ?? '';
-            this.selectedStatus = data['status'] ?? '';
-            if (data['from'] && data['to']) {
-                this.selectedDate[0] = new Date(data['from']);
-                this.selectedDate[1] = new Date(data['to']);
-            }
-            if (data['from'] && !data['to']) {
-                this.selectedDate[1] = null;
-                this.selectedDate[0] = new Date(data['from']);
-            }
-
-            this.queryParams = { ...data };
-        });
-        this.role = this.authService.getRole();
-    }
-
-    loadAppointments(event: any) {
         this.loading = true;
 
-        const page = event.first / event.rows;
-        const size = event.rows;
-
-        let params = {};
-
-        if (this.searchText != '') {
-            params['q'] = this.searchText;
-        }
-
-        if (this.selectedStatus) {
-            params['status'] = this.selectedStatus;
-        }
-
-        if (this.selectedDoctor) {
-            params['doctor'] = this.selectedDoctor;
-        }
-
-        if (this.selectedDate && this.selectedDate[0]) {
-            params['from'] = this.datePipe.transform(
-                this.selectedDate[0],
-                'yyyy-MM-dd'
-            );
-        }
-
-        if (this.selectedDate && this.selectedDate[1]) {
-            params['to'] = this.datePipe.transform(
-                this.selectedDate[1],
-                'yyyy-MM-dd'
-            );
-        }
-
-        params['page'] = page;
-        params['size'] = size;
-
-        let queryParams = this.commonService.getHttpParamsByJson(params);
-        this.appointmentService.getAll(queryParams).subscribe((data: any) => {
-            this.appointments = data.data;
-            this.totalRecords = data.total;
-            this.loading = false;
-        });
-    }
-
-    onSearchName(value: any) {
-        this.searchSubject.next(value); // Push the value into the subject
-    }
-
-    async clear(event) {
-        this.selectedStatus = '';
-        this.searchText = '';
-        this.selectedDoctor = '';
-        let data = { first: 0, rows: 10 };
-        this.loadAppointments(data);
-    }
-
-    exportExcel() {
-        const doctors = this.appointments.map((item) => {
-            return {
-                appointment_number: item.appointment_number,
-                first_name: item.patient.first_name,
-                last_name: item.patient.last_name,
-                mobile: item.patient.mobile,
-                status: item.status,
-                email: item.patient.email,
-            };
-        });
-        import('xlsx').then((xlsx) => {
-            const worksheet = xlsx.utils.json_to_sheet(doctors);
-            const workbook = {
-                Sheets: { data: worksheet },
-                SheetNames: ['data'],
-            };
-            const excelBuffer: any = xlsx.write(workbook, {
-                bookType: 'xlsx',
-                type: 'array',
+        this.actionLogsService
+            .getAll(this.commonService.getHttpParamsByJson(params))
+            .subscribe({
+                next: (res: any) => {
+                    this.logs = res?.data ?? [];
+                    this.totalRecords = res?.total ?? 0;
+                    this.loading = false;
+                },
+                error: () => {
+                    this.logs = [];
+                    this.totalRecords = 0;
+                    this.loading = false;
+                },
             });
-            this.saveAsExcelFile(excelBuffer, 'appointments');
-        });
     }
 
-    saveAsExcelFile(buffer: any, fileName: string): void {
-        let EXCEL_TYPE =
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-        let EXCEL_EXTENSION = '.xlsx';
-        const data: Blob = new Blob([buffer], {
-            type: EXCEL_TYPE,
-        });
-        FileSaver.saveAs(
-            data,
-            fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
-        );
+    viewDetails(log: any) {
+        this.selectedLog = log;
+        this.detailVisible = true;
+    }
+
+    actionLabel(action: string) {
+        return this.actionList.find((a) => a.code === action)?.name ?? action;
+    }
+
+    actionSeverity(action: string) {
+        switch (action) {
+            case 'CREATE':
+                return 'success';
+            case 'UPDATE':
+                return 'info';
+            case 'DELETE':
+                return 'danger';
+            case 'LOGIN_FAILED':
+                return 'warning';
+            default:
+                return 'secondary';
+        }
+    }
+
+    moduleLabel(code: string) {
+        return this.moduleList.find((m) => m.code === code)?.name ?? code;
+    }
+
+    formatValue(value: any): string {
+        if (value === null || value === undefined) return '—';
+        if (typeof value === 'object') return JSON.stringify(value);
+        return String(value);
     }
 }
