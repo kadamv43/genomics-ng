@@ -4,8 +4,8 @@
 
 export const environment = {
     production: false,
-    baseUrl: 'https://stageapi.genomicsivfcentre.com/',
-    uploadPath: 'https://stageapi.genomicsivfcentre.com/uploads/',
+    baseUrl: 'https://ivf.genomicsivfcentre.com/',
+    uploadPath: 'https://ivf.genomicsivfcentre.com/uploads/',
 };
 
 /*
