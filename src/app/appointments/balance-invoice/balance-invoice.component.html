@@ -189,6 +189,11 @@
                     </div>
                     <div class="col-3">
                         <input pInputText id="firstname2" type="text" formControlName="discount" />
+                        <small class="p-error block" *ngIf="
+                                invoiceForm.hasError('discountInvalid') &&
+                                (discount.dirty || discount.touched)
+                            ">
+                            Discount cannot be greater than the pending balance</small>
                     </div>
                 </div>
 
@@ -238,6 +243,19 @@
                     </div>
                     <div class="col-4">
                         <input class="w-full" pInputText type="text" formControlName="price" />
+                        <small class="p-error block" *ngIf="
+                                payment_mode1.get('price').hasError('pendingAmountMismatch') &&
+                                (payment_mode1.get('price').dirty ||
+                                    payment_mode1.get('price').touched)
+                            ">
+                            Enter the exact pending amount ({{ pendingPaymentAmount | currency : "INR" }}) to continue,
+                            or select Partial Payment.</small>
+                        <small class="p-error block" *ngIf="
+                                invoiceForm.hasError('paymentSplitMismatch') &&
+                                (payment_mode1.get('price').dirty ||
+                                    payment_mode1.get('price').touched)
+                            ">
+                            Payment method amounts must equal {{ pendingPaymentAmount | currency : "INR" }}</small>
                     </div>
                 </div>
                 <div *ngIf="showPayment2" [formGroup]="payment_mode2" class="grid mt-2">

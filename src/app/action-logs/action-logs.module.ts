@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { ActionLogsRoutingModule } from './action-logs-routing.module';
 import { ActionLogsListComponent } from './action-logs-list/action-logs-list.component';
@@ -19,11 +20,16 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { CalendarModule } from 'primeng/calendar';
+import { TagModule } from 'primeng/tag';
 
 @NgModule({
     declarations: [ActionLogsListComponent],
     imports: [
         CommonModule,
+        FormsModule,
+        CalendarModule,
+        TagModule,
         TableModule,
         ToolbarModule,
         ButtonModule,
